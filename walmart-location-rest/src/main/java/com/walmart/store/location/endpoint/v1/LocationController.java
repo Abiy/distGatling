@@ -20,7 +20,7 @@ public class LocationController {
 
     @RequestMapping("/home")
     @ResponseBody
-    Map home() {
+    public Map home() {
         log.info("Got other request");
 
         return ImmutableMap.of(
