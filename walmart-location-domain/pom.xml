@@ -5,11 +5,18 @@
     <parent>
         <artifactId>walmart-location-service</artifactId>
         <groupId>com.walmart.store</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${wm.loc.ver}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>walmart-location-domain</artifactId>
 
-
+    <dependencies>
+       	<dependency>
+         	<groupId>com.walmart.store</groupId>
+           	<artifactId>walmart-location-data</artifactId>
+           	<version>${wm.loc.ver}</version>
+       	</dependency>
+	</dependencies>
+	
 </project>

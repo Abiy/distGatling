@@ -1,35 +1,41 @@
 package com.walmart.store.location.endpoint.v1;
 
-import java.util.Map;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ImmutableMap;
+import com.walmart.store.location.domain.LocationService;
+import com.walmart.store.location.model.Location;
 
 /**
  * Created by ahailem on 11/2/15.
  */
 @Component
-@Path("/home")
+@Path("/location")
 public class LocationController {
 
     private final Logger log = LoggerFactory.getLogger(LocationController.class);
 
+    private LocationService locSvc;
+    
+    @Autowired
+    public LocationController(LocationService locSvc) {
+    	this.locSvc = locSvc;
+    }
+    
     @GET
+    @Path("{id}")
     @Produces("application/json")
-    public Map<String, Object> home() {
-        log.info("Processing home request.");
+    public Location getLocation(@PathParam("id") long id) {
+        log.info("Processing location get request.");
 
-        return ImmutableMap.of(
-       		"name", "someName",
-                "age", 27
-        );
+        return locSvc.getLocation(id);    
     }
 
 }
