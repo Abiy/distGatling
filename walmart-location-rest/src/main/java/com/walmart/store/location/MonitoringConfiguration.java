@@ -39,7 +39,7 @@ public class MonitoringConfiguration {
                         .convertDurationsTo(TimeUnit.MILLISECONDS)
                         .filter(MetricFilter.ALL)
                         .build(graphite);
-        reporter.start(1, TimeUnit.MINUTES);
+        reporter.start(10, TimeUnit.SECONDS);
 
         return reporter;
     }
