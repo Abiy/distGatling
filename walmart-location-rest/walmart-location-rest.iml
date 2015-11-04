@@ -11,6 +11,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="walmart-location-domain" />
+    <orderEntry type="module" module-name="walmart-location-data" />
+    <orderEntry type="module" module-name="walmart-location-model" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-web:1.2.7.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:1.2.7.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:1.2.7.RELEASE" level="project" />
@@ -88,5 +91,7 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.12" level="project" />
     <orderEntry type="library" name="Maven: io.dropwizard.metrics:metrics-graphite:3.1.2" level="project" />
     <orderEntry type="library" name="Maven: io.dropwizard.metrics:metrics-jvm:3.1.2" level="project" />
+    <orderEntry type="library" name="Maven: io.dropwizard.metrics:metrics-jersey2:3.1.2" level="project" />
+    <orderEntry type="library" name="Maven: io.dropwizard.metrics:metrics-annotation:3.1.2" level="project" />
   </component>
 </module>

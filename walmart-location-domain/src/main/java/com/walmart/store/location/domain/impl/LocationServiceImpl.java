@@ -1,11 +1,10 @@
 package com.walmart.store.location.domain.impl;
 
+import com.walmart.store.location.data.LocationRepository;
+import com.walmart.store.location.domain.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.walmart.store.location.data.LocationRepository;
-import com.walmart.store.location.domain.LocationService;
-import com.walmart.store.location.model.Location;
 
 @Service
 public class LocationServiceImpl implements LocationService {
@@ -18,7 +17,7 @@ public class LocationServiceImpl implements LocationService {
 	}
 	
 	@Override
-	public Location getLocation(long id) {
+	public com.walmart.store.location.model.Location getLocation(long id) {
 		return locRep.getLocation(id);
 	}
 	
