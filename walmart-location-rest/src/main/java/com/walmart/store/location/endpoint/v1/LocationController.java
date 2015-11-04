@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.codahale.metrics.annotation.Metric;
 import com.walmart.store.location.domain.LocationService;
 import com.walmart.store.location.model.Location;
 
@@ -32,6 +33,7 @@ public class LocationController {
     @GET
     @Path("{id}")
     @Produces("application/json")
+    @Metric
     public Location getLocation(@PathParam("id") long id) {
         log.info("Processing location get request.");
 
