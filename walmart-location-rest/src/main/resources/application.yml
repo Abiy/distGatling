@@ -1,6 +1,25 @@
 graphite:
+    host: localhost
+    port: 2003
 
 jersey:
     controller:
         packages: com.walmart
+
+logging.level.root: INFO
+logging.level.com.walmart: DEBUG
+
+---
+
+spring:
+    profiles: integration
+
+logging.level.com.walmart: INFO
+    
+---
+
+spring:
+    profiles: production
+
+logging.level.com.walmart: INFO
 
