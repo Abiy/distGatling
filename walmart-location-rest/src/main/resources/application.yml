@@ -12,6 +12,11 @@ logging.level.com.walmart: DEBUG
 ---
 
 spring:
+    profiles: testing
+    
+---
+
+spring:
     profiles: integration
 
 logging.level.com.walmart: INFO
