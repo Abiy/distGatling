@@ -31,10 +31,12 @@ public class MonitoringConfiguration {
 
     @Bean
     public GraphiteReporter graphiteReporter(Graphite graphite,
-                                             MetricRegistry registry) {
+                                             MetricRegistry registry,
+                                             @Value("${graphite.prefix}")
+    										 String prefix) {
         GraphiteReporter reporter =
                 GraphiteReporter.forRegistry(registry)
-                        .prefixedWith("location")
+                        .prefixedWith(prefix)
                         .convertRatesTo(TimeUnit.SECONDS)
                         .convertDurationsTo(TimeUnit.MILLISECONDS)
                         .filter(MetricFilter.ALL)
