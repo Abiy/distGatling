@@ -1,3 +1,6 @@
 graphite:
-    host: 192.168.99.100
-    port: 2003
+
+jersey:
+    controller:
+        packages: com.walmart
+
