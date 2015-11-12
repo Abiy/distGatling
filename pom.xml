@@ -47,8 +47,28 @@
             <artifactId>metrics-jersey2</artifactId>
             <version>3.1.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <version>1.11.0.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jhades</groupId>
+            <artifactId>jhades</artifactId>
+            <version>1.0.4</version>
+        </dependency>
     </dependencies>
-    
+   <!-- <repositories>
+        <repository>
+            <id>neo4j</id>
+            <url>http://m2.neo4j.org/content/repositories/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>-->
     <build>
         <plugins>
 			<plugin>
