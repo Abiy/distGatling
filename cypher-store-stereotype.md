@@ -1,13 +1,11 @@
 
-MATCH (n1:DcStereotype) DETACH DELETE n1
+MATCH (n1:StoreStereotype) DETACH DELETE n1
+MATCH (n:StoreTypeStereotype) DETACH DELETE n
+MATCH (n:StoreAisleStereotype) DETACH DELETE n
+MATCH (n:StoreRackStereotype) DETACH DELETE n
+MATCH (n:StoreSlotStereotype) DETACH DELETE n
 
-MATCH (n:DcZoneStereotype) DETACH DELETE n
-
-MATCH (n:DcDepartmentStereotype) DETACH DELETE n
-MATCH (n:DcIsleStereotype) DETACH DELETE n
-MATCH (n:DcSectionStereotype) DETACH DELETE n
-
-CREATE (n1:DcStereotype { entity:'DcNode', template:  '[  {
+CREATE (n1:StoreStereotype { entity:'StoreNode', template:  '[  {
                                           "version":"1.0",
                                           "attributes":[
                                         {
@@ -16,11 +14,7 @@ CREATE (n1:DcStereotype { entity:'DcNode', template:  '[  {
                                            "name":"type",
                                            "required":true,
                                            "expression":"eval.contains(m,v)",
-                                           "Stereotype":[
-                                                     "DC",
-                                                     "STORE",
-                                                     "CLUB"
-                                                   ],
+                                           "metaData":["STORE"],
                                            "defaultValue":"STORE"
                                          },
                                          {
@@ -28,14 +22,14 @@ CREATE (n1:DcStereotype { entity:'DcNode', template:  '[  {
                                            "type":"String",
                                            "name":"nodeId",
                                            "required":true,
-                                           "expression":"(v.length()== 15)",
-                                           "Stereotype":null,
+                                           "expression":"(v.length()== 36)",
+                                           "metaData":null,
                                            "defaultValue":null
                                          }
                                          ]
                                          }]'}),
 
- (n2:DcZoneStereotype { entity:'DcZone', template:  '[  {
+ (n2:StoreTypeStereotype { entity:'StoreType', template:  '[  {
                                           "version":"1.0",
                                           "attributes":[
                                         {
@@ -44,72 +38,43 @@ CREATE (n1:DcStereotype { entity:'DcNode', template:  '[  {
                                            "name":"type",
                                            "required":true,
                                            "expression":"eval.contains(m,v)",
-                                           "Stereotype":[
-                                                     "ZONE1",
-                                                     "ZONE2",
-                                                     "ZONE3"
+                                           "metaData":[
+                                                     "TYPE1",
+                                                     "TYPE2",
+                                                     "TYPE3"
                                                    ],
                                            "defaultValue":"ZONE1"
                                          },
                                          {
                                            "validationType":"Expression",
                                            "type":"String",
-                                           "name":"zoneId",
+                                           "name":"typeId",
                                            "required":true,
                                            "expression":"(v.length()== 36)",
-                                           "Stereotype":null,
+                                           "metaData":null,
                                            "defaultValue":null
                                          }
                                          ]
                                          }]'}),
- (n2)-[:BELONGS_TO]->(n1),
-
- (n3:DcDepartmentStereotype { entity:'DcDepartment', template:  '[  {
-                                          "version":"1.0",
-                                          "attributes":[
-                                        {
-                                           "validationType":"Expression",
-                                           "type":"String",
-                                           "name":"name",
-                                           "required":true,
-                                           "expression":"eval.contains(m,v)",
-                                           "Stereotype":[
-                                                     "PHARMACY",
-                                                     "PRODUCE",
-                                                     "TIRE"
-                                                   ],
-                                           "defaultValue":"PRODUCE"
-                                         },
-                                         {
-                                           "validationType":"Expression",
-                                           "type":"String",
-                                           "name":"departmentId",
-                                           "required":true,
-                                           "expression":"(v.length()== 36)",
-                                           "Stereotype":null,
-                                           "defaultValue":null
-                                         }
-                                         ]
-                                         }]'}),
- (n3)-[:BELONGS_TO]->(n1)
+ (n2)-[:BELONGS_TO]->(n1)
 
 //Create the index to enforce only one instance of the meta data exists at a time
-CREATE CONSTRAINT ON (n:DcStereotype) ASSERT exists(n.entity)
-CREATE CONSTRAINT ON (n:DcZoneStereotype) ASSERT exists(n.entity)
-CREATE CONSTRAINT ON (n:DcDepartmentStereotype) ASSERT exists(n.entity)
-CREATE CONSTRAINT ON (n:DcIsleStereotype) ASSERT exists(n.entity)
-CREATE CONSTRAINT ON (n:DcSectionStereotype) ASSERT exists(n.entity)
+CREATE CONSTRAINT ON (n:StoreStereotype) ASSERT exists(n.entity)
+CREATE CONSTRAINT ON (n:StoreTypeStereotype) ASSERT exists(n.entity)
+CREATE CONSTRAINT ON (n:StoreAisleStereotype) ASSERT exists(n.entity)
+CREATE CONSTRAINT ON (n:StoreRackStereotype) ASSERT exists(n.entity)
+CREATE CONSTRAINT ON (n:StoreSlotStereotype) ASSERT exists(n.entity)
 
-CREATE CONSTRAINT ON (n1:DcStereotype) ASSERT n1.entity IS UNIQUE
-CREATE CONSTRAINT ON (n2:DcZoneStereotype) ASSERT n2.entity IS UNIQUE
-CREATE CONSTRAINT ON (n2:DcDepartmentStereotype) ASSERT n2.entity IS UNIQUE
-CREATE CONSTRAINT ON (n2:DcIsleStereotype) ASSERT n2.entity IS UNIQUE
-CREATE CONSTRAINT ON (n2:DcSectionStereotype) ASSERT n2.entity IS UNIQUE
+CREATE CONSTRAINT ON (n1:StoreStereotype) ASSERT n1.entity IS UNIQUE
+CREATE CONSTRAINT ON (n2:StoreTypeStereotype) ASSERT n2.entity IS UNIQUE
+CREATE CONSTRAINT ON (n2:StoreAisleStereotype) ASSERT n2.entity IS UNIQUE
+CREATE CONSTRAINT ON (n2:StoreRackStereotype) ASSERT n2.entity IS UNIQUE
+CREATE CONSTRAINT ON (n2:StoreSlotStereotype) ASSERT n2.entity IS UNIQUE
 
-//Zone childs
-MATCH (z:DcZoneStereotype)
-WITH z
-CREATE (n1:DcIsleStereotype { entity:'DcIsel', template:  '[  {
+//Type childs
+MATCH (type:StoreTypeStereotype)
+WITH type
+CREATE (aisle:StoreAisleStereotype { entity:'StoreAisle', template:  '[  {
                                           "version":"1.0",
                                           "attributes":[
                                         {
@@ -118,22 +83,22 @@ CREATE (n1:DcIsleStereotype { entity:'DcIsel', template:  '[  {
                                            "name":"type",
                                            "required":true,
                                            "expression":"(v.length()>= 15)",
-                                           "Stereotype":null,
+                                           "metaData":null,
                                            "defaultValue":null
                                          },
                                          {
                                            "validationType":"Expression",
                                            "type":"String",
-                                           "name":"isleId",
+                                           "name":"aisleId",
                                            "required":true,
-                                           "expression":"(v.length()== 15)",
-                                           "Stereotype":null,
+                                           "expression":"(v.length()== 36)",
+                                           "metaData":null,
                                            "defaultValue":null
                                          }
                                          ]
                                          }]'}),
-(n1)-[:BELONGS_TO]->(z),
-(s1:DcSectionStereotype { entity:'DcSection', template:  '[  {
+(aisle)-[:BELONGS_TO]->(type),
+(rack:StoreRackStereotype { entity:'StoreRack', template:  '[  {
                                           "version":"1.0",
                                           "attributes":[
                                         {
@@ -142,22 +107,46 @@ CREATE (n1:DcIsleStereotype { entity:'DcIsel', template:  '[  {
                                            "name":"type",
                                            "required":true,
                                            "expression":"(v.length()>= 15)",
-                                           "Stereotype":null,
+                                           "metaData":null,
                                            "defaultValue":null
                                          },
                                          {
                                            "validationType":"Expression",
                                            "type":"String",
-                                           "name":"sectionId",
+                                           "name":"rackId",
                                            "required":true,
-                                           "expression":"(v.length()== 15)",
-                                           "Stereotype":null,
+                                           "expression":"(v.length()== 36)",
+                                           "metaData":null,
                                            "defaultValue":null
                                          }
                                          ]
                                          }]'}),
-(s1)-[:BELONGS_TO]->(n1),
-(l1:DcLocationStereotype { entity:'DcLocation', template:  '[  {
+(rack)-[:BELONGS_TO]->(aisle),
+(slot:StoreSlotStereotype { entity:'StoreSlot', template:  '[  {
+                                          "version":"1.0",
+                                          "attributes":[
+                                        {
+                                           "validationType":"Expression",
+                                           "type":"String",
+                                           "name":"type",
+                                           "required":true,
+                                           "expression":"(v.length()>= 15)",
+                                           "metaData":null,
+                                           "defaultValue":null
+                                         },
+                                         {
+                                           "validationType":"Expression",
+                                           "type":"String",
+                                           "name":"slotId",
+                                           "required":true,
+                                           "expression":"(v.length()== 15)",
+                                           "metaData":null,
+                                           "defaultValue":null
+                                         }
+                                         ]
+                                         }]'}),
+(slot)-[:BELONGS_TO]->(rack),
+(l1:StoreLocationStereotype { entity:'StoreLocation', template:  '[  {
                                         "version":"1.0",
                                         "attributes":[
                                       {
@@ -166,7 +155,7 @@ CREATE (n1:DcIsleStereotype { entity:'DcIsel', template:  '[  {
                                          "name":"type",
                                          "required":true,
                                          "expression":"(v.length()>= 15)",
-                                         "Stereotype":null,
+                                         "metaData":null,
                                          "defaultValue":null
                                        },
                                        {
@@ -175,12 +164,12 @@ CREATE (n1:DcIsleStereotype { entity:'DcIsel', template:  '[  {
                                          "name":"locationId",
                                          "required":true,
                                          "expression":"(v.length()== 15)",
-                                         "Stereotype":null,
+                                         "metaData":null,
                                          "defaultValue":null
                                        }
                                        ]
                                        }]'}),
-(l1)-[:BELONGS_TO]->(s1)
+(l1)-[:BELONGS_TO]->(slot)
 
 
 
