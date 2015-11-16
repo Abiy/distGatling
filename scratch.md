@@ -9,7 +9,8 @@ graph in a consistent and valid state
     Specifications for how nodes are inter-connected
 
 In neo4j relationships are unidirectional, a cardinality of a relationship defines the minimum and maximum outgoing instance of the same relationship.
-Example:<return> f
+Example:
+
     Given  BELONGS_TO relationship between a rack and an aisle
     Can the rack exist
         Without a BELONGS_TO relation to an aisle? This is dictated by minCardinality.
