@@ -4,6 +4,7 @@ MATCH (n:StoreTypeStereotype) DETACH DELETE n
 MATCH (n:StoreAisleStereotype) DETACH DELETE n
 MATCH (n:StoreRackStereotype) DETACH DELETE n
 MATCH (n:StoreSlotStereotype) DETACH DELETE n
+MATCH (n:StoreDepartmentStereotype) DETACH DELETE n
 
 CREATE (n1:StoreStereotype { entity:'StoreNode', template:  '[  {
                                           "version":"1.0",
@@ -15,7 +16,7 @@ CREATE (n1:StoreStereotype { entity:'StoreNode', template:  '[  {
                                            "required":true,
                                            "expression":"eval.contains(m,v)",
                                            "metaData":["STORE"],
-                                           "defaultValue":"STORE"
+                                           "desc":"validation message", "defaultValue":"STORE"
                                          },
                                          {
                                            "validationType":"Expression",
@@ -24,7 +25,7 @@ CREATE (n1:StoreStereotype { entity:'StoreNode', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()== 36)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          }
                                          ]
                                          }]'}),
@@ -43,7 +44,7 @@ CREATE (n1:StoreStereotype { entity:'StoreNode', template:  '[  {
                                                      "TYPE2",
                                                      "TYPE3"
                                                    ],
-                                           "defaultValue":"ZONE1"
+                                           "desc":"validation message", "defaultValue":"ZONE1"
                                          },
                                          {
                                            "validationType":"Expression",
@@ -52,11 +53,11 @@ CREATE (n1:StoreStereotype { entity:'StoreNode', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()== 36)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          }
                                          ]
                                          }]'}),
- (n2)-[:BELONGS_TO]->(n1)
+ (n2)-[:BELONGS_TO_STEREOTYPE{minCardinality:"1",maxCardinality:"*"}]->(n1)
 
 //Create the index to enforce only one instance of the meta data exists at a time
 CREATE CONSTRAINT ON (n:StoreStereotype) ASSERT exists(n.entity)
@@ -84,7 +85,7 @@ CREATE (aisle:StoreAisleStereotype { entity:'StoreAisle', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()>= 15)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          },
                                          {
                                            "validationType":"Expression",
@@ -93,11 +94,11 @@ CREATE (aisle:StoreAisleStereotype { entity:'StoreAisle', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()== 36)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          }
                                          ]
                                          }]'}),
-(aisle)-[:BELONGS_TO]->(type),
+(aisle)-[:BELONGS_TO_STEREOTYPE{minCardinality:"1",maxCardinality:"1"}]->(type),
 (rack:StoreRackStereotype { entity:'StoreRack', template:  '[  {
                                           "version":"1.0",
                                           "attributes":[
@@ -108,7 +109,7 @@ CREATE (aisle:StoreAisleStereotype { entity:'StoreAisle', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()>= 15)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          },
                                          {
                                            "validationType":"Expression",
@@ -117,11 +118,11 @@ CREATE (aisle:StoreAisleStereotype { entity:'StoreAisle', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()== 36)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          }
                                          ]
                                          }]'}),
-(rack)-[:BELONGS_TO]->(aisle),
+(rack)-[:BELONGS_TO_STEREOTYPE{minCardinality:"1",maxCardinality:"1"}]->(aisle),
 (slot:StoreSlotStereotype { entity:'StoreSlot', template:  '[  {
                                           "version":"1.0",
                                           "attributes":[
@@ -132,7 +133,7 @@ CREATE (aisle:StoreAisleStereotype { entity:'StoreAisle', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()>= 15)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          },
                                          {
                                            "validationType":"Expression",
@@ -141,11 +142,11 @@ CREATE (aisle:StoreAisleStereotype { entity:'StoreAisle', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()== 15)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          }
                                          ]
                                          }]'}),
-(slot)-[:BELONGS_TO]->(rack),
+(slot)-[:BELONGS_TO_STEREOTYPE{minCardinality:"1",maxCardinality:"1"}]->(rack),
 (l1:StoreLocationStereotype { entity:'StoreLocation', template:  '[  {
                                         "version":"1.0",
                                         "attributes":[
@@ -156,7 +157,7 @@ CREATE (aisle:StoreAisleStereotype { entity:'StoreAisle', template:  '[  {
                                          "required":true,
                                          "expression":"(v.length()>= 15)",
                                          "metaData":null,
-                                         "defaultValue":null
+                                         "desc":"validation message", "defaultValue":null
                                        },
                                        {
                                          "validationType":"Expression",
@@ -165,12 +166,41 @@ CREATE (aisle:StoreAisleStereotype { entity:'StoreAisle', template:  '[  {
                                          "required":true,
                                          "expression":"(v.length()== 15)",
                                          "metaData":null,
-                                         "defaultValue":null
+                                         "desc":"validation message", "defaultValue":null
                                        }
                                        ]
                                        }]'}),
-(l1)-[:BELONGS_TO]->(slot)
+(l1)-[:BELONGS_TO_STEREOTYPE{minCardinality:"1",maxCardinality:"1"}]->(slot)
 
+//Create department as a node
+MATCH (a:StoreAisleStereotype),(b:StoreRackStereotype),(c:StoreSlotStereotype)
+WITH a, b,c
+CREATE (dept:StoreDepartmentStereotype { entity:'StoreDepartment', template:  '[  {
+                                          "version":"1.0",
+                                          "attributes":[
+                                        {
+                                           "validationType":"Expression",
+                                           "type":"String",
+                                           "name":"name",
+                                           "required":true,
+                                           "expression":"eval.contains(m,v)",
+                                           "metaData":["PHARMACY","PRODUCE"],
+                                           "desc":"validation message", "defaultValue":"PRODUCE"
+                                         },
+                                         {
+                                           "validationType":"Expression",
+                                           "type":"String",
+                                           "name":"nodeId",
+                                           "required":true,
+                                           "expression":"(v.length()== 36)",
+                                           "metaData":null,
+                                           "desc":"validation message", "defaultValue":null
+                                         }
+                                         ]
+                                         }]'}),
+(a)-[:ASSIGNED_TO_STEREOTYPE{minCardinality:"0",maxCardinality:"1"}]->(dept),
+(b)-[:ASSIGNED_TO_STEREOTYPE{minCardinality:"0",maxCardinality:"1"}]->(dept),
+(c)-[:ASSIGNED_TO_STEREOTYPE{minCardinality:"0",maxCardinality:"1"}]->(dept)
 
 
 

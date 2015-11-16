@@ -7,24 +7,8 @@ MATCH (n:DcSectionStereotype) DETACH DELETE n
 CREATE (n1:DcStereotype { entity:'DcNode', template:  '[  {
                                           "version":"1.0",
                                           "attributes":[
-                                        {
-                                           "validationType":"Expression",
-                                           "type":"String",
-                                           "name":"type",
-                                           "required":true,
-                                           "expression":"eval.contains(m,v)",
-                                           "metaData":null,
-                                           "defaultValue":"STORE"
-                                         },
-                                         {
-                                           "validationType":"Expression",
-                                           "type":"String",
-                                           "name":"nodeId",
-                                           "required":true,
-                                           "expression":"(v.length()== 15)",
-                                           "metaData":null,
-                                           "defaultValue":null
-                                         }
+                                             {"validationType":"Expression","type":"String","name":"type","required":true,"expression":"eval.contains(m,v)","metaData":null,"desc":"validation message", "defaultValue":"STORE"},
+                                             {"validationType":"Expression","type":"String","name":"nodeId","required":true,"expression":"(v.length()== 15)","metaData":null,"desc":"validation message", "defaultValue":null}
                                          ]
                                          }]'}),
 
@@ -42,7 +26,7 @@ CREATE (n1:DcStereotype { entity:'DcNode', template:  '[  {
                                                      "ZONE2",
                                                      "ZONE3"
                                                    ],
-                                           "defaultValue":"ZONE1"
+                                           "desc":"validation message", "defaultValue":"ZONE1"
                                          },
                                          {
                                            "validationType":"Expression",
@@ -51,11 +35,11 @@ CREATE (n1:DcStereotype { entity:'DcNode', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()== 36)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          }
                                          ]
                                          }]'}),
- (n2)-[:BELONGS_TO]->(n1)
+ (n2)-[:BELONGS_TO_STEREOTYPE{minCardinality:"1",maxCardinality:"*"}]->(n1)
 
 //Create the index to enforce only one instance of the meta data exists at a time
 CREATE CONSTRAINT ON (n:DcStereotype) ASSERT exists(n.entity)
@@ -81,7 +65,7 @@ CREATE (n1:DcAisleStereotype { entity:'DcAisle', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()>= 15)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          },
                                          {
                                            "validationType":"Expression",
@@ -90,11 +74,11 @@ CREATE (n1:DcAisleStereotype { entity:'DcAisle', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()== 15)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          }
                                          ]
                                          }]'}),
-(n1)-[:BELONGS_TO]->(z),
+(n1)-[:BELONGS_TO_STEREOTYPE{minCardinality:"1",maxCardinality:"*"}]->(z),
 (s1:DcSectionStereotype { entity:'DcSection', template:  '[  {
                                           "version":"1.0",
                                           "attributes":[
@@ -105,7 +89,7 @@ CREATE (n1:DcAisleStereotype { entity:'DcAisle', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()>= 15)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          },
                                          {
                                            "validationType":"Expression",
@@ -114,11 +98,11 @@ CREATE (n1:DcAisleStereotype { entity:'DcAisle', template:  '[  {
                                            "required":true,
                                            "expression":"(v.length()== 15)",
                                            "metaData":null,
-                                           "defaultValue":null
+                                           "desc":"validation message", "defaultValue":null
                                          }
                                          ]
                                          }]'}),
-(s1)-[:BELONGS_TO]->(n1),
+(s1)-[:BELONGS_TO_STEREOTYPE{minCardinality:"1",maxCardinality:"*"}]->(n1),
 (l1:DcLocationStereotype { entity:'DcLocation', template:  '[  {
                                         "version":"1.0",
                                         "attributes":[
@@ -129,7 +113,7 @@ CREATE (n1:DcAisleStereotype { entity:'DcAisle', template:  '[  {
                                          "required":true,
                                          "expression":"(v.length()>= 15)",
                                          "metaData":null,
-                                         "defaultValue":null
+                                         "desc":"validation message", "defaultValue":null
                                        },
                                        {
                                          "validationType":"Expression",
@@ -138,11 +122,11 @@ CREATE (n1:DcAisleStereotype { entity:'DcAisle', template:  '[  {
                                          "required":true,
                                          "expression":"(v.length()== 15)",
                                          "metaData":null,
-                                         "defaultValue":null
+                                         "desc":"validation message", "defaultValue":null
                                        }
                                        ]
                                        }]'}),
-(l1)-[:BELONGS_TO]->(s1)
+(l1)-[:BELONGS_TO_STEREOTYPE{minCardinality:"1",maxCardinality:"*"}]->(s1)
 
 
 
