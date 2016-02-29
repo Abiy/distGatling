@@ -1,7 +1,7 @@
 graphite:
     host: localhost
     port: 2003
-    prefix: location
+    prefix: container
     frequency-in-seconds: 1
 
 jersey:

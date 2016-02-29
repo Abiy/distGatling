@@ -1,4 +1,4 @@
-package com.walmart.store.location;
+package com.walmart.store.container;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jersey2.InstrumentedResourceMethodApplicationListener;

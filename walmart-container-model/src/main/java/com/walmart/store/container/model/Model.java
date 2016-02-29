@@ -1,4 +1,4 @@
-package com.walmart.store.location.model;
+package com.walmart.store.container.model;
 
 import java.util.Map;
 

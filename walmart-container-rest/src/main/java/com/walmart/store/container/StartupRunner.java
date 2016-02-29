@@ -1,4 +1,4 @@
-package com.walmart.store.location;
+package com.walmart.store.container;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -1,8 +1,8 @@
-package com.walmart.store.location.endpoint.v1;
+package com.walmart.store.container.endpoint.v1;
 
-import com.walmart.store.location.AbstractRestIntTest;
-import com.walmart.store.location.data.entities.Entity;
-import com.walmart.store.location.domain.DomainService;
+import com.walmart.store.container.AbstractRestIntTest;
+import com.walmart.store.container.data.entities.Entity;
+import com.walmart.store.container.domain.DomainService;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.walmart.store.location.data.entities;
+package com.walmart.store.container.data.entities;
 
 /**
  * Model

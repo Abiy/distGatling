@@ -1,8 +1,8 @@
-package com.walmart.store.location.domain.impl;
+package com.walmart.store.container.domain.impl;
 
-import com.walmart.store.location.data.DataRepository;
-import com.walmart.store.location.data.entities.Entity;
-import com.walmart.store.location.domain.DomainService;
+import com.walmart.store.container.data.DataRepository;
+import com.walmart.store.container.data.entities.Entity;
+import com.walmart.store.container.domain.DomainService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

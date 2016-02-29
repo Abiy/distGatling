@@ -1,4 +1,4 @@
-package com.walmart.store.location;
+package com.walmart.store.container;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

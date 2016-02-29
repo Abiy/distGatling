@@ -1,7 +1,7 @@
-package com.walmart.store.location.data.impl;
+package com.walmart.store.container.data.impl;
 
-import com.walmart.store.location.data.DataRepository;
-import com.walmart.store.location.data.entities.Entity;
+import com.walmart.store.container.data.DataRepository;
+import com.walmart.store.container.data.entities.Entity;
 
 import org.springframework.stereotype.Repository;
 
