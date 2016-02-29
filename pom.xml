@@ -7,14 +7,14 @@
 		<wm.loc.ver>1.0-SNAPSHOT</wm.loc.ver>
 	</properties>
     <groupId>com.walmart.store</groupId>
-    <artifactId>walmart-location-service</artifactId>
+    <artifactId>walmart-container-service</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>walmart-location-model</module>
-        <module>walmart-location-data</module>
-        <module>walmart-location-domain</module>
-        <module>walmart-location-rest</module>
+        <module>walmart-container-model</module>
+        <module>walmart-container-data</module>
+        <module>walmart-container-domain</module>
+        <module>walmart-container-rest</module>
     </modules>
 
     <parent>
