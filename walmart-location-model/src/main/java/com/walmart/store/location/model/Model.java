@@ -2,17 +2,17 @@ package com.walmart.store.location.model;
 
 import java.util.Map;
 
-public class Location {
+public class Model {
 	private long id;
 	private String name;
 	private Map<String, Object> attributes;
 	
 	
-	public Location() {
+	public Model() {
 		//For Jackson
 	}
 	
-	public Location(long id, String name, Map<String, Object> attributes) {
+	public Model(long id, String name, Map<String, Object> attributes) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -55,7 +55,7 @@ public class Location {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Location other = (Location) obj;
+		Model other = (Model) obj;
 		if (id != other.id)
 			return false;
 		return true;
