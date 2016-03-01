@@ -1,0 +1,262 @@
+package com.walmart.gatling.commons;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import akka.actor.ActorInitializationException;
+import akka.actor.ActorRef;
+import akka.actor.Cancellable;
+import akka.actor.DeathPactException;
+import akka.actor.OneForOneStrategy;
+import akka.actor.Props;
+import akka.actor.ReceiveTimeout;
+import akka.actor.SupervisorStrategy;
+import akka.actor.Terminated;
+import akka.actor.UntypedActor;
+import akka.cluster.client.ClusterClient;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
+import akka.japi.Function;
+import akka.japi.Procedure;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
+import com.walmart.gatling.commons.Master.*;
+import static akka.actor.SupervisorStrategy.Directive;
+import static akka.actor.SupervisorStrategy.escalate;
+import static akka.actor.SupervisorStrategy.restart;
+import static akka.actor.SupervisorStrategy.stop;
+
+public class Worker extends UntypedActor {
+
+    private final ActorRef clusterClient;
+    private String workerRole;
+    private final String workerId = UUID.randomUUID().toString();
+    private final ActorRef workExecutor;
+    private final Cancellable registerTask;
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private String currentJobId = null;
+    private final Cancellable keepAliveTask;
+
+    private final Procedure<Object> working = new Procedure<Object>() {
+        public void apply(Object message) {
+            if (message instanceof WorkComplete) {
+                Object result = ((WorkComplete) message).result;
+                log.info("Work is complete. Result {}.", result);
+                sendToMaster(new MasterWorkerProtocol.WorkIsDone(workerId, jobId(), result));
+                getContext().setReceiveTimeout(Duration.create(5, "seconds"));
+                Procedure<Object> waitForWorkIsDoneAck = waitForWorkIsDoneAck(result);
+                getContext().become(waitForWorkIsDoneAck);
+            }
+            else if (message instanceof WorkFailed) {
+                Object result = ((WorkFailed) message).result;
+                log.info("Work is failed. Result {}.", result);
+                sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId()));
+                getContext().become(idle);
+                //getContext().setReceiveTimeout(Duration.create(5, "seconds"));
+                ///Procedure<Object> waitForWorkIsDoneAck = waitForWorkIsDoneAck(result);
+                //getContext().become(waitForWorkIsDoneAck);
+            }
+            else if(message==KeepAliveTick){
+                log.info("Job is in progress. {}.", jobId());
+                if (currentJobId!=null){
+                    sendToMaster(new MasterWorkerProtocol.WorkInProgress(workerId, jobId()));
+                }
+            }else if (message instanceof Job) {
+                log.info("Yikes. Master told me to do work, while I'm working.");
+            } else {
+                unhandled(message);
+            }
+        }
+    };
+
+    private final Procedure<Object> idle = new Procedure<Object>() {
+        public void apply(Object message) {
+            if (message instanceof MasterWorkerProtocol.WorkIsReady)
+                sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
+            else if (message instanceof Master.Job) {
+                Job job = (Job) message;
+                log.info("Got work: {}", job.taskEvent);
+                currentJobId = job.jobId;
+                workExecutor.tell(job, getSelf());
+                getContext().become(working);
+            } else unhandled(message);
+        }
+    };
+
+    public static final Object KeepAliveTick = new Object() {
+        @Override
+        public String toString() {
+            return "KeepAliveTick";
+        }
+    };
+
+    public Worker(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval, String workerRole) {
+        this.clusterClient = clusterClient;
+        this.workerRole = workerRole;
+        this.workExecutor = getContext().watch(getContext().actorOf(workExecutorProps, "exec"));
+        this.registerTask = getContext().system().scheduler().schedule
+                (
+                        Duration.Zero(),
+                        registerInterval,
+                        clusterClient,
+                        new ClusterClient.SendToAll("/user/master/active", new MasterWorkerProtocol.RegisterWorker(workerId)),
+                        getContext().dispatcher(),
+                        getSelf()
+                );
+        FiniteDuration workTimeout = Duration.create(60, "seconds");
+        this.keepAliveTask = getContext().system().scheduler().schedule(workTimeout.div(2), workTimeout.div(2), getSelf(), KeepAliveTick, getContext().dispatcher(), getSelf());
+    }
+
+    public static Props props(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval,String workerRole) {
+        return Props.create(Worker.class, clusterClient, workExecutorProps, registerInterval, workerRole);
+    }
+
+    public static Props props(ActorRef clusterClient, Props workExecutorProps,String workerRole) {
+        return props(clusterClient, workExecutorProps, Duration.create(10, "seconds"),workerRole);
+    }
+
+    private String jobId() {
+        if (currentJobId!=null)
+            return currentJobId;
+        else
+            throw new IllegalStateException("Not working");
+    }
+
+    @Override
+    public SupervisorStrategy supervisorStrategy() {
+        return new OneForOneStrategy(-1, Duration.Inf(),
+                new Function<Throwable, Directive>() {
+                    @Override
+                    public Directive apply(Throwable t) {
+                        log.info("Throwable, Work is failed for1 "+ t);
+                        if (t instanceof ActorInitializationException)
+                            return stop();
+                        else if (t instanceof DeathPactException)
+                            return stop();
+                        else if (t instanceof Exception) {
+                            if (currentJobId!=null) {
+                                log.info("Exception, Work is failed for "+ currentJobId);
+                                sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId()));
+                            }
+                            getContext().become(idle);
+                            return restart();
+                        }
+                        else if (t instanceof RuntimeException) {
+                            if (currentJobId!=null) {
+                                log.info("RuntimeException, Work is failed for "+ currentJobId);
+                                sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId()));
+                            }
+                            getContext().become(idle);
+                            return restart();
+                        }
+                        else {
+                            log.info("Throwable, Work is failed for "+ t);
+                            return escalate();
+                        }
+                    }
+                }
+        );
+    }
+
+    @Override
+    public void postStop() {
+        registerTask.cancel();
+        keepAliveTask.cancel();
+    }
+
+    public void onReceive(Object message) {
+        unhandled(message);
+    }
+
+    private Procedure<Object> waitForWorkIsDoneAck(final Object result) {
+        return new Procedure<Object>() {
+            public void apply(Object message) {
+                if (message instanceof Ack && ((Ack) message).workId.equals(jobId())) {
+                    sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
+                    getContext().setReceiveTimeout(Duration.Undefined());
+                    getContext().become(idle);
+                } else if (message instanceof ReceiveTimeout) {
+                    log.info("No ack from master, retrying (" + workerId + " -> " + jobId() + ")");
+                    sendToMaster(new MasterWorkerProtocol.WorkIsDone(workerId, jobId(), result));
+                } else {
+                    unhandled(message);
+                }
+            }
+        };
+    }
+
+    {
+        getContext().become(idle);
+    }
+
+    @Override
+    public void unhandled(Object message) {
+        if(message==KeepAliveTick){
+            //do nothing
+        }
+        else if (message instanceof Terminated && ((Terminated) message).getActor().equals(workExecutor)) {
+            log.info("Received Terminated from exec.");
+            getContext().stop(getSelf());
+        } else if (message instanceof MasterWorkerProtocol.WorkIsReady) {
+            // do nothing
+        } else {
+            super.unhandled(message);
+        }
+    }
+
+    private void sendToMaster(Object msg) {
+        clusterClient.tell(new ClusterClient.SendToAll("/user/master/active", msg), getSelf());
+    }
+
+    public static final class WorkComplete implements Serializable {
+        public final Object result;
+
+        public WorkComplete(Object result) {
+            this.result = result;
+        }
+
+        @Override
+        public String toString() {
+            return "WorkComplete{" +
+                    "result=" + result +
+                    '}';
+        }
+    }
+
+    public static final class WorkFailed implements Serializable {
+        public final Object result;
+
+        public WorkFailed(Object result) {
+            this.result = result;
+        }
+
+        @Override
+        public String toString() {
+            return "WorkFailed{" +
+                    "result=" + result +
+                    '}';
+        }
+    }
+
+    public static final class Result implements Serializable {
+        public final int result;
+        public final String errPath;
+        public final String stdPath;
+
+        public Result(int result, String errPath, String stdPath) {
+            this.result = result;
+            this.errPath = errPath;
+            this.stdPath = stdPath;
+        }
+
+
+        @Override
+        public String toString() {
+            return "Result{" +
+                    "result='" + result + '\'' +
+                    ", errPath='" + errPath + '\'' +
+                    ", stdPath='" + stdPath + '\'' +
+                    '}';
+        }
+    }
+}

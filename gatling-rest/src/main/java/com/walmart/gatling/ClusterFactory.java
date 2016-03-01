@@ -35,17 +35,17 @@ public class ClusterFactory {
     public static ActorRef startMaster(int port, String role, boolean isPrimary) {
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + role + "]").
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)).
-                withFallback(ConfigFactory.load());
+                withFallback(ConfigFactory.load("application"));
 
         FiniteDuration workTimeout = Duration.create(60, "seconds");
 
-        ActorSystem system = ActorSystem.create(Constants.WorkflowSystem, conf);
+        ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);
 
-        String journalPath = String.format("akka.tcp://%s%s", Constants.WorkflowSystem, "@127.0.0.1:2551/user/store");
+        String journalPath = String.format("akka.tcp://%s%s", Constants.PerformanceSystem, "@127.0.0.1:2551/user/store");
         startupSharedJournal(system, isPrimary, ActorPath$.MODULE$.fromString(journalPath));
 
         final ClusterSingletonManagerSettings settings =
-                ClusterSingletonManagerSettings.create(system).withRole("active");
+                ClusterSingletonManagerSettings.create(system).withRole(role);
 
         ActorRef ref = system.actorOf(
                 ClusterSingletonManager.props(Master.props(workTimeout),  PoisonPill.getInstance(), settings),
