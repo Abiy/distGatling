@@ -1,4 +1,4 @@
-package com.walmart.store.container.data;
+package com.walmart.gatling.data;
 
 public interface DataRepository {
 

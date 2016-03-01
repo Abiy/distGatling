@@ -1,4 +1,4 @@
-package com.walmart.store.container;
+package com.walmart.gatling;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

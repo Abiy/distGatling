@@ -1,10 +1,10 @@
-package com.walmart.store.container.endpoint.v1;
+package com.walmart.gatling.endpoint.v1;
 
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
-import com.walmart.store.container.data.DataRepository;
-import com.walmart.store.container.data.Entity;
-import com.walmart.store.container.domain.DomainService;
+import com.walmart.gatling.data.DataRepository;
+import com.walmart.gatling.data.Entity;
+import com.walmart.gatling.domain.DomainService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

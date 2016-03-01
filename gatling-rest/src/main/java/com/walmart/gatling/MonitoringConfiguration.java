@@ -1,4 +1,4 @@
-package com.walmart.store.container;
+package com.walmart.gatling;
 
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricFilter;
@@ -7,7 +7,7 @@ import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
-import com.walmart.store.container.domain.HostUtils;
+import com.walmart.gatling.domain.HostUtils;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

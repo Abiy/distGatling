@@ -1,4 +1,4 @@
-package com.walmart.store.container.domain;
+package com.walmart.gatling.domain;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

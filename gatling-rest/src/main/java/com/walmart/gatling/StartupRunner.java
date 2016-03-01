@@ -1,4 +1,4 @@
-package com.walmart.store.container;
+package com.walmart.gatling;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

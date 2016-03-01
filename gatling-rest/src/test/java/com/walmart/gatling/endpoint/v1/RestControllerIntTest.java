@@ -1,8 +1,8 @@
-package com.walmart.store.container.endpoint.v1;
+package com.walmart.gatling.endpoint.v1;
 
-import com.walmart.store.container.AbstractRestIntTest;
-import com.walmart.store.container.data.Entity;
-import com.walmart.store.container.domain.DomainService;
+import com.walmart.gatling.domain.DomainService;
+import com.walmart.gatling.AbstractRestIntTest;
+import com.walmart.gatling.data.Entity;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
