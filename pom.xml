@@ -3,15 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-	<properties>
-		<wm.loc.ver>1.0-SNAPSHOT</wm.loc.ver>
-	</properties>
+    <properties>
+        <wm.loc.ver>1.0-SNAPSHOT</wm.loc.ver>
+    </properties>
     <groupId>com.walmart.store</groupId>
     <artifactId>distributed-gatling</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>gatling-rest</module>
+        <module>gatling-agent</module>
+        <module>gatling-ui</module>
+        <module>gatling-commons</module>
     </modules>
 
     <parent>
@@ -56,48 +59,93 @@
             <artifactId>jhades</artifactId>
             <version>1.0.4</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_2.11</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-cluster_2.11</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-contrib_2.11</artifactId>
+            <version>2.4.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.iq80.leveldb</groupId>
+                    <artifactId>leveldb</artifactId>
+                </exclusion>
+
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.iq80.leveldb</groupId>
+            <artifactId>leveldb</artifactId>
+            <version>0.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-testkit_2.11</artifactId>
+            <version>2.4.2</version>
+        </dependency>
     </dependencies>
-   <!-- <repositories>
-        <repository>
-            <id>neo4j</id>
-            <url>http://m2.neo4j.org/content/repositories/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>-->
+    <!-- <repositories>
+         <repository>
+             <id>neo4j</id>
+             <url>http://m2.neo4j.org/content/repositories/releases</url>
+             <snapshots>
+                 <enabled>false</enabled>
+             </snapshots>
+         </repository>
+     </repositories>-->
     <build>
         <plugins>
-			<plugin>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>bundle-sources</id>
-						<phase>package</phase>
-						<goals>
-							<!-- produce source artifact for main project sources -->
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>        
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>aggregate</id>
-						<goals>
-							<goal>aggregate</goal>
-						</goals>
-						<configuration>
-						    <dependencySourceIncludes>
-						        <dependencySourceInclude>com.walmart.store:*</dependencySourceInclude>
-						    </dependencySourceIncludes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bundle-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <!-- produce source artifact for main project sources -->
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>aggregate</id>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                        <configuration>
+                            <dependencySourceIncludes>
+                                <dependencySourceInclude>com.walmart.store:*
+                                </dependencySourceInclude>
+                            </dependencySourceIncludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
