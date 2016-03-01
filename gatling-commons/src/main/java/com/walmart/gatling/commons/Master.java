@@ -1,18 +1,14 @@
-package com.walmart.store.commons;
-
-
+package com.walmart.gatling.commons;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 import akka.actor.Props;
 import akka.cluster.Cluster;
 import akka.cluster.client.ClusterClientReceptionist;
-import akka.cluster.pubsub.DistributedPubSub;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.persistence.UntypedPersistentActor;
@@ -27,7 +23,7 @@ public class Master extends UntypedPersistentActor {
     }
 
     private final FiniteDuration workTimeout;
-    private final ActorRef mediator = DistributedPubSub.get(getContext().system()).mediator();
+    //private final ActorRef mediator = DistributedPubSub.get(getContext().system()).mediator();
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private final Cancellable cleanupTask;
 
@@ -61,8 +57,6 @@ public class Master extends UntypedPersistentActor {
         private boolean isBusy() {
             return !isIdle();
         }
-
-        ;
 
         protected abstract String getWorkId();
 
@@ -146,19 +140,15 @@ public class Master extends UntypedPersistentActor {
 
         @Override
         public boolean equals(Object o) {
-            if (this==o)
+            if (this == o)
                 return true;
-            if (o==null || !getClass().equals(o.getClass()))
+            if (o == null || !getClass().equals(o.getClass()))
                 return false;
 
             WorkerState that = (WorkerState) o;
 
-            if (!ref.equals(that.ref))
-                return false;
-            if (!status.equals(that.status))
-                return false;
+            return ref.equals(that.ref) && status.equals(that.status);
 
-            return true;
         }
 
         @Override

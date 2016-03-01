@@ -1,4 +1,4 @@
-package com.walmart.store.commons;
+package com.walmart.gatling.commons;
 
 public interface JobDomainEvent {
 
