@@ -99,7 +99,7 @@ public class Worker extends UntypedActor {
                         Duration.Zero(),
                         registerInterval,
                         clusterClient,
-                        new ClusterClient.SendToAll("/user/master/active", new MasterWorkerProtocol.RegisterWorker(workerId)),
+                        new ClusterClient.SendToAll("/user/master/singleton", new MasterWorkerProtocol.RegisterWorker(workerId)),
                         getContext().dispatcher(),
                         getSelf()
                 );
@@ -205,7 +205,7 @@ public class Worker extends UntypedActor {
     }
 
     private void sendToMaster(Object msg) {
-        clusterClient.tell(new ClusterClient.SendToAll("/user/master/active", msg), getSelf());
+        clusterClient.tell(new ClusterClient.SendToAll("/user/master/singleton", msg), getSelf());
     }
 
     public static final class WorkComplete implements Serializable {

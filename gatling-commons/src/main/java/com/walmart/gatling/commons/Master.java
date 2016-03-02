@@ -283,6 +283,7 @@ public class Master extends UntypedPersistentActor {
 
         System.out.println("MESSAGE IS BEING PROCESSED ON THE MASTER...............");
         if (cmd instanceof MasterWorkerProtocol.RegisterWorker) {
+            System.out.println("MESSAGE IS BEING PROCESSED FOR REGISTERING NEW WORKER...............");
             String workerId = ((MasterWorkerProtocol.RegisterWorker) cmd).workerId;
             if (workers.containsKey(workerId)) {
                 workers.put(workerId, workers.get(workerId).copyWithRef(getSender()));

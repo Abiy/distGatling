@@ -49,7 +49,7 @@ public class MonitoringConfiguration {
         return reporter;
     }
 
-    @Bean
+    //@Bean
     public ConsoleReporter consoleReporter( MetricRegistry registry ) {
         ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
                 .convertRatesTo(TimeUnit.SECONDS)

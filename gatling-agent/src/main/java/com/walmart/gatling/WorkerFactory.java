@@ -22,16 +22,16 @@ import akka.cluster.client.ClusterClientSettings;
 
 public class WorkerFactory {
 
-    public static void startWorkersWithExecutors(AgentConfig agent) {
+    public static ActorSystem startWorkersWithExecutors(AgentConfig agent) {
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + agent.getActor().getRole() + "]")
                 .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + agent.getActor().getPort()))
-                .withFallback(ConfigFactory.load("worker"));
+                .withFallback(ConfigFactory.load("application"));
 
         ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);
 
         Set<ActorPath> initialContacts = new HashSet<>();
         for (String contactAddress : conf.getStringList("contact-points")) {
-            initialContacts.add(ActorPaths.fromString(contactAddress + "/user/receptionist"));
+            initialContacts.add(ActorPaths.fromString(contactAddress + "/system/receptionist"));
         }
 
         ClusterClientSettings settings =  ClusterClientSettings.create(system).withInitialContacts(initialContacts);
@@ -42,16 +42,12 @@ public class WorkerFactory {
                     Worker.props(clusterClient, createWorkExecutor(agent.getActor().getExecuterType(), agent), agent.getActor().getRole()),
                     agent.getActor().getRole()+i);
         }
+        return system;
 
     }
 
     private static Props createWorkExecutor(String executorType, AgentConfig agentConfig){
-
-        if(true)
-            return Props.create(ScriptExecutor.class, agentConfig);
-
-
-        return Props.create(WorkExecutor.class);
+       return Props.create(ScriptExecutor.class, agentConfig);
     }
 
 }

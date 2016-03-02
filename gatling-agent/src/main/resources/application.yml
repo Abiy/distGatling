@@ -1,3 +1,20 @@
+server:
+  port: 8090
+
+actor:
+  numberOfActors: 5
+  port: 2555
+  role: "script"
+  executerType: "script"
+job:
+  path: "/Users/ahailemichael/workspace/jobs/"
+  logDirectory: "/Users/ahailemichael/workspace/jobs/"
+  command: "/bin/bash"
+  artifact: "/Users/ahailemichael/workspace/jobs/artifact/script/{0}.sh"
+logServer:
+  port: 8083
+  hostName: ""
+
 graphite:
     host: localhost
     port: 2003
