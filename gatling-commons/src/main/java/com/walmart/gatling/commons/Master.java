@@ -188,6 +188,25 @@ public class Master extends UntypedPersistentActor {
         }
     }
 
+    public static final class ServerInfo implements Serializable {
+        public final String jobId;
+        public final String roleId;
+
+        public ServerInfo(String jobId, String roleId) {
+            this.jobId = jobId;
+            this.roleId = roleId;
+        }
+
+        @Override
+        public String toString() {
+            return "ServerInfo{" +
+                    "jobId='" + jobId + '\'' +
+                    ", roleId='" + roleId + '\'' +
+                    '}';
+        }
+
+    }
+
     public static final class WorkResult implements Serializable {
         public final Object result;
         public final Job job;
@@ -262,6 +281,7 @@ public class Master extends UntypedPersistentActor {
     @Override
     public void onReceiveCommand(Object cmd) throws Exception {
 
+        System.out.println("MESSAGE IS BEING PROCESSED ON THE MASTER...............");
         if (cmd instanceof MasterWorkerProtocol.RegisterWorker) {
             String workerId = ((MasterWorkerProtocol.RegisterWorker) cmd).workerId;
             if (workers.containsKey(workerId)) {
@@ -320,7 +340,11 @@ public class Master extends UntypedPersistentActor {
                 log.info("Work {} failed by worker {}", workId, workerId);
                 changeWorkerToIdle(workerId, workId);
             }
-        } else if (cmd instanceof Job) {
+        } else if (cmd instanceof ServerInfo) {
+                log.info("Accepted Server info request: {}", cmd);
+                getSender().tell(cmd, getSelf());
+        }
+        else if (cmd instanceof Job) {
             final String workId = ((Job) cmd).jobId;
             // idempotent
             if (jobDatabase.isAccepted(workId)) {

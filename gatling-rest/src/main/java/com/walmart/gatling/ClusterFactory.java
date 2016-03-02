@@ -32,25 +32,26 @@ import com.walmart.gatling.commons.Master;
 public class ClusterFactory {
 
 
-    public static ActorRef startMaster(int port, String role, boolean isPrimary) {
+    public static ActorSystem startMaster(int port, String role, boolean isPrimary) {
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + role + "]").
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)).
                 withFallback(ConfigFactory.load("application"));
 
-        FiniteDuration workTimeout = Duration.create(60, "seconds");
-
         ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);
+        ClusterFactory.getMaster("backend",isPrimary,system);
+        return system;
+    }
 
+    public static ActorRef  getMaster(String role, boolean isPrimary, ActorSystem system) {
         String journalPath = String.format("akka.tcp://%s%s", Constants.PerformanceSystem, "@127.0.0.1:2551/user/store");
         startupSharedJournal(system, isPrimary, ActorPath$.MODULE$.fromString(journalPath));
-
+        FiniteDuration workTimeout = Duration.create(60, "seconds");
         final ClusterSingletonManagerSettings settings =
                 ClusterSingletonManagerSettings.create(system).withRole(role);
 
         ActorRef ref = system.actorOf(
-                ClusterSingletonManager.props(Master.props(workTimeout),  PoisonPill.getInstance(), settings),
+                ClusterSingletonManager.props(Master.props(workTimeout), PoisonPill.getInstance(), settings),
                 "master");
-
         return ref;
     }
 

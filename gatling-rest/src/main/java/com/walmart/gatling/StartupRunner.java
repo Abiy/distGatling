@@ -11,6 +11,6 @@ public class StartupRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         logger.info("Application Initializing...");
         //run basic check to make sure the app is starting in a healthy state
-        ClusterFactory.startMaster(2551,"backend",true);
+
     }
 }

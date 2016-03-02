@@ -1,9 +1,11 @@
 package com.walmart.gatling.commons;
 
 import java.io.Serializable;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import akka.actor.UntypedActor;
 import akka.cluster.singleton.ClusterSingletonProxy;
 import akka.cluster.singleton.ClusterSingletonProxySettings;
@@ -18,15 +20,13 @@ import static akka.pattern.Patterns.pipe;
 
 public class MasterClientActor extends UntypedActor {
 
-  final  ActorRef masterProxy;
+  ActorRef masterProxy;
 
-  public  MasterClientActor(){
+  public  MasterClientActor(ActorSystem system){
 
     ClusterSingletonProxySettings proxySettings =
-            ClusterSingletonProxySettings.create(getContext().system()).withRole("backend");
-    masterProxy = getContext().actorOf(
-            ClusterSingletonProxy.props("/user/master/active", proxySettings)
-            , "masterProxy");
+            ClusterSingletonProxySettings.create(system).withRole("backend");
+    masterProxy =system.actorOf(ClusterSingletonProxy.props("/user/master", proxySettings), "masterProxy" + UUID.randomUUID());
   }
 
   public void onReceive(Object message) {
@@ -34,54 +34,54 @@ public class MasterClientActor extends UntypedActor {
     Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
     Future<Object> f = ask(masterProxy, message, timeout);
 
-
     final ExecutionContext ec = getContext().system().dispatcher();
 
     Future<Object> res = f.map(new Mapper<Object, Object>() {
       @Override
       public Object apply(Object msg) {
-        if (msg instanceof Master.Ack)
-          return Ok.getInstance();
+        if (msg instanceof Master.ServerInfo)
+          return new Ok(msg);
         else
-          return super.apply(msg);
+          return new NotOk(msg);
       }
     }, ec).recover(new Recover<Object>() {
       @Override
       public Object recover(Throwable failure) throws Throwable {
-        return NotOk.getInstance();
+        return new NotOk(null);
       }
     }, ec);
 
     pipe(res, ec).to(getSender());
   }
 
-  public static final class Ok implements Serializable {
-    private Ok() {}
-
-    private static final Ok instance = new Ok();
-
-    public static Ok getInstance() {
-      return instance;
+  public  static class Ok implements Serializable {
+    private Object msg;
+    private Ok(Object msg) {
+      this.msg=msg;
+    }
+    public Object getMsg() {
+      return msg;
     }
 
     @Override
     public String toString() {
       return "Ok";
     }
-  };
+  }
 
-  public static final class NotOk implements Serializable {
-    private NotOk() {}
 
-    private static final NotOk instance = new NotOk();
-
-    public static NotOk getInstance() {
-      return instance;
+  public static  class NotOk implements Serializable {
+    private Object msg;
+    private NotOk(Object msg) {
+      this.msg=msg;
+    }
+    public Object getMsg() {
+      return msg;
     }
 
     @Override
     public String toString() {
       return "NotOk";
     }
-  };
+  }
 }

@@ -23,7 +23,7 @@ import javax.ws.rs.ApplicationPath;
  *
  */
 @Component
-@ApplicationPath("/api")
+@ApplicationPath("/gatling")
 public class JerseyConfig extends ResourceConfig {
 	private static final Logger logger = LoggerFactory.getLogger(JerseyConfig.class);
 	

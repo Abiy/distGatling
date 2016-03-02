@@ -22,7 +22,7 @@ public class RestControllerIntTest extends AbstractRestIntTest {
 	
 	@Test
 	public void testRestGetByIdMarshalsCorrectly() {
-		Entity wireLoc = template.getForObject(rootUrl+ "/template/1", Entity.class);
+		Entity wireLoc = template.getForObject(rootUrl+ "/server/status", Entity.class);
 		System.out.println(wireLoc);
 		assertEqualsServiceValue(wireLoc);
 	}
