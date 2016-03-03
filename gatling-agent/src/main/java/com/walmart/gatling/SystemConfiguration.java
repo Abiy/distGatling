@@ -2,6 +2,7 @@ package com.walmart.gatling;
 
 import com.walmart.gatling.commons.AgentConfig;
 import com.walmart.gatling.commons.MasterClientActor;
+import com.walmart.gatling.domain.HostUtils;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,21 +29,33 @@ public class SystemConfiguration {
     @Value("${actor.executerType}")
     private String executerType;
 
+    @Value("${server.port}")
+    private int clientPort;
+
    @Bean
    public AgentConfig configBuilder(Environment env){
        AgentConfig agentConfig = new AgentConfig();
+
        AgentConfig.Actor actor = new AgentConfig.Actor();
        actor.setExecuterType(executerType);
        actor.setNumberOfActors(numberOfActors);
        actor.setPort(port);
        actor.setRole(role);
        agentConfig.setActor(actor);
+
        AgentConfig.Job jobInfo = new AgentConfig.Job();
        jobInfo.setArtifact(env.getProperty("job.artifact"));
        jobInfo.setCommand(env.getProperty("job.command"));
+       jobInfo.setPath(env.getProperty("job.path"));
        jobInfo.setLogDirectory(env.getProperty("job.logDirectory"));
        jobInfo.setExitValues(new int[]{0});
        agentConfig.setJob(jobInfo);
+
+       AgentConfig.LogServer logServer = new AgentConfig.LogServer();
+       logServer.setHostName(HostUtils.lookupHost());
+       logServer.setPort(clientPort);
+       agentConfig.setLogServer(logServer);
+
        return agentConfig;
    }
 

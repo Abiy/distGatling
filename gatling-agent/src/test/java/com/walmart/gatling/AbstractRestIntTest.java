@@ -34,7 +34,7 @@ public abstract class AbstractRestIntTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractRestIntTest.class);
 	protected RestTemplateWithPutReturnSupport template = new RestTemplateWithPutReturnSupport();
-	protected final String rootUrl = "http://localhost:8080/api/v1";
+	protected final String rootUrl = "http://localhost:8090/api/v1";
 
 	@Autowired
 	protected ObjectMapper mapper;

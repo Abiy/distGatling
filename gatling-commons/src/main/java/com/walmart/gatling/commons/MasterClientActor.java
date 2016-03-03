@@ -39,10 +39,7 @@ public class MasterClientActor extends UntypedActor {
     Future<Object> res = f.map(new Mapper<Object, Object>() {
       @Override
       public Object apply(Object msg) {
-        if (msg instanceof Master.ServerInfo)
           return new Ok(msg);
-        else
-          return new NotOk(msg);
       }
     }, ec).recover(new Recover<Object>() {
       @Override

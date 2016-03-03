@@ -56,7 +56,7 @@ public class AgentConfig {
         String result = StringUtils.EMPTY;
         final String ENCODING = "UTF-8";
         try {
-            result = String.format("http://%s:%s/log/stream?filePath=%s", host, Integer.toString(logServer.getPort()), URLEncoder.encode(filePath, ENCODING));
+            result = String.format("http://%s:%s/api/log/stream?filePath=%s", host, Integer.toString(logServer.getPort()), URLEncoder.encode(filePath, ENCODING));
         } catch (UnsupportedEncodingException e) {
             ;
         }
@@ -172,6 +172,10 @@ public class AgentConfig {
 
         public String getErrorPath(String jobName, String jobId) {
             return String.format("%slogs/errors/%s/%s.log", logDirectory, jobName, jobId);
+        }
+
+        public String getResultPath(String roleId,String jobId) {
+            return String.format("%s/%s/%s", logDirectory, roleId, jobId);
         }
 
         public String getCommand() {

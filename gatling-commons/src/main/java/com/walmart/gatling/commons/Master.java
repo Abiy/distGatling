@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
+
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 import akka.actor.Props;
@@ -11,7 +13,9 @@ import akka.cluster.Cluster;
 import akka.cluster.client.ClusterClientReceptionist;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import akka.japi.Procedure;
 import akka.persistence.UntypedPersistentActor;
+import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import scala.collection.JavaConversions;
 import scala.concurrent.duration.Deadline;
 import scala.concurrent.duration.FiniteDuration;
@@ -51,7 +55,7 @@ public class Master extends UntypedPersistentActor {
         }
     }
 
-    private static abstract class WorkerStatus {
+    public static abstract class WorkerStatus {
         protected abstract boolean isIdle();
 
         private boolean isBusy() {
@@ -121,7 +125,7 @@ public class Master extends UntypedPersistentActor {
         }
     }
 
-    private static final class WorkerState {
+    public static final class WorkerState {
         public final ActorRef ref;
         public final WorkerStatus status;
 
@@ -172,14 +176,16 @@ public class Master extends UntypedPersistentActor {
     };
 
     public static final class Job implements Serializable {
+        public final Object taskEvent;//task
         public final String jobId;
         public final String roleId;
-        public final Object taskEvent;//task
+        public final String trackingId;
 
-        public Job(String jobId, String roleId, Object job) {
-            this.jobId = jobId;
+        public Job( String roleId, Object job, String trackingId) {
+            this.jobId = UUID.randomUUID().toString();
             this.roleId = roleId;
             this.taskEvent = job;
+            this.trackingId = trackingId;
         }
 
         @Override
@@ -189,22 +195,26 @@ public class Master extends UntypedPersistentActor {
     }
 
     public static final class ServerInfo implements Serializable {
-        public final String jobId;
-        public final String roleId;
 
-        public ServerInfo(String jobId, String roleId) {
-            this.jobId = jobId;
-            this.roleId = roleId;
+        private ImmutableMap<String, WorkerState>  workers;
+
+        public ServerInfo() {
+        }
+
+        public ServerInfo(HashMap<String, WorkerState> workers) {
+            this.workers = ImmutableMap.copyOf(workers);
+        }
+
+        public ImmutableMap<String, WorkerState>  getWorkers() {
+            return workers;
         }
 
         @Override
         public String toString() {
             return "ServerInfo{" +
-                    "jobId='" + jobId + '\'' +
-                    ", roleId='" + roleId + '\'' +
+                    "workers=" + workers +
                     '}';
         }
-
     }
 
     public static final class WorkResult implements Serializable {
@@ -252,6 +262,10 @@ public class Master extends UntypedPersistentActor {
             this.workId = workId;
         }
 
+        public String getWorkId() {
+            return workId;
+        }
+
         @Override
         public String toString() {
             return "Ack{" + "jobId='" + workId + '\'' + '}';
@@ -280,10 +294,7 @@ public class Master extends UntypedPersistentActor {
 
     @Override
     public void onReceiveCommand(Object cmd) throws Exception {
-
-        System.out.println("MESSAGE IS BEING PROCESSED ON THE MASTER...............");
         if (cmd instanceof MasterWorkerProtocol.RegisterWorker) {
-            System.out.println("MESSAGE IS BEING PROCESSED FOR REGISTERING NEW WORKER...............");
             String workerId = ((MasterWorkerProtocol.RegisterWorker) cmd).workerId;
             if (workers.containsKey(workerId)) {
                 workers.put(workerId, workers.get(workerId).copyWithRef(getSender()));
@@ -295,6 +306,7 @@ public class Master extends UntypedPersistentActor {
                 }
             }
         } else if (cmd instanceof MasterWorkerProtocol.WorkerRequestsWork) {
+            log.info("Worker requested work: {}", cmd);
             if (jobDatabase.hasJob()) {
                 MasterWorkerProtocol.WorkerRequestsWork msg = ((MasterWorkerProtocol.WorkerRequestsWork) cmd);
                 final String workerId = msg.workerId;
@@ -303,10 +315,18 @@ public class Master extends UntypedPersistentActor {
                     final Job job = jobDatabase.nextJob();
                     boolean jobWorkerRoleMatched  = msg.role.equalsIgnoreCase(job.roleId)  ;
                     if (jobWorkerRoleMatched) {
-
+                        persist(new JobState.JobStarted(job.jobId), event -> {
+                            jobDatabase = jobDatabase.updated(event);
+                            log.info("Giving worker {} some taskEvent {}", workerId, event.workId);
+                            workers.put(workerId, state.copyWithStatus(new Busy(event.workId, workTimeout.fromNow())));
+                            getSender().tell(job, getSelf());
+                        });
                     }
                     else {
-
+                        persist(new JobState.JobPostponed(job.jobId), event -> {
+                            jobDatabase = jobDatabase.updated(event);
+                            log.info("Postponing work: {}", workerId);
+                        });
                     }
                 }
             }
@@ -324,8 +344,9 @@ public class Master extends UntypedPersistentActor {
             }
 
         } else if (cmd instanceof MasterWorkerProtocol.WorkIsDone) {
-            final String workerId = ((MasterWorkerProtocol.WorkIsDone) cmd).workerId;
-            final String workId = ((MasterWorkerProtocol.WorkIsDone) cmd).workId;
+            MasterWorkerProtocol.WorkIsDone workDone = ((MasterWorkerProtocol.WorkIsDone) cmd);
+            final String workerId = workDone.workerId;
+            final String workId = workDone.workId;
             if (jobDatabase.isDone(workId)) {
                 getSender().tell(new Ack(workId), getSelf());
             } else if (!jobDatabase.isInProgress(workId)) {
@@ -333,6 +354,10 @@ public class Master extends UntypedPersistentActor {
             } else {
                 log.info("Work {} is done by worker {}", workId, workerId);
                 changeWorkerToIdle(workerId, workId);
+                persist(new JobState.JobCompleted(workId, ((MasterWorkerProtocol.WorkIsDone) cmd).result), event -> {
+                    jobDatabase = jobDatabase.updated(event);
+                    getSender().tell(new Ack(event.workId), getSelf());
+                });
             }
         } else if (cmd instanceof MasterWorkerProtocol.WorkFailed) {
             final String workId = ((MasterWorkerProtocol.WorkFailed) cmd).workId;
@@ -340,10 +365,14 @@ public class Master extends UntypedPersistentActor {
             if (jobDatabase.isInProgress(workId)) {
                 log.info("Work {} failed by worker {}", workId, workerId);
                 changeWorkerToIdle(workerId, workId);
+                persist(new JobState.JobFailed(workId), event -> {
+                    jobDatabase = jobDatabase.updated(event);
+                    notifyWorkers();
+                });
             }
         } else if (cmd instanceof ServerInfo) {
                 log.info("Accepted Server info request: {}", cmd);
-                getSender().tell(cmd, getSelf());
+                getSender().tell(new ServerInfo(workers), getSelf());
         }
         else if (cmd instanceof Job) {
             final String workId = ((Job) cmd).jobId;
@@ -352,6 +381,14 @@ public class Master extends UntypedPersistentActor {
                 getSender().tell(new Ack(workId), getSelf());
             } else {
                 log.info("Accepted work: {}", workId);
+                persist(new JobState.JobAccepted((Job) cmd), new Procedure<JobState.JobAccepted>() {
+                    public void apply(JobState.JobAccepted event) throws Exception {
+                        // Ack back to original sender
+                        getSender().tell(new Ack(event.job.jobId), getSelf());
+                        jobDatabase = jobDatabase.updated(event);
+                        notifyWorkers();
+                    }
+                });
             }
         } else if (cmd==CleanupTick) {
             Iterator<Map.Entry<String, WorkerState>> iterator = workers.entrySet().iterator();

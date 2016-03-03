@@ -1,5 +1,7 @@
 package com.walmart.gatling.commons;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -21,6 +23,9 @@ import akka.japi.Procedure;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 import com.walmart.gatling.commons.Master.*;
+
+import org.apache.commons.io.FileUtils;
+
 import static akka.actor.SupervisorStrategy.Directive;
 import static akka.actor.SupervisorStrategy.escalate;
 import static akka.actor.SupervisorStrategy.restart;
@@ -75,11 +80,13 @@ public class Worker extends UntypedActor {
                 sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
             else if (message instanceof Master.Job) {
                 Job job = (Job) message;
-                log.info("Got work: {}", job.taskEvent);
+                log.info("Got work: {}", job);
                 currentJobId = job.jobId;
                 workExecutor.tell(job, getSelf());
                 getContext().become(working);
-            } else unhandled(message);
+            }
+            else
+             unhandled(message);
         }
     };
 
@@ -125,34 +132,31 @@ public class Worker extends UntypedActor {
     @Override
     public SupervisorStrategy supervisorStrategy() {
         return new OneForOneStrategy(-1, Duration.Inf(),
-                new Function<Throwable, Directive>() {
-                    @Override
-                    public Directive apply(Throwable t) {
-                        log.info("Throwable, Work is failed for1 "+ t);
-                        if (t instanceof ActorInitializationException)
-                            return stop();
-                        else if (t instanceof DeathPactException)
-                            return stop();
-                        else if (t instanceof Exception) {
-                            if (currentJobId!=null) {
-                                log.info("Exception, Work is failed for "+ currentJobId);
-                                sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId()));
-                            }
-                            getContext().become(idle);
-                            return restart();
+                t -> {
+                    log.info("Throwable, Work is failed for1 "+ t);
+                    if (t instanceof ActorInitializationException)
+                        return stop();
+                    else if (t instanceof DeathPactException)
+                        return stop();
+                    else if (t instanceof Exception) {
+                        if (currentJobId!=null) {
+                            log.info("Exception, Work is failed for "+ currentJobId);
+                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId()));
                         }
-                        else if (t instanceof RuntimeException) {
-                            if (currentJobId!=null) {
-                                log.info("RuntimeException, Work is failed for "+ currentJobId);
-                                sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId()));
-                            }
-                            getContext().become(idle);
-                            return restart();
+                        getContext().become(idle);
+                        return restart();
+                    }
+                    else if (t instanceof RuntimeException) {
+                        if (currentJobId!=null) {
+                            log.info("RuntimeException, Work is failed for "+ currentJobId);
+                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId()));
                         }
-                        else {
-                            log.info("Throwable, Work is failed for "+ t);
-                            return escalate();
-                        }
+                        getContext().become(idle);
+                        return restart();
+                    }
+                    else {
+                        log.info("Throwable, Work is failed for "+ t);
+                        return escalate();
                     }
                 }
         );
@@ -169,18 +173,16 @@ public class Worker extends UntypedActor {
     }
 
     private Procedure<Object> waitForWorkIsDoneAck(final Object result) {
-        return new Procedure<Object>() {
-            public void apply(Object message) {
-                if (message instanceof Ack && ((Ack) message).workId.equals(jobId())) {
-                    sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
-                    getContext().setReceiveTimeout(Duration.Undefined());
-                    getContext().become(idle);
-                } else if (message instanceof ReceiveTimeout) {
-                    log.info("No ack from master, retrying (" + workerId + " -> " + jobId() + ")");
-                    sendToMaster(new MasterWorkerProtocol.WorkIsDone(workerId, jobId(), result));
-                } else {
-                    unhandled(message);
-                }
+        return message -> {
+            if (message instanceof Ack && ((Ack) message).workId.equals(jobId())) {
+                sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
+                getContext().setReceiveTimeout(Duration.Undefined());
+                getContext().become(idle);
+            } else if (message instanceof ReceiveTimeout) {
+                log.info("No ack from master, retrying (" + workerId + " -> " + jobId() + ")");
+                sendToMaster(new MasterWorkerProtocol.WorkIsDone(workerId, jobId(), result));
+            } else {
+                unhandled(message);
             }
         };
     }
@@ -242,21 +244,26 @@ public class Worker extends UntypedActor {
         public final int result;
         public final String errPath;
         public final String stdPath;
+        public final String metrics;
 
-        public Result(int result, String errPath, String stdPath) {
+        public Result(int result, String errPath, String stdPath, String metrics) {
             this.result = result;
             this.errPath = errPath;
             this.stdPath = stdPath;
+            this.metrics = metrics;
         }
 
 
         @Override
         public String toString() {
             return "Result{" +
-                    "result='" + result + '\'' +
+                    "result=" + result +
                     ", errPath='" + errPath + '\'' +
                     ", stdPath='" + stdPath + '\'' +
+                    ", metrics='" + metrics + '\'' +
                     '}';
         }
     }
+
+
 }

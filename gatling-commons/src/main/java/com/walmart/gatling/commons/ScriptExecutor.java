@@ -11,12 +11,14 @@ import org.apache.commons.exec.LogOutputStream;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import akka.event.Logging;
@@ -38,12 +40,13 @@ public class ScriptExecutor extends WorkExecutor {
 
     @Override
     public void onReceive(Object message) {
+        log.info("Script worker received task: {}", message);
         if (message instanceof Master.Job) {
             Master.Job job = (Master.Job) message;
             TaskEvent taskEvent = (TaskEvent)job.taskEvent;
             if (taskEvent.getRoleName().equalsIgnoreCase("script")) {
                 CommandLine cmdLine = new CommandLine(agentConfig.getJob().getCommand());
-
+                log.info("Verified Script worker received task: {}", message);
                 Map<String, Object> map = new HashMap<>();
 
                 if (StringUtils.isNotEmpty(agentConfig.getJob().getMainClass()))
@@ -59,6 +62,7 @@ public class ScriptExecutor extends WorkExecutor {
                 for (Pair<String, String> pair : taskEvent.getParameters()) {
                     cmdLine.addArgument(pair.getValue());
                 }
+                cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId,job.jobId));
 
                 cmdLine.setSubstitutionMap(map);
                 DefaultExecutor executor = new DefaultExecutor();
@@ -80,12 +84,13 @@ public class ScriptExecutor extends WorkExecutor {
                     executor.setStreamHandler(psh);
                     System.out.println(cmdLine);
                     int exitResult = executor.execute(cmdLine);
-                    Worker.Result result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath));
+                    Worker.Result result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),  null);
                     if(executor.isFailure(exitResult)){
                         log.info("Script Executor Failed, result: " +result.toString());
                         getSender().tell(new Worker.WorkFailed(result), getSelf());
                     }
                     else{
+                        result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),getMetrics(job));
                         log.info("Script Executor Completed, result: " +result.toString());
                         getSender().tell(new Worker.WorkComplete(result), getSelf());
                     }
@@ -105,6 +110,23 @@ public class ScriptExecutor extends WorkExecutor {
         }
     }
 
+    public String getMetrics(Master.Job job) {
+        File dir = new File(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
+        log.info("Directory for metrics: {}", dir.getAbsolutePath());
+        List<File> files = (List<File>) FileUtils.listFiles(dir, logFilter, logFilter);
+        log.info("Files for metrics: {}", files);
+        StringBuilder logMetrics = new StringBuilder();
+        for (File file : files) {
+            try {
+                logMetrics.append(FileUtils.readFileToString(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        return logMetrics.toString();
+    }
+
 
     class ExecLogHandler extends LogOutputStream {
         private  FileOutputStream file;
@@ -122,4 +144,16 @@ public class ScriptExecutor extends WorkExecutor {
             }
         }
     }
+
+    IOFileFilter logFilter = new IOFileFilter() {
+        @Override
+        public boolean accept(File file) {
+            return true;
+        }
+
+        @Override
+        public boolean accept(File file, String name) {
+            return true;
+        }
+    };
 }
