@@ -42,71 +42,75 @@ public class ScriptExecutor extends WorkExecutor {
     public void onReceive(Object message) {
         log.info("Script worker received task: {}", message);
         if (message instanceof Master.Job) {
-            Master.Job job = (Master.Job) message;
-            TaskEvent taskEvent = (TaskEvent)job.taskEvent;
-            if (taskEvent.getRoleName().equalsIgnoreCase("script")) {
-                CommandLine cmdLine = new CommandLine(agentConfig.getJob().getCommand());
-                log.info("Verified Script worker received task: {}", message);
-                Map<String, Object> map = new HashMap<>();
+            runJob(message);
+        }
+    }
 
-                if (StringUtils.isNotEmpty(agentConfig.getJob().getMainClass()))
-                    cmdLine.addArgument(agentConfig.getJob().getCpOrJar());
+    private void runJob(Object message) {
+        Master.Job job = (Master.Job) message;
+        TaskEvent taskEvent = (TaskEvent)job.taskEvent;
+        if (taskEvent.getRoleName().equalsIgnoreCase("script")) {
+            CommandLine cmdLine = new CommandLine(agentConfig.getJob().getCommand());
+            log.info("Verified Script worker received task: {}", message);
+            Map<String, Object> map = new HashMap<>();
 
-                map.put("path", new File(agentConfig.getJob().getJobArtifact(taskEvent.getJobName())));
-                cmdLine.addArgument("${path}");
+            if (StringUtils.isNotEmpty(agentConfig.getJob().getMainClass()))
+                cmdLine.addArgument(agentConfig.getJob().getCpOrJar());
 
-                if (!StringUtils.isEmpty(agentConfig.getJob().getMainClass())) {
-                    cmdLine.addArgument(agentConfig.getJob().getMainClass());
-                }
-                //parameters come from the task event
-                for (Pair<String, String> pair : taskEvent.getParameters()) {
-                    cmdLine.addArgument(pair.getValue());
-                }
-                cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId,job.jobId));
+            map.put("path", new File(agentConfig.getJob().getJobArtifact(taskEvent.getJobName())));
+            cmdLine.addArgument("${path}");
 
-                cmdLine.setSubstitutionMap(map);
-                DefaultExecutor executor = new DefaultExecutor();
-                executor.setExitValues(agentConfig.getJob().getExitValues());
-                ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
-                executor.setWatchdog(watchdog);
-                executor.setWorkingDirectory(new File(agentConfig.getJob().getPath()));
-                FileOutputStream outFile = null;
-                FileOutputStream errorFile = null;
-                try {
-                    String outPath = agentConfig.getJob().getOutPath(taskEvent.getJobName(), job.jobId);
-                    String errPath = agentConfig.getJob().getErrorPath(taskEvent.getJobName(), job.jobId);
-                    //create the std and err files
-                    outFile = FileUtils.openOutputStream(new File(outPath));
-                    errorFile = FileUtils.openOutputStream(new File(errPath));
-
-                    PumpStreamHandler psh = new PumpStreamHandler(new ExecLogHandler(outFile),new ExecLogHandler(errorFile));
-
-                    executor.setStreamHandler(psh);
-                    System.out.println(cmdLine);
-                    int exitResult = executor.execute(cmdLine);
-                    Worker.Result result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),  null);
-                    if(executor.isFailure(exitResult)){
-                        log.info("Script Executor Failed, result: " +result.toString());
-                        getSender().tell(new Worker.WorkFailed(result), getSelf());
-                    }
-                    else{
-                        result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),getMetrics(job));
-                        log.info("Script Executor Completed, result: " +result.toString());
-                        getSender().tell(new Worker.WorkComplete(result), getSelf());
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                }finally {
-                    IOUtils.closeQuietly(outFile);
-                    IOUtils.closeQuietly(errorFile);
-                }
-
+            if (!StringUtils.isEmpty(agentConfig.getJob().getMainClass())) {
+                cmdLine.addArgument(agentConfig.getJob().getMainClass());
             }
-            else{
-                unhandled(message);
+            //parameters come from the task event
+            for (Pair<String, String> pair : taskEvent.getParameters()) {
+                cmdLine.addArgument(pair.getValue());
             }
+            cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId,job.jobId));
+
+            cmdLine.setSubstitutionMap(map);
+            DefaultExecutor executor = new DefaultExecutor();
+            executor.setExitValues(agentConfig.getJob().getExitValues());
+            ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
+            executor.setWatchdog(watchdog);
+            executor.setWorkingDirectory(new File(agentConfig.getJob().getPath()));
+            FileOutputStream outFile = null;
+            FileOutputStream errorFile = null;
+            try {
+                String outPath = agentConfig.getJob().getOutPath(taskEvent.getJobName(), job.jobId);
+                String errPath = agentConfig.getJob().getErrorPath(taskEvent.getJobName(), job.jobId);
+                //create the std and err files
+                outFile = FileUtils.openOutputStream(new File(outPath));
+                errorFile = FileUtils.openOutputStream(new File(errPath));
+
+                PumpStreamHandler psh = new PumpStreamHandler(new ExecLogHandler(outFile),new ExecLogHandler(errorFile));
+
+                executor.setStreamHandler(psh);
+                System.out.println(cmdLine);
+                int exitResult = executor.execute(cmdLine);
+                Worker.Result result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),  null, job);
+                if(executor.isFailure(exitResult)){
+                    log.info("Script Executor Failed, result: " +result.toString());
+                    getSender().tell(new Worker.WorkFailed(result), getSelf());
+                }
+                else{
+                    result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),getMetrics(job), job);
+                    log.info("Script Executor Completed, result: " +result.toString());
+                    getSender().tell(new Worker.WorkComplete(result), getSelf());
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }finally {
+                IOUtils.closeQuietly(outFile);
+                IOUtils.closeQuietly(errorFile);
+            }
+
+        }
+        else{
+            unhandled(message);
         }
     }
 

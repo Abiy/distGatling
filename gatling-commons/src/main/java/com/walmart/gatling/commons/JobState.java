@@ -1,11 +1,14 @@
 package com.walmart.gatling.commons;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.stream.Collectors;
 
 
 public final class JobState {
@@ -14,6 +17,8 @@ public final class JobState {
     private final Set<String> acceptedJobIds;
     private final Set<String> doneJobIds;
     private final ConcurrentLinkedDeque<Master.Job> pendingJobs;
+    private final  List<Worker.Result> failedJobs;
+    private final List<Worker.Result> completedJobs;
 
 
     public JobState updated(JobDomainEvent event) {
@@ -37,10 +42,12 @@ public final class JobState {
 
 
     public JobState() {
-        jobsInProgress = new HashMap<String, Master.Job>();
-        acceptedJobIds = new HashSet<String>();
-        doneJobIds = new HashSet<String>();
-        pendingJobs = new ConcurrentLinkedDeque<Master.Job>();
+        jobsInProgress = new HashMap<>();
+        acceptedJobIds = new HashSet<>();
+        doneJobIds = new HashSet<>();
+        pendingJobs = new ConcurrentLinkedDeque<>();
+        failedJobs = new ArrayList<>();
+        completedJobs = new ArrayList<>();
     }
 
     private JobState(JobState jobState, JobAccepted workAccepted) {
@@ -48,11 +55,12 @@ public final class JobState {
         Set<String> tmp_acceptedWorkIds = new HashSet<String>(jobState.acceptedJobIds);
         tmp_pendingJob.addLast(workAccepted.job);
         tmp_acceptedWorkIds.add(workAccepted.job.jobId);
-        jobsInProgress = new HashMap<String, Master.Job>(jobState.jobsInProgress);
+        jobsInProgress = new HashMap<>(jobState.jobsInProgress);
         acceptedJobIds = tmp_acceptedWorkIds;
         doneJobIds = new HashSet<String>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
-
+        failedJobs = new ArrayList<>(jobState.failedJobs);
+        completedJobs = new ArrayList<>(jobState.completedJobs);
 
     }
 
@@ -71,6 +79,8 @@ public final class JobState {
         ;
         doneJobIds = new HashSet<String>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
+        failedJobs = new ArrayList<>(jobState.failedJobs);
+        completedJobs = new ArrayList<>(jobState.completedJobs);
     }
 
     public JobState(JobState jobState, JobCompleted workCompleted) {
@@ -80,10 +90,15 @@ public final class JobState {
         tmp_doneWorkIds.add(workCompleted.workId);
         jobsInProgress = tmp_workInProgress;
         acceptedJobIds = new HashSet<String>(jobState.acceptedJobIds);
-        ;
+
         doneJobIds = tmp_doneWorkIds;
         pendingJobs = new ConcurrentLinkedDeque<Master.Job>(jobState.pendingJobs);
-        ;
+        failedJobs = new ArrayList<>(jobState.failedJobs);
+
+        List<Worker.Result> tmp_completed = new ArrayList<>(jobState.completedJobs);
+        Worker.Result result = (Worker.Result) workCompleted.result;
+        tmp_completed.add(result);
+        completedJobs = new ArrayList<>(tmp_completed);
     }
 
 
@@ -92,12 +107,19 @@ public final class JobState {
         ConcurrentLinkedDeque<Master.Job> tmp_pendingJob = new ConcurrentLinkedDeque<Master.Job>(jobState.pendingJobs);
         Set<String> acceptedJobIds_tmp =  new HashSet<>(jobState.acceptedJobIds) ;
         acceptedJobIds_tmp.remove(jobFailed.workId);
-        //tmp_pendingJob.addLast(jobState.jobsInProgress.get(jobFailed.workId));
+        //tmp_pendingJob.addLast(jobState.jobsInProgress.get(failedJobs.workId));
         tmp_workInProgress.remove(jobFailed.workId);
         jobsInProgress = tmp_workInProgress;
         acceptedJobIds = acceptedJobIds_tmp;
         doneJobIds = new HashSet<String>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
+
+        completedJobs = new ArrayList<>(jobState.completedJobs);
+
+        List<Worker.Result> tmp_Failed = new ArrayList<>(jobState.failedJobs);
+        Worker.Result result = (Worker.Result) jobFailed.result;
+        tmp_Failed.add(result);
+        failedJobs = new ArrayList<>(tmp_Failed);
     }
 
 
@@ -110,6 +132,8 @@ public final class JobState {
         acceptedJobIds = new HashSet<String>(jobState.acceptedJobIds);
         doneJobIds = new HashSet<String>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
+        failedJobs = new ArrayList<>(jobState.failedJobs);
+        completedJobs = new ArrayList<>(jobState.completedJobs);
     }
 
     public JobState(JobState jobState, JobPostponed jobPostponed) {
@@ -120,13 +144,8 @@ public final class JobState {
         acceptedJobIds = new HashSet<String>(jobState.acceptedJobIds);
         doneJobIds = new HashSet<String>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
-    }
-
-
-    public void test() {
-        for (Master.Job job : pendingJobs) {
-            System.out.println(job.taskEvent);
-        }
+        failedJobs = new ArrayList<>(jobState.failedJobs);
+        completedJobs = new ArrayList<>(jobState.completedJobs);
     }
 
 
@@ -201,9 +220,10 @@ public final class JobState {
 
     public static final class JobFailed implements JobDomainEvent, Serializable {
         public final String workId;
-
-        public JobFailed(String workId) {
+        public final Object result;
+        public JobFailed(String workId, Object result) {
             this.workId = workId;
+            this.result = result;
         }
         @Override
         public String toString() {
@@ -245,6 +265,27 @@ public final class JobState {
         public String toString() {
             return JobStatusString.PENDING;
         }
+    }
+
+    public TrackingResult getTrackingInfo(String trackingId) {
+        long pendingCount = pendingJobs.stream().filter(p -> p.trackingId.equalsIgnoreCase(trackingId)).count();
+        long inprogressCount = jobsInProgress.values().stream().filter(p -> p.trackingId.equalsIgnoreCase(trackingId)).count();
+        TrackingResult result = new TrackingResult(pendingCount, inprogressCount);
+        result.setCompleted(
+                completedJobs.stream()
+                        .filter(c -> c.job.trackingId.equalsIgnoreCase(trackingId))
+                        .map(p -> new TaskTrackingInfo(p.errPath, (p.stdPath)))
+                        .collect(Collectors.toList()));
+        result.setFailed(failedJobs.stream().filter(c -> c.job.trackingId.equalsIgnoreCase(trackingId))
+                .map(p -> new TaskTrackingInfo(p.errPath, p.stdPath))
+                .collect(Collectors.toList()));
+        return result;
+    }
+
+    public List<Worker.Result> getCompletedResults(String trackingId) {
+        return completedJobs.stream()
+                .filter(c -> c.job.trackingId.equalsIgnoreCase(trackingId))
+                .collect(Collectors.toList());
     }
 
     public interface JobStatusString  {

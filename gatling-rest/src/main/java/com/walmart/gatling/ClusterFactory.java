@@ -26,23 +26,25 @@ import akka.util.Timeout;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
+
+import com.walmart.gatling.commons.AgentConfig;
 import com.walmart.gatling.commons.Constants;
 import com.walmart.gatling.commons.Master;
 
 public class ClusterFactory {
 
 
-    public static ActorSystem startMaster(int port, String role, boolean isPrimary) {
+    public static ActorSystem startMaster(int port, String role, boolean isPrimary,AgentConfig agentConfig) {
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + role + "]").
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)).
                 withFallback(ConfigFactory.load("application"));
 
         ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);
-        ClusterFactory.getMaster("backend",isPrimary,system);
+        ClusterFactory.getMaster("backend",isPrimary,system,agentConfig);
         return system;
     }
 
-    public static ActorRef  getMaster(String role, boolean isPrimary, ActorSystem system) {
+    public static ActorRef  getMaster(String role, boolean isPrimary, ActorSystem system, AgentConfig agentConfig) {
         String journalPath = String.format("akka.tcp://%s%s", Constants.PerformanceSystem, "@127.0.0.1:2551/user/store");
         startupSharedJournal(system, isPrimary, ActorPath$.MODULE$.fromString(journalPath));
         FiniteDuration workTimeout = Duration.create(60, "seconds");
@@ -50,7 +52,7 @@ public class ClusterFactory {
                 ClusterSingletonManagerSettings.create(system).withRole(role);
 
         ActorRef ref = system.actorOf(
-                ClusterSingletonManager.props(Master.props(workTimeout), PoisonPill.getInstance(), settings),
+                ClusterSingletonManager.props(Master.props(workTimeout,agentConfig), PoisonPill.getInstance(), settings),
                 "master");
         return ref;
     }

@@ -55,7 +55,7 @@ public class Worker extends UntypedActor {
             else if (message instanceof WorkFailed) {
                 Object result = ((WorkFailed) message).result;
                 log.info("Work is failed. Result {}.", result);
-                sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId()));
+                sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),result));
                 getContext().become(idle);
                 //getContext().setReceiveTimeout(Duration.create(5, "seconds"));
                 ///Procedure<Object> waitForWorkIsDoneAck = waitForWorkIsDoneAck(result);
@@ -141,7 +141,7 @@ public class Worker extends UntypedActor {
                     else if (t instanceof Exception) {
                         if (currentJobId!=null) {
                             log.info("Exception, Work is failed for "+ currentJobId);
-                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId()));
+                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Object()));
                         }
                         getContext().become(idle);
                         return restart();
@@ -149,7 +149,7 @@ public class Worker extends UntypedActor {
                     else if (t instanceof RuntimeException) {
                         if (currentJobId!=null) {
                             log.info("RuntimeException, Work is failed for "+ currentJobId);
-                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId()));
+                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Object()));
                         }
                         getContext().become(idle);
                         return restart();
@@ -245,12 +245,14 @@ public class Worker extends UntypedActor {
         public final String errPath;
         public final String stdPath;
         public final String metrics;
+        public final Job job;
 
-        public Result(int result, String errPath, String stdPath, String metrics) {
+        public Result(int result, String errPath, String stdPath, String metrics, Job job) {
             this.result = result;
             this.errPath = errPath;
             this.stdPath = stdPath;
             this.metrics = metrics;
+            this.job = job;
         }
 
 
@@ -261,6 +263,7 @@ public class Worker extends UntypedActor {
                     ", errPath='" + errPath + '\'' +
                     ", stdPath='" + stdPath + '\'' +
                     ", metrics='" + metrics + '\'' +
+                    ", job=" + job +
                     '}';
         }
     }

@@ -62,10 +62,12 @@ public abstract class MasterWorkerProtocol {
     public static final class WorkFailed implements Serializable {
         public final String workerId;
         public final String workId;
+        public final Object result;
 
-        public WorkFailed(String workerId, String workId) {
+        public WorkFailed(String workerId, String workId,Object result) {
             this.workerId = workerId;
             this.workId = workId;
+            this.result = result;
         }
 
         @Override
