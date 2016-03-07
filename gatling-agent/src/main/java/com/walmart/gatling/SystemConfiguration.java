@@ -32,6 +32,9 @@ public class SystemConfiguration {
     @Value("${server.port}")
     private int clientPort;
 
+    @Value("${akka.contact-points}")
+    private String contactPoints;
+
    @Bean
    public AgentConfig configBuilder(Environment env){
        AgentConfig agentConfig = new AgentConfig();
@@ -55,6 +58,8 @@ public class SystemConfiguration {
        logServer.setHostName(HostUtils.lookupHost());
        logServer.setPort(clientPort);
        agentConfig.setLogServer(logServer);
+
+       agentConfig.setContactPoint(contactPoints);
 
        return agentConfig;
    }

@@ -30,9 +30,8 @@ public class WorkerFactory {
         ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);
 
         Set<ActorPath> initialContacts = new HashSet<>();
-        for (String contactAddress : conf.getStringList("contact-points")) {
-            initialContacts.add(ActorPaths.fromString(contactAddress + "/system/receptionist"));
-        }
+        initialContacts.add(ActorPaths.fromString(agent.getContactPoint() ));
+
 
         ClusterClientSettings settings =  ClusterClientSettings.create(system).withInitialContacts(initialContacts);
         final ActorRef clusterClient = system.actorOf(ClusterClient.props(settings), "clusterClient");

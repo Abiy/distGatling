@@ -14,7 +14,8 @@ job:
 logServer:
   port: 8090
   hostName: ""
-
+akka:
+  contact-points: "akka.tcp://PerformanceSystem@127.0.0.1:2551/system/receptionist"
 graphite:
     host: localhost
     port: 2003

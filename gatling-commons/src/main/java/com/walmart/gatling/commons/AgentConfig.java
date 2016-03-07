@@ -20,6 +20,12 @@ public class AgentConfig {
     private Job job;
     private LogServer logServer;
 
+    public String getContactPoint() {
+        return contactPoint;
+    }
+
+    private String contactPoint;
+
     public LogServer getLogServer() {
         return logServer;
     }
@@ -62,6 +68,10 @@ public class AgentConfig {
         }
 
         return result;
+    }
+
+    public void setContactPoint(String contactPoint) {
+        this.contactPoint = contactPoint;
     }
 
     @XmlRootElement
