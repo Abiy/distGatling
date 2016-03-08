@@ -1,8 +1,8 @@
 package com.walmart.gatling;
 
 import com.walmart.gatling.commons.AgentConfig;
+import com.walmart.gatling.commons.HostUtils;
 import com.walmart.gatling.commons.MasterClientActor;
-import com.walmart.gatling.domain.HostUtils;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +12,6 @@ import org.springframework.core.env.Environment;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import akka.routing.FromConfig;
 import akka.routing.RoundRobinPool;
 
 /**

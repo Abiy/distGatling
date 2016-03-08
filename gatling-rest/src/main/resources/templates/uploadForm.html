@@ -13,40 +13,42 @@
 
 <div class="container">
 
-    <form method="POST" enctype="multipart/form-data" action="/upload" role="form" class="form-horizontal" >
-        <div class="form-group" >
+    <form method="POST" enctype="multipart/form-data" action="/upload" role="form"
+          class="form-horizontal">
+        <div class="form-group">
             <div class="col-xs-4">
-            <label>File to upload:</label>
-            <input type="file" name="file" class="form-control"/>
+                <label>File to upload:</label>
+                <input type="file" name="file" class="form-control"/>
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-xs-4">
-            <label>Name:</label>
-            <input type="text" name="name" class="form-control"/>
+                <label>Name:</label>
+                <input type="text" name="name" class="form-control"/>
+            </div>
         </div>
-</div>
         <div class="form-group">
             <div class="col-xs-4">
-           <label> Project:</label>
-            <input type="text" name="role" class="form-control"/>
-          </div></div>
+                <label> Project:</label>
+                <input type="text" name="role" class="form-control"/>
+            </div>
+        </div>
         <div class="form-group">
             <div class="col-xs-4">
                 <label>Name:</label>
 
-                    <select name="type" class="form-control">
-                        <option value="data">Data</option>
-                        <option  value="simulation">Simulation</option>
-                        <option  value="config">Config</option>
-                    </select>
+                <select name="type" class="form-control">
+                    <option value="data">Data</option>
+                    <option value="simulations">Simulation</option>
+                    <option value="config">Config</option>
+                </select>
 
-           </div>
+            </div>
         </div>
         <div class="form-group">
-        <input type="submit" value="Upload" class="btn btn-primary"/>
-            </div>
+            <input type="submit" value="Upload" class="btn btn-primary"/>
+        </div>
     </form>
 
 </div>

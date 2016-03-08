@@ -1,10 +1,16 @@
 package com.walmart.gatling.commons;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import akka.actor.ActorRef;
@@ -33,8 +39,10 @@ public class Master extends UntypedPersistentActor {
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private final Cancellable cleanupTask;
 
-    private HashMap<String, WorkerState> workers = new HashMap<String, WorkerState>();
+    private HashMap<String, WorkerState> workers = new HashMap<>();
+    private Set<String> fileTracker = new HashSet<>();
     private JobState jobDatabase = new JobState();
+    private  Map<String,UploadFile> fileDtabase = new HashMap<>();
 
     public Master(FiniteDuration workTimeout, AgentConfig agentConfig) {
         this.workTimeout = workTimeout;
@@ -202,6 +210,54 @@ public class Master extends UntypedPersistentActor {
         }
     }
 
+    public static final class FileJob implements Serializable {
+        public final String content;//task
+        public final String jobId;
+        public final UploadFile uploadFileRequest;
+
+        public FileJob(  String content, UploadFile uploadFileRequest) {
+            this.jobId = UUID.randomUUID().toString();
+            this.uploadFileRequest = uploadFileRequest;
+            this.content = content;
+        }
+
+        @Override
+        public String toString() {
+            return "FileJob{" +
+                    "content='" + content + '\'' +
+                    ", jobId='" + jobId + '\'' +
+                    ", uploadFileRequest=" + uploadFileRequest +
+                    '}';
+        }
+    }
+
+    public static final class UploadFile implements Serializable {
+        public final String trackingId;
+        public final String path,name,role,type;
+
+        public UploadFile(String trackingId, String path, String name, String role, String type) {
+            this.trackingId = trackingId;
+            this.path = path;
+            this.name = name;
+            this.role = role;
+            this.type = type;
+        }
+        public String getFileName(){
+            return "user-files/"+ type+"/"+name;
+        }
+
+        @Override
+        public String toString() {
+            return "UploadFile{" +
+                    "trackingId='" + trackingId + '\'' +
+                    ", path='" + path + '\'' +
+                    ", name='" + name + '\'' +
+                    ", role='" + role + '\'' +
+                    ", type='" + type + '\'' +
+                    '}';
+        }
+    }
+
     public static final class Report implements Serializable {
         public final String trackingId;
         public final TaskEvent taskEvent;
@@ -276,44 +332,6 @@ public class Master extends UntypedPersistentActor {
         }
     }
 
-    public static final class WorkResult implements Serializable {
-        public final Object result;
-        public final Job job;
-
-        public WorkResult(Job job, Object result) {
-            this.result = result;
-            this.job = job;
-        }
-
-
-        @Override
-        public String toString() {
-            return "WorkResult{" +
-                    "result=" + result +
-                    ", job=" + job +
-                    '}';
-        }
-    }
-
-    public final static class JobLogEvent implements Serializable {
-        public final JobDomainEvent domainEvent;
-        public final Job job;
-
-        public JobLogEvent(JobDomainEvent domainEvent, Job job) {
-
-            this.domainEvent = domainEvent;
-            this.job = job;
-        }
-
-        @Override
-        public String toString() {
-            return "JobLogEvent{" +
-                    "domainEvent=" + domainEvent +
-                    ", taskEvent=" + job +
-                    '}';
-        }
-    }
-
     public static final class Ack implements Serializable {
         final String workId;
 
@@ -335,6 +353,11 @@ public class Master extends UntypedPersistentActor {
     public void onReceiveRecover(Object arg0) throws Exception {
         if (arg0 instanceof JobDomainEvent) {
             jobDatabase = jobDatabase.updated((JobDomainEvent) arg0);
+            log.info("Replayed {}", arg0.getClass().getSimpleName());
+        }
+        else if (arg0 instanceof UploadFile) {
+            UploadFile request = (UploadFile)arg0;
+            fileDtabase.put(request.trackingId, request);
             log.info("Replayed {}", arg0.getClass().getSimpleName());
         }
     }
@@ -364,7 +387,19 @@ public class Master extends UntypedPersistentActor {
                     getSender().tell(MasterWorkerProtocol.WorkIsReady.getInstance(), getSelf());
                 }
             }
-        } else if (cmd instanceof MasterWorkerProtocol.WorkerRequestsWork) {
+        }
+        else if (cmd instanceof MasterWorkerProtocol.WorkerRequestsFile) {
+            MasterWorkerProtocol.WorkerRequestsFile msg = ((MasterWorkerProtocol.WorkerRequestsFile) cmd);
+            Set<String> trackingIds = fileDtabase.keySet();
+            Optional<String> unsentFile = trackingIds.stream().map(p -> p.concat("_").concat(msg.host)).filter(p -> !fileTracker.contains(p)).findFirst();
+            if(unsentFile.isPresent()){
+                String tId = unsentFile.get().split("_")[0];
+                UploadFile uploadFile = fileDtabase.get(tId);
+                String content = FileUtils.readFileToString(new File(uploadFile.path));
+                getSender().tell(new FileJob(content,uploadFile), getSelf());
+            }
+        }
+        else if (cmd instanceof MasterWorkerProtocol.WorkerRequestsWork) {
             log.info("Worker requested work: {}", cmd);
             if (jobDatabase.hasJob()) {
                 MasterWorkerProtocol.WorkerRequestsWork msg = ((MasterWorkerProtocol.WorkerRequestsWork) cmd);
@@ -389,7 +424,12 @@ public class Master extends UntypedPersistentActor {
                     }
                 }
             }
-        } else if (cmd instanceof MasterWorkerProtocol.WorkInProgress) {
+        }
+        else if (cmd instanceof  Worker.FileUploadComplete){
+            Worker.FileUploadComplete result = (Worker.FileUploadComplete)cmd;
+            fileTracker.add(result.result.trackingId+"_"+result.host);
+        }
+        else if (cmd instanceof MasterWorkerProtocol.WorkInProgress) {
             final String workerId = ((MasterWorkerProtocol.WorkInProgress) cmd).workerId;
             final String workId = ((MasterWorkerProtocol.WorkInProgress) cmd).workId;
             final WorkerState state = workers.get(workerId);
@@ -441,6 +481,14 @@ public class Master extends UntypedPersistentActor {
             log.info("Accepted tracking info request: {}", cmd);
             List<Worker.Result> result = jobDatabase.getCompletedResults(((Report) cmd).trackingId);
             reportExecutor.forward(new GenerateReport((Report)cmd,result),getContext());
+        }
+        else if (cmd instanceof UploadFile) {
+            log.info("Accepted upload file request: {}", cmd);
+            UploadFile request = (UploadFile)cmd;
+            persist(request, event -> {
+                getSender().tell(new Ack(request.trackingId), getSelf());
+               fileDtabase.put(request.trackingId,request);
+            });
         }
         else if (cmd instanceof Job) {
             final String workId = ((Job) cmd).jobId;

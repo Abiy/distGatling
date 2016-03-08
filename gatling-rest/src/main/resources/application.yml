@@ -15,6 +15,9 @@ logServer:
   port: 8080
   hostName: ""
 
+file:
+  repository: "/Users/ahailem/uploadspace/upload/"
+
 graphite:
     host: localhost
     port: 2003

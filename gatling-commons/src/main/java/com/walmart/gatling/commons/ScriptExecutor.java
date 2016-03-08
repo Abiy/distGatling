@@ -40,9 +40,20 @@ public class ScriptExecutor extends WorkExecutor {
 
     @Override
     public void onReceive(Object message) {
-        log.info("Script worker received task: {}", message);
+        //log.info("Script worker received task: {}", message);
         if (message instanceof Master.Job) {
             runJob(message);
+        }
+        else if (message instanceof Master.FileJob) {
+            Master.FileJob fileJob = (Master.FileJob) message;
+            try {
+                FileUtils.touch(new File(agentConfig.getJob().getPath(),fileJob.uploadFileRequest.getFileName()));
+                FileUtils.writeStringToFile(new File(agentConfig.getJob().getPath(),fileJob.uploadFileRequest.getFileName()),fileJob.content);
+                getSender().tell(new Worker.FileUploadComplete(fileJob.uploadFileRequest,HostUtils.lookupHost()), getSelf());
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
         }
     }
 

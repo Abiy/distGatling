@@ -1,7 +1,8 @@
 package com.walmart.gatling.commons;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import com.walmart.gatling.commons.Master.Ack;
+import com.walmart.gatling.commons.Master.Job;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -18,15 +19,10 @@ import akka.actor.UntypedActor;
 import akka.cluster.client.ClusterClient;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import akka.japi.Function;
 import akka.japi.Procedure;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
-import com.walmart.gatling.commons.Master.*;
 
-import org.apache.commons.io.FileUtils;
-
-import static akka.actor.SupervisorStrategy.Directive;
 import static akka.actor.SupervisorStrategy.escalate;
 import static akka.actor.SupervisorStrategy.restart;
 import static akka.actor.SupervisorStrategy.stop;
@@ -34,6 +30,7 @@ import static akka.actor.SupervisorStrategy.stop;
 public class Worker extends UntypedActor {
 
     private final ActorRef clusterClient;
+    private final String host;
     private String workerRole;
     private final String workerId = UUID.randomUUID().toString();
     private final ActorRef workExecutor;
@@ -51,6 +48,10 @@ public class Worker extends UntypedActor {
                 getContext().setReceiveTimeout(Duration.create(5, "seconds"));
                 Procedure<Object> waitForWorkIsDoneAck = waitForWorkIsDoneAck(result);
                 getContext().become(waitForWorkIsDoneAck);
+            }
+            else if (message instanceof  Worker.FileUploadComplete){
+                sendToMaster(message);
+                getContext().become(idle);
             }
             else if (message instanceof WorkFailed) {
                 Object result = ((WorkFailed) message).result;
@@ -76,13 +77,23 @@ public class Worker extends UntypedActor {
 
     private final Procedure<Object> idle = new Procedure<Object>() {
         public void apply(Object message) {
-            if (message instanceof MasterWorkerProtocol.WorkIsReady)
+            if(message==KeepAliveTick){
+                sendToMaster(new MasterWorkerProtocol.WorkerRequestsFile(workerId, workerRole, host));
+            }
+            else if (message instanceof MasterWorkerProtocol.WorkIsReady)
                 sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
             else if (message instanceof Master.Job) {
                 Job job = (Job) message;
                 log.info("Got work: {}", job);
                 currentJobId = job.jobId;
                 workExecutor.tell(job, getSelf());
+                getContext().become(working);
+            }
+            else if (message instanceof Master.FileJob) {
+                Master.FileJob fileJob = (Master.FileJob) message;
+                log.info("Got file upload work: {}", fileJob.uploadFileRequest);
+                currentJobId = fileJob.jobId;
+                workExecutor.tell(fileJob, getSelf());
                 getContext().become(working);
             }
             else
@@ -100,6 +111,7 @@ public class Worker extends UntypedActor {
     public Worker(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval, String workerRole) {
         this.clusterClient = clusterClient;
         this.workerRole = workerRole;
+        this.host = HostUtils.lookupHost();
         this.workExecutor = getContext().watch(getContext().actorOf(workExecutorProps, "exec"));
         this.registerTask = getContext().system().scheduler().schedule
                 (
@@ -221,6 +233,24 @@ public class Worker extends UntypedActor {
         public String toString() {
             return "WorkComplete{" +
                     "result=" + result +
+                    '}';
+        }
+    }
+
+    public static final class FileUploadComplete implements Serializable {
+        public final Master.UploadFile result;
+        public final String host;
+
+        public FileUploadComplete(Master.UploadFile result, String host) {
+            this.result = result;
+            this.host = host;
+        }
+
+        @Override
+        public String toString() {
+            return "FileUploadComplete{" +
+                    "result=" + result +
+                    ", host='" + host + '\'' +
                     '}';
         }
     }

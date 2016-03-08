@@ -38,6 +38,27 @@ public abstract class MasterWorkerProtocol {
         }
     }
 
+    public static final class WorkerRequestsFile implements Serializable {
+        public final String workerId;
+        public final String role;
+        public final String host;
+
+        public WorkerRequestsFile(String workerId, String role,String host) {
+            this.workerId = workerId;
+            this.role = role;
+            this.host = host;
+        }
+
+        @Override
+        public String toString() {
+            return "WorkerRequestsFile{" +
+                    "workerId='" + workerId + '\'' +
+                    ", role='" + role + '\'' +
+                    ", host='" + host + '\'' +
+                    '}';
+        }
+    }
+
     public static final class WorkIsDone implements Serializable {
         public final String workerId;
         public final String workId;

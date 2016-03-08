@@ -117,8 +117,19 @@ public class ServerRepository {
 
         log.info("Report generated {}",result);
         if(result!=null && result instanceof ReportExecutor.ReportResult) {
-            log.info("Report generated accuretly{}",result);
+            log.info("Report generated accurately {}",result);
             return (ReportExecutor.ReportResult)result;
+        }
+        return null;
+    }
+
+    public String uploadFile(String path, String name, String role, String type) {
+        String trackingId = UUID.randomUUID().toString();
+        Master.UploadFile uploadFileRequest = new Master.UploadFile(trackingId,path,name,role,type);
+        Object result = sendToMaster(uploadFileRequest,5);
+        log.info("UploadFile request sent {}",result);
+        if(result!=null && result instanceof Master.Ack) {
+            return ((Master.Ack)result).getWorkId();
         }
         return null;
     }
