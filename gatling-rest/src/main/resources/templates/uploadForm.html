@@ -1,0 +1,61 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+          crossorigin="anonymous"/>
+</head>
+<body>
+
+<div class="container" th:if="${message}">
+    <h2 th:text="${message}"/>
+</div>
+
+<div class="container">
+
+    <form method="POST" enctype="multipart/form-data" action="/upload" role="form" class="form-horizontal" >
+        <div class="form-group" >
+            <div class="col-xs-4">
+            <label>File to upload:</label>
+            <input type="file" name="file" class="form-control"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-xs-4">
+            <label>Name:</label>
+            <input type="text" name="name" class="form-control"/>
+        </div>
+</div>
+        <div class="form-group">
+            <div class="col-xs-4">
+           <label> Project:</label>
+            <input type="text" name="role" class="form-control"/>
+          </div></div>
+        <div class="form-group">
+            <div class="col-xs-4">
+                <label>Name:</label>
+
+                    <select name="type" class="form-control">
+                        <option value="data">Data</option>
+                        <option  value="simulation">Simulation</option>
+                        <option  value="config">Config</option>
+                    </select>
+
+           </div>
+        </div>
+        <div class="form-group">
+        <input type="submit" value="Upload" class="btn btn-primary"/>
+            </div>
+    </form>
+
+</div>
+
+<div class="container">
+    <ul>
+        <li th:each="file : ${files}" th:text="${file}"></li>
+    </ul>
+</div>
+
+</body>
+</html>
