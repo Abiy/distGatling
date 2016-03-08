@@ -79,6 +79,16 @@ public class RestController {
         return Response.status(Response.Status.ACCEPTED).entity(workers).build();
     }
 
+    @GET
+    @Path("/upload/{id}")
+    @Produces("application/json")
+    @Timed
+    @Metered(name="meter-getServerInfo")
+    public Response getUploadInfo(@PathParam("id") String trackingId) {
+        Master.UploadInfo info = serverRepository.getUploadStatus(new Master.UploadInfo(trackingId));
+        return Response.status(Response.Status.ACCEPTED).entity(info).build();
+    }
+
     @POST
     @Path("/job")
     @Produces("application/json")

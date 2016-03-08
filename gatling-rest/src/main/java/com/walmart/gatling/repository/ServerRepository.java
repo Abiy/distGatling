@@ -133,4 +133,12 @@ public class ServerRepository {
         }
         return null;
     }
+
+    public Master.UploadInfo getUploadStatus(Master.UploadInfo uploadInfo) {
+        Object result = sendToMaster(uploadInfo,5);
+        if(result!=null && result instanceof Master.UploadInfo) {
+            return ((Master.UploadInfo)result);
+        }
+        return null;
+    }
 }
