@@ -40,7 +40,7 @@ public class ScriptExecutor extends WorkExecutor {
 
     @Override
     public void onReceive(Object message) {
-        //log.info("Script worker received task: {}", message);
+        log.info("Script worker received task: {}", message);
         if (message instanceof Master.Job) {
             runJob(message);
         }
@@ -60,7 +60,7 @@ public class ScriptExecutor extends WorkExecutor {
     private void runJob(Object message) {
         Master.Job job = (Master.Job) message;
         TaskEvent taskEvent = (TaskEvent)job.taskEvent;
-        if (taskEvent.getRoleName().equalsIgnoreCase("script")) {
+        if (true) {
             CommandLine cmdLine = new CommandLine(agentConfig.getJob().getCommand());
             log.info("Verified Script worker received task: {}", message);
             Map<String, Object> map = new HashMap<>();
@@ -98,7 +98,7 @@ public class ScriptExecutor extends WorkExecutor {
                 PumpStreamHandler psh = new PumpStreamHandler(new ExecLogHandler(outFile),new ExecLogHandler(errorFile));
 
                 executor.setStreamHandler(psh);
-                System.out.println(cmdLine);
+                log.info("command: {}",cmdLine);
                 int exitResult = executor.execute(cmdLine);
                 Worker.Result result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),  null, job);
                 if(executor.isFailure(exitResult)){
