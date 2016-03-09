@@ -36,9 +36,13 @@ public class ClusterFactory {
 
 
     public static ActorSystem startMaster(int port, String role, boolean isPrimary,AgentConfig agentConfig) {
+        String ip = HostUtils.lookupIp();
+        String seed = String.format("akka.cluster.seed-nodes=[\"akka.tcp://%s%s", Constants.PerformanceSystem, "@"+ HostUtils.lookupIp() +":2551\"]");
+        System.out.println(seed);
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + role + "]").
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)).
-                withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + HostUtils.lookupIp())).
+                withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + ip)).
+                withFallback(ConfigFactory.parseString(seed)).
                 withFallback(ConfigFactory.load("application"));
 
         ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);
@@ -47,7 +51,7 @@ public class ClusterFactory {
     }
 
     public static ActorRef  getMaster(String role, boolean isPrimary, ActorSystem system, AgentConfig agentConfig) {
-        String journalPath = String.format("akka.tcp://%s%s", Constants.PerformanceSystem, "@127.0.0.1:2551/user/store");
+        String journalPath = String.format("akka.tcp://%s%s", Constants.PerformanceSystem, "@"+ HostUtils.lookupIp() +":2551/user/store");
         startupSharedJournal(system, isPrimary, ActorPath$.MODULE$.fromString(journalPath));
         FiniteDuration workTimeout = Duration.create(60, "seconds");
         final ClusterSingletonManagerSettings settings =
