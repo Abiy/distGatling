@@ -31,7 +31,7 @@ public class MasterClientActor extends UntypedActor {
 
   public void onReceive(Object message) {
 
-    Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
+    Timeout timeout = new Timeout(120, TimeUnit.SECONDS);
     Future<Object> f = ask(masterProxy, message, timeout);
 
     final ExecutionContext ec = getContext().system().dispatcher();

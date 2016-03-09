@@ -48,7 +48,7 @@ public class SystemConfiguration {
         jobInfo.setCommand(env.getProperty("job.command"));
         jobInfo.setPath(env.getProperty("job.path"));
         jobInfo.setLogDirectory(env.getProperty("job.logDirectory"));
-        jobInfo.setExitValues(new int[]{0});
+        jobInfo.setExitValues(new int[]{0,1,2});
         agentConfig.setJob(jobInfo);
 
         AgentConfig.LogServer logServer = new AgentConfig.LogServer();

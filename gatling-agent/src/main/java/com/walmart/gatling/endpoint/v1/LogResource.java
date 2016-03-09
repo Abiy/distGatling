@@ -1,6 +1,9 @@
 package com.walmart.gatling.endpoint.v1;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,6 +30,8 @@ import javax.ws.rs.core.UriInfo;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class LogResource {
+
+    private final Logger log = LoggerFactory.getLogger(LogResource.class);
     @Context
     UriInfo uriInfo;
 
@@ -60,15 +65,13 @@ public class LogResource {
 
         try {
             File f = new File(filePath);
+            log.info("File: {}",filePath);
             final FileInputStream fStream = new FileInputStream(f);
-            StreamingOutput stream = new StreamingOutput() {
-                @Override
-                public void write(OutputStream output) throws IOException, WebApplicationException {
-                    try {
-                        pipe(fStream, output);
-                    } catch (Exception e) {
-                        throw new WebApplicationException(e);
-                    }
+            StreamingOutput stream = output -> {
+                try {
+                    pipe(fStream, output);
+                } catch (Exception e) {
+                    throw new WebApplicationException(e);
                 }
             };
             return Response.ok(stream).build();

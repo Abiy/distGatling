@@ -78,7 +78,8 @@ public class ReportExecutor extends WorkExecutor {
             for (Worker.Result result : job.results) {
                 String file = dir  + i++ + ".log";
                 FileUtils.touch(new File(file));
-                FileUtils.writeStringToFile( new File(file),result.metrics);
+                System.out.println("File: " + file);
+                FileUtils.writeStringToFile(new File(file), result.metrics);
             }
             String outPath = agentConfig.getJob().getOutPath(taskEvent.getJobName(), job.reportJob.trackingId);
             String errPath = agentConfig.getJob().getErrorPath(taskEvent.getJobName(), job.reportJob.trackingId);

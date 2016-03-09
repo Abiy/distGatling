@@ -43,7 +43,7 @@ public class Worker extends UntypedActor {
         public void apply(Object message) {
             if (message instanceof WorkComplete) {
                 Object result = ((WorkComplete) message).result;
-                log.info("Work is complete. Result {}.", result);
+                //log.info("Work is complete. Result {}.", result);
                 sendToMaster(new MasterWorkerProtocol.WorkIsDone(workerId, jobId(), result));
                 getContext().setReceiveTimeout(Duration.create(5, "seconds"));
                 Procedure<Object> waitForWorkIsDoneAck = waitForWorkIsDoneAck(result);

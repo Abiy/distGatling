@@ -88,9 +88,10 @@ public class ScriptExecutor extends WorkExecutor {
             executor.setWorkingDirectory(new File(agentConfig.getJob().getPath()));
             FileOutputStream outFile = null;
             FileOutputStream errorFile = null;
+            String outPath="",errPath="";
             try {
-                String outPath = agentConfig.getJob().getOutPath(taskEvent.getJobName(), job.jobId);
-                String errPath = agentConfig.getJob().getErrorPath(taskEvent.getJobName(), job.jobId);
+                outPath = agentConfig.getJob().getOutPath(taskEvent.getJobName(), job.jobId);
+                errPath = agentConfig.getJob().getErrorPath(taskEvent.getJobName(), job.jobId);
                 //create the std and err files
                 outFile = FileUtils.openOutputStream(new File(outPath));
                 errorFile = FileUtils.openOutputStream(new File(errPath));
@@ -114,7 +115,10 @@ public class ScriptExecutor extends WorkExecutor {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new RuntimeException(e);
+                //throw new RuntimeException(e);
+                Worker.Result result = new Worker.Result(-1,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),  null, job);
+                log.info("Executor Encountered run time exception, result: " +result.toString());
+                getSender().tell(new Worker.WorkFailed(result), getSelf());
             }
            finally {
                 IOUtils.closeQuietly(outFile);
