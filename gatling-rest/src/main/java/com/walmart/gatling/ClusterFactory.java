@@ -29,6 +29,7 @@ import scala.concurrent.duration.FiniteDuration;
 
 import com.walmart.gatling.commons.AgentConfig;
 import com.walmart.gatling.commons.Constants;
+import com.walmart.gatling.commons.HostUtils;
 import com.walmart.gatling.commons.Master;
 
 public class ClusterFactory {
@@ -37,6 +38,7 @@ public class ClusterFactory {
     public static ActorSystem startMaster(int port, String role, boolean isPrimary,AgentConfig agentConfig) {
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + role + "]").
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)).
+                withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + HostUtils.lookupIp())).
                 withFallback(ConfigFactory.load("application"));
 
         ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);

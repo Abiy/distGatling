@@ -4,6 +4,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.walmart.gatling.commons.AgentConfig;
 import com.walmart.gatling.commons.Constants;
+import com.walmart.gatling.commons.HostUtils;
 import com.walmart.gatling.commons.ScriptExecutor;
 import com.walmart.gatling.commons.WorkExecutor;
 import com.walmart.gatling.commons.Worker;
@@ -25,6 +26,7 @@ public class WorkerFactory {
     public static ActorSystem startWorkersWithExecutors(AgentConfig agent) {
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + agent.getActor().getRole() + "]")
                 .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + agent.getActor().getPort()))
+                .withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + HostUtils.lookupIp()))
                 .withFallback(ConfigFactory.load("application"));
 
         ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);

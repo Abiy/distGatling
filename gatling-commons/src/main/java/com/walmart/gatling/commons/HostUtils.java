@@ -20,4 +20,16 @@ public class HostUtils {
         }
         return "UNKNOWN";
     }
+
+    public static String lookupIp() {
+        InetAddress ip;
+        String ipAddress;
+        try {
+            ipAddress = InetAddress.getLocalHost().getHostAddress();
+            return ipAddress;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return "UNKNOWN";
+    }
 }
