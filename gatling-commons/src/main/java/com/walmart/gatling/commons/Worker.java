@@ -153,7 +153,7 @@ public class Worker extends UntypedActor {
                     else if (t instanceof Exception) {
                         if (currentJobId!=null) {
                             log.info("Exception, Work is failed for "+ currentJobId);
-                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Object()));
+                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Result(-1,"","","",null)));
                         }
                         getContext().become(idle);
                         return restart();
@@ -161,7 +161,7 @@ public class Worker extends UntypedActor {
                     else if (t instanceof RuntimeException) {
                         if (currentJobId!=null) {
                             log.info("RuntimeException, Work is failed for "+ currentJobId);
-                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Object()));
+                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Result(-1,"","","",null)));
                         }
                         getContext().become(idle);
                         return restart();

@@ -378,8 +378,8 @@ public class Master extends UntypedPersistentActor {
             log.info("Replayed {}", arg0.getClass().getSimpleName());
         }
         else if (arg0 instanceof UploadFile) {
-            UploadFile request = (UploadFile)arg0;
-            fileDtabase.put(request.trackingId, request);
+            //UploadFile request = (UploadFile)arg0;
+            //fileDtabase.put(request.trackingId, request);
             log.info("Replayed {}", arg0.getClass().getSimpleName());
         }
     }
@@ -525,6 +525,7 @@ public class Master extends UntypedPersistentActor {
             }
         } else if (cmd == CleanupTick) {
             Iterator<Map.Entry<String, WorkerState>> iterator = workers.entrySet().iterator();
+            Set<String> tobeRemoved = new HashSet<>();
             while (iterator.hasNext()) {
                 Map.Entry<String, WorkerState> entry = iterator.next();
                 String workerId = entry.getKey();
@@ -532,9 +533,13 @@ public class Master extends UntypedPersistentActor {
                 if (state.status.isBusy()) {
                     if (state.status.getDeadLine().isOverdue()) {
                         log.info("Work timed out: {}", state.status.getWorkId());
-                        workers.remove(workerId);
+                        tobeRemoved.add(workerId);
+                        //workers.remove(workerId);
                     }
                 }
+            }
+            for (String workerId : tobeRemoved) {
+                workers.remove(workerId);
             }
         } else {
             unhandled(cmd);

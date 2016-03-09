@@ -53,7 +53,7 @@ public class ClusterFactory {
     public static ActorRef  getMaster(String role, boolean isPrimary, ActorSystem system, AgentConfig agentConfig) {
         String journalPath = String.format("akka.tcp://%s%s", Constants.PerformanceSystem, "@"+ HostUtils.lookupIp() +":2551/user/store");
         startupSharedJournal(system, isPrimary, ActorPath$.MODULE$.fromString(journalPath));
-        FiniteDuration workTimeout = Duration.create(60, "seconds");
+        FiniteDuration workTimeout = Duration.create(120, "seconds");
         final ClusterSingletonManagerSettings settings =
                 ClusterSingletonManagerSettings.create(system).withRole(role);
 

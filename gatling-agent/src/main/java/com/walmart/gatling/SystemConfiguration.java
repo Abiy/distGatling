@@ -1,8 +1,8 @@
 package com.walmart.gatling;
 
 import com.walmart.gatling.commons.AgentConfig;
+import com.walmart.gatling.commons.HostUtils;
 import com.walmart.gatling.commons.MasterClientActor;
-import com.walmart.gatling.domain.HostUtils;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -51,11 +51,11 @@ public class SystemConfiguration {
        jobInfo.setCommand(env.getProperty("job.command"));
        jobInfo.setPath(env.getProperty("job.path"));
        jobInfo.setLogDirectory(env.getProperty("job.logDirectory"));
-       jobInfo.setExitValues(new int[]{0});
+       jobInfo.setExitValues(new int[]{0,2,1});
        agentConfig.setJob(jobInfo);
 
        AgentConfig.LogServer logServer = new AgentConfig.LogServer();
-       logServer.setHostName(HostUtils.lookupHost());
+       logServer.setHostName(HostUtils.lookupIp());
        logServer.setPort(clientPort);
        agentConfig.setLogServer(logServer);
 

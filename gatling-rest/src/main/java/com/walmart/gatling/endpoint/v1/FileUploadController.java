@@ -2,6 +2,7 @@ package com.walmart.gatling.endpoint.v1;
 
 import com.walmart.gatling.repository.ServerRepository;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -62,18 +63,12 @@ public class FileUploadController {
                                    @RequestParam("type") String type,
                                    @RequestParam("file") MultipartFile file,
                                    RedirectAttributes redirectAttributes) {
-        if (name.contains("/")) {
-            redirectAttributes.addFlashAttribute("message", "Folder separators not allowed");
-            return "redirect:upload";
-        }
-        if (name.contains("/")) {
-            redirectAttributes.addFlashAttribute("message", "Relative pathnames not allowed");
-            return "redirect:upload";
-        }
 
         if (!file.isEmpty()) {
             try {
                 String path = tempFileDir + "/" + name;
+                System.out.println(path);
+                FileUtils.touch(new File(path));
                 BufferedOutputStream stream = new BufferedOutputStream(
                         new FileOutputStream(new File(path)));
                 FileCopyUtils.copy(file.getInputStream(), stream);

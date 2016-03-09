@@ -49,7 +49,7 @@ public class ScriptExecutor extends WorkExecutor {
             try {
                 FileUtils.touch(new File(agentConfig.getJob().getPath(),fileJob.uploadFileRequest.getFileName()));
                 FileUtils.writeStringToFile(new File(agentConfig.getJob().getPath(),fileJob.uploadFileRequest.getFileName()),fileJob.content);
-                getSender().tell(new Worker.FileUploadComplete(fileJob.uploadFileRequest,HostUtils.lookupHost()), getSelf());
+                getSender().tell(new Worker.FileUploadComplete(fileJob.uploadFileRequest,HostUtils.lookupIp()), getSelf());
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
@@ -96,7 +96,6 @@ public class ScriptExecutor extends WorkExecutor {
                 errorFile = FileUtils.openOutputStream(new File(errPath));
 
                 PumpStreamHandler psh = new PumpStreamHandler(new ExecLogHandler(outFile),new ExecLogHandler(errorFile));
-
                 executor.setStreamHandler(psh);
                 log.info("command: {}",cmdLine);
                 int exitResult = executor.execute(cmdLine);
@@ -104,17 +103,20 @@ public class ScriptExecutor extends WorkExecutor {
                 if(executor.isFailure(exitResult)){
                     log.info("Script Executor Failed, result: " +result.toString());
                     getSender().tell(new Worker.WorkFailed(result), getSelf());
+                    return;
                 }
                 else{
                     result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),getMetrics(job), job);
                     log.info("Script Executor Completed, result: " +result.toString());
                     getSender().tell(new Worker.WorkComplete(result), getSelf());
+                    return;
                 }
 
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
-            }finally {
+            }
+           finally {
                 IOUtils.closeQuietly(outFile);
                 IOUtils.closeQuietly(errorFile);
             }
