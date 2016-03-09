@@ -20,7 +20,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
@@ -38,11 +37,7 @@ public class FileUploadController {
     @RequestMapping(method = RequestMethod.GET, value = "/upload")
     public String provideUploadInfo(Model model) throws IOException {
         File rootFolder = new File(tempFileDir);
-        if (rootFolder.exists()) {
-            List<String> fileNames = Arrays.stream(rootFolder.listFiles())
-                    .map(f -> f.getName())
-                    .collect(Collectors.toList());
-        } else {
+        if (!rootFolder.exists()) {
             rootFolder.mkdir();
         }
         rootFolder = new File(tempFileDir);
