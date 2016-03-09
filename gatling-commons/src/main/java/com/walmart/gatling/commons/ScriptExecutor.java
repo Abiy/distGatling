@@ -107,8 +107,8 @@ public class ScriptExecutor extends WorkExecutor {
                     return;
                 }
                 else{
-                    result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),getMetrics(job), job);
                     log.info("Script Executor Completed, job: " + job.jobId);
+                    result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),getMetrics(job), job);
                     getSender().tell(new Worker.WorkComplete(result), getSelf());
                     return;
                 }

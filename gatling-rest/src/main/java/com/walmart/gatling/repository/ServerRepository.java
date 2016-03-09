@@ -97,7 +97,7 @@ public class ServerRepository {
     }
 
     public TrackingResult getTrackingInfo(String trackingId) {
-        Object result = sendToMaster(new Master.TrackingInfo(trackingId),6);
+        Object result = sendToMaster(new Master.TrackingInfo(trackingId),60);
         if(result!=null && result instanceof TrackingResult) {
             TrackingResult info = (TrackingResult)result;
             return info;

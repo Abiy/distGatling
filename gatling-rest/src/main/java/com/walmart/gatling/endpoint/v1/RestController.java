@@ -115,9 +115,8 @@ public class RestController {
     public Response getTrack(@Context UriInfo uriInfo,@PathParam("id") String trackingId) {
         TrackingResult result;
         try {
-            System.out.println("TRACKING ID: " + uriInfo.getPath());
             result = serverRepository.getTrackingInfo(trackingId);
-            return Response.status(Response.Status.ACCEPTED).entity( ImmutableMap.of("trackingId",result)).build();
+            return Response.status(Response.Status.ACCEPTED).entity( ImmutableMap.of("trackingInfo",result)).build();
         } catch (Exception e) {
             log.error("Error while submitting user tracking request for: {}, {}",trackingId,e);
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Could not submit the job to the cluster master.").build();
