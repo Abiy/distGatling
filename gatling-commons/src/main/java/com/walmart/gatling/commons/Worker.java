@@ -111,7 +111,7 @@ public class Worker extends UntypedActor {
     public Worker(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval, String workerRole) {
         this.clusterClient = clusterClient;
         this.workerRole = workerRole;
-        this.host = HostUtils.lookupHost();
+        this.host = HostUtils.lookupIp();
         this.workExecutor = getContext().watch(getContext().actorOf(workExecutorProps, "exec"));
         this.registerTask = getContext().system().scheduler().schedule
                 (
