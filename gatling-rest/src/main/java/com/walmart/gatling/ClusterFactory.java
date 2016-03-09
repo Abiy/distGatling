@@ -38,7 +38,6 @@ public class ClusterFactory {
     public static ActorSystem startMaster(int port, String role, boolean isPrimary,AgentConfig agentConfig) {
         String ip = HostUtils.lookupIp();
         String seed = String.format("akka.cluster.seed-nodes=[\"akka.tcp://%s%s", Constants.PerformanceSystem, "@"+ HostUtils.lookupIp() +":2551\"]");
-        System.out.println(seed);
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + role + "]").
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)).
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + ip)).
