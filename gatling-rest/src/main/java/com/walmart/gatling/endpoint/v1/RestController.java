@@ -98,7 +98,7 @@ public class RestController {
         String result;
         try {
             result = serverRepository.submitJob(jobModel);
-            return Response.status(Response.Status.ACCEPTED).entity( ImmutableMap.of("trackingId",result)).build();
+            return Response.status(Response.Status.ACCEPTED).entity( ImmutableMap.of("trackingPath","/gatling/server/track/"+ result)).build();
         } catch (Exception e) {
             log.error("Error while submitting user job {}, {}",jobModel,e);
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Could not submit the job to the cluster master.").build();

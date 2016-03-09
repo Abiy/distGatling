@@ -102,13 +102,13 @@ public class ScriptExecutor extends WorkExecutor {
                 int exitResult = executor.execute(cmdLine);
                 Worker.Result result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),  null, job);
                 if(executor.isFailure(exitResult)){
-                    log.info("Script Executor Failed, result: " +result.toString());
+                    log.info("Script Executor Failed, job: " + job.jobId);
                     getSender().tell(new Worker.WorkFailed(result), getSelf());
                     return;
                 }
                 else{
                     result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),getMetrics(job), job);
-                    log.info("Script Executor Completed, result: " +result.toString());
+                    log.info("Script Executor Completed, job: " + job.jobId);
                     getSender().tell(new Worker.WorkComplete(result), getSelf());
                     return;
                 }
