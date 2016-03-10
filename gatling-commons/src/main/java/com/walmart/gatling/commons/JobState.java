@@ -272,13 +272,13 @@ public final class JobState {
         long pendingCount = pendingJobs.stream().filter(p -> p.trackingId.equalsIgnoreCase(trackingId)).count();
         long inprogressCount = jobsInProgress.values().stream().filter(p -> p.trackingId.equalsIgnoreCase(trackingId)).count();
         TrackingResult result = new TrackingResult(pendingCount, inprogressCount);
-        System.out.println("Completed Tracking: "+ completedJobs);
+        //System.out.println("Completed Tracking: "+ completedJobs);
         result.setCompleted(
                 completedJobs.stream()
                         .filter(c -> c.job.trackingId.equalsIgnoreCase(trackingId))
                         .map(p -> new TaskTrackingInfo(p.errPath, (p.stdPath)))
                         .collect(Collectors.toList()));
-        System.out.println("Failed Tracking: "+ failedJobs);
+        //System.out.println("Failed Tracking: "+ failedJobs);
         result.setFailed(failedJobs.stream().filter(c -> c.job.trackingId.equalsIgnoreCase(trackingId))
                 .map(p -> new TaskTrackingInfo(p.errPath, p.stdPath))
                 .collect(Collectors.toList()));
