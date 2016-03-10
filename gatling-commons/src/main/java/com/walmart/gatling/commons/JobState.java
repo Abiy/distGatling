@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 
@@ -17,8 +18,8 @@ public final class JobState {
     private final Set<String> acceptedJobIds;
     private final Set<String> doneJobIds;
     private final ConcurrentLinkedDeque<Master.Job> pendingJobs;
-    private final  List<Worker.Result> failedJobs;
-    private final List<Worker.Result> completedJobs;
+    private final ConcurrentLinkedQueue<Worker.Result> failedJobs;
+    private final ConcurrentLinkedQueue<Worker.Result> completedJobs;
 
 
     public JobState updated(JobDomainEvent event) {
@@ -46,8 +47,8 @@ public final class JobState {
         acceptedJobIds = new HashSet<>();
         doneJobIds = new HashSet<>();
         pendingJobs = new ConcurrentLinkedDeque<>();
-        failedJobs = new ArrayList<>();
-        completedJobs = new ArrayList<>();
+        failedJobs = new ConcurrentLinkedQueue<>();
+        completedJobs = new ConcurrentLinkedQueue<>();
     }
 
     private JobState(JobState jobState, JobAccepted workAccepted) {
@@ -59,8 +60,8 @@ public final class JobState {
         acceptedJobIds = tmp_acceptedWorkIds;
         doneJobIds = new HashSet<String>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
-        failedJobs = new ArrayList<>(jobState.failedJobs);
-        completedJobs = new ArrayList<>(jobState.completedJobs);
+        failedJobs = new ConcurrentLinkedQueue<>(jobState.failedJobs);
+        completedJobs = new ConcurrentLinkedQueue<>(jobState.completedJobs);
 
     }
 
@@ -79,8 +80,8 @@ public final class JobState {
         ;
         doneJobIds = new HashSet<String>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
-        failedJobs = new ArrayList<>(jobState.failedJobs);
-        completedJobs = new ArrayList<>(jobState.completedJobs);
+        failedJobs = new ConcurrentLinkedQueue<>(jobState.failedJobs);
+        completedJobs = new ConcurrentLinkedQueue<>(jobState.completedJobs);
     }
 
     public JobState(JobState jobState, JobCompleted workCompleted) {
@@ -93,12 +94,12 @@ public final class JobState {
 
         doneJobIds = tmp_doneWorkIds;
         pendingJobs = new ConcurrentLinkedDeque<Master.Job>(jobState.pendingJobs);
-        failedJobs = new ArrayList<>(jobState.failedJobs);
+        failedJobs = new ConcurrentLinkedQueue<>(jobState.failedJobs);
 
         List<Worker.Result> tmp_completed = new ArrayList<>(jobState.completedJobs);
         Worker.Result result = (Worker.Result) workCompleted.result;
         tmp_completed.add(result);
-        completedJobs = new ArrayList<>(tmp_completed);
+        completedJobs = new ConcurrentLinkedQueue<>(tmp_completed);
     }
 
 
@@ -114,12 +115,12 @@ public final class JobState {
         doneJobIds = new HashSet<String>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
 
-        completedJobs = new ArrayList<>(jobState.completedJobs);
+        completedJobs = new ConcurrentLinkedQueue<>(jobState.completedJobs);
 
         List<Worker.Result> tmp_Failed = new ArrayList<>(jobState.failedJobs);
         Worker.Result result = (Worker.Result) jobFailed.result;
         tmp_Failed.add(result);
-        failedJobs = new ArrayList<>(tmp_Failed);
+        failedJobs = new ConcurrentLinkedQueue<>(tmp_Failed);
     }
 
 
@@ -132,8 +133,8 @@ public final class JobState {
         acceptedJobIds = new HashSet<String>(jobState.acceptedJobIds);
         doneJobIds = new HashSet<String>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
-        failedJobs = new ArrayList<>(jobState.failedJobs);
-        completedJobs = new ArrayList<>(jobState.completedJobs);
+        failedJobs = new ConcurrentLinkedQueue<>(jobState.failedJobs);
+        completedJobs = new ConcurrentLinkedQueue<>(jobState.completedJobs);
     }
 
     public JobState(JobState jobState, JobPostponed jobPostponed) {
@@ -144,8 +145,8 @@ public final class JobState {
         acceptedJobIds = new HashSet<String>(jobState.acceptedJobIds);
         doneJobIds = new HashSet<String>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
-        failedJobs = new ArrayList<>(jobState.failedJobs);
-        completedJobs = new ArrayList<>(jobState.completedJobs);
+        failedJobs = new ConcurrentLinkedQueue<>(jobState.failedJobs);
+        completedJobs = new ConcurrentLinkedQueue<>(jobState.completedJobs);
     }
 
 
