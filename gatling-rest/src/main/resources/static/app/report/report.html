@@ -9,7 +9,8 @@
             </div>
         </div>
         <div class="form-group">
-            <input type="submit" value="Submit Report" class="btn btn-primary"/>
+            <input type="submit" value="Generate Report" class="btn btn-primary"/>
+            <img ng-show="inProgress" src="/spinner.gif">
         </div>
     </form>
 
@@ -17,7 +18,7 @@
 
     <div class="col-xs-4" ng-show="report.length > 0">
         <label> Follow the link to view the report.</label>
-        <a ng-href="{{report}}">tracker</a>
+        <a ng-href="{{report}}">report</a>
     </div>
 
 </div>
