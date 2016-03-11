@@ -1,0 +1,37 @@
+<div class="container">
+
+    <form role="form" class="form-horizontal"  ng-submit="submitJob()">
+
+        <div class="form-group">
+            <div class="col-xs-4">
+                <label>Project:</label>
+                <input type="text" name="roleId" class="form-control" ng-model="role"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-4">
+                <label> Simulation:</label>
+                <input type="text" name="simulation" class="form-control" ng-model="simulation"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-4">
+                <label> Count:</label>
+                <input type="text" name="count" class="form-control" ng-model="count"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Submit Job" class="btn btn-primary"/>
+        </div>
+    </form>
+
+    <br/>
+
+    <div class="col-xs-4" ng-show="tracker.length > 0">
+        <label> The cluster has received your job, follow the link to track the progress.</label>
+        <a ng-href="{{tracker}}">tracker</a>
+    </div>
+
+</div>
+
+<div class="alert alert-info" role="alert" ></div>

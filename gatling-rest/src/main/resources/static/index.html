@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="./bower_components/bootstrap-css-only/css/bootstrap.min.css" />
+</head>
+<body ng-app="gatling">
+<div class="container">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Distributed Gatling </a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#/">Home</a></li>
+                <li><a href="#/cluster">Cluster</a></li>
+                <li><a href="#/job">Job</a></li>
+                <li><a href="#/tracker">Job Tracker</a></li>
+                <li><a href="#/report">Report</a></li>
+                <li><a href="/upload">Repository</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="alert alert-info" role="alert" ng-hide="items && items.length > 0">
+
+    </div>
+    <ng-view></ng-view>
+</div>
+<script type="text/javascript" src="./bower_components/angular/angular.min.js"></script>
+<script type="text/javascript" src="./bower_components/angular-route/angular-route.js"></script>
+<script type="text/javascript" src="./bower_components/angular-resource/angular-resource.min.js"></script>
+<script type="text/javascript" src="./app/app.js"></script>
+<script type="text/javascript" src="./app/cluster/controller.js"></script>
+<script type="text/javascript" src="./app/job/controller.js"></script>
+<script type="text/javascript" src="./app/tracker/controller.js"></script>
+<script type="text/javascript" src="./app/home/controller.js"></script>
+<script type="text/javascript" src="./app/report/controller.js"></script>
+</body>
+</html>

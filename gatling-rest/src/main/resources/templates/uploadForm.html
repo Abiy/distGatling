@@ -10,7 +10,28 @@
 <div class="container" th:if="${message}">
     <h2 th:text="${message}"/>
 </div>
-
+<div>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Distributed Gatling </a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="/#/cluster">Cluster</a></li>
+                <li><a href="/#/job">Job</a></li>
+                <li><a href="/#/tracker">Job Tracker</a></li>
+                <li><a href="/#/report">Report</a></li>
+                <li><a href="/upload">Repository</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="alert alert-info" role="alert" ></div>
+</div>
 <div class="container">
 
     <form method="POST" enctype="multipart/form-data" action="/upload" role="form"
@@ -58,6 +79,6 @@
         <li th:each="file : ${files}" th:text="${file}"></li>
     </ul>
 </div>
-
+<div class="alert alert-info" role="alert" ></div>
 </body>
 </html>

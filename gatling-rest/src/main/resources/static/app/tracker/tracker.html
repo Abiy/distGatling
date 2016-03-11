@@ -1,0 +1,64 @@
+<fieldset disabled>
+    <div class="form-group">
+        <p> Pending Count: {{pendingCount}}</p>
+    </div>
+
+    <div class="form-group">
+        <p> In Progress Count: {{inProgressCount}}</p>
+    </div>
+    <div class="form-group" ng-show="inProgressCount>0">
+        <p> Job In Progress</p>
+    </div>
+    <div class="form-group" ng-show="pendingCount>0 && inProgressCount==0">
+        <p> No Worker Available</p>
+    </div>
+
+    <div class="form-group" ng-show="pendingCount==0 && inProgressCount==0">
+        <p> Job Completed</p><a ng-href="#/report/{{trackingId}}">View Report</a>
+    </div>
+</fieldset>
+
+<div class="alert alert-info" role="alert" >
+    COMPLETED TASKS:
+</div>
+<div class="table-responsive">
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ERROR</th>
+            <th>STD</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="work in completed">
+            <td> <a ng-href="{{work.errorLog}}"> Error Log</a> <p>{{work.errorLog}}</p> </td>
+            <td><a ng-href="{{work.stdLog}}"> Std Log</a><p>{{work.stdLog}}</p></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-info" role="alert" >
+  FAILED TASKS:
+</div>
+
+<div class="table-responsive">
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ERROR</th>
+            <th>STD</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="work in failed">
+            <td> <a ng-href="{{work.errorLog}}"> Error Log</a> <p>{{work.errorLog}}</p> </td>
+            <td><a ng-href="{{work.stdLog}}"> Std Log</a><p>{{work.stdLog}}</p></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-info" role="alert" ></div>

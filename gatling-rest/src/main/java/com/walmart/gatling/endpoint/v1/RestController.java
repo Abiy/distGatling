@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -98,7 +99,9 @@ public class RestController {
         String result;
         try {
             result = serverRepository.submitJob(jobModel);
-            return Response.status(Response.Status.ACCEPTED).entity( ImmutableMap.of("trackingPath","/gatling/server/track/"+ result)).build();
+            //String path = "/gatling/server/track/" + result;
+            String path = "#/tracker/" + result;
+            return Response.status(Response.Status.ACCEPTED).entity( ImmutableMap.of("trackingPath",path)).build();
         } catch (Exception e) {
             log.error("Error while submitting user job {}, {}",jobModel,e);
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Could not submit the job to the cluster master.").build();
