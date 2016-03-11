@@ -6,10 +6,6 @@
           crossorigin="anonymous"/>
 </head>
 <body>
-
-<div class="container" th:if="${message}">
-    <h2 th:text="${message}"/>
-</div>
 <div>
     <nav class="navbar navbar-inverse">
         <div class="container-fluid">
@@ -32,6 +28,11 @@
     </nav>
     <div class="alert alert-info" role="alert" ></div>
 </div>
+<div class="container" th:if="${message}">
+    <h2 th:text="${message}"/>
+    <a th:href="${link}" > Upload status</a>
+</div>
+
 <div class="container">
 
     <form method="POST" enctype="multipart/form-data" action="/upload" role="form"
@@ -62,7 +63,7 @@
                 <select name="type" class="form-control">
                     <option value="data">Data</option>
                     <option value="simulations">Simulation</option>
-                    <option value="config">Config</option>
+                    <option value="conf">Config</option>
                 </select>
 
             </div>

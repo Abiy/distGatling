@@ -40,7 +40,7 @@ public class ScriptExecutor extends WorkExecutor {
 
     @Override
     public void onReceive(Object message) {
-        log.info("Script worker received task: {}", message);
+        //log.info("Script worker received task: {}", message);
         if (message instanceof Master.Job) {
             runJob(message);
         }

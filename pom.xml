@@ -13,7 +13,6 @@
     <modules>
         <module>gatling-rest</module>
         <module>gatling-agent</module>
-        <module>gatling-ui</module>
         <module>gatling-commons</module>
         <module>gatling-bundle</module>
     </modules>

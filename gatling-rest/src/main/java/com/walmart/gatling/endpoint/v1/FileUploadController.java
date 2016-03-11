@@ -70,7 +70,10 @@ public class FileUploadController {
                 stream.close();
                 String trackingId = serverRepository.uploadFile(path, name, role, type);
                 redirectAttributes.addFlashAttribute("message",
-                        "You successfully uploaded " + name + "! Tracking Id: " + trackingId);
+                        "You successfully uploaded " + name + "! ");
+
+                redirectAttributes.addFlashAttribute("link",
+                        "/#/file/" + trackingId);
             } catch (Exception e) {
                 redirectAttributes.addFlashAttribute("message",
                         "You failed to upload " + name + " => " + e.getMessage());

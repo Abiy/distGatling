@@ -482,6 +482,8 @@ public class Master extends UntypedPersistentActor {
         }
 
         public String getFileName() {
+            if(type.equalsIgnoreCase("conf"))
+                return type + "/" + name;
             return "user-files/" + type + "/" + name;
         }
 
