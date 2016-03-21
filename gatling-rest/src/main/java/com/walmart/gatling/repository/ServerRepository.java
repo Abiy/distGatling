@@ -74,8 +74,8 @@ public class ServerRepository {
         TaskEvent taskEvent = new TaskEvent();
         taskEvent.setJobName("gatling");
         taskEvent.setRoleName(jobModel.getRoleId());
-        taskEvent.setParameters(Arrays.asList(new Pair<>("0", "-nr"),
-                new Pair<>("1", "-s"), new Pair<>("2", jobModel.getSimulation())
+        taskEvent.setParameters(Arrays.asList(new Pair<>("0", "-nr"),new Pair<>("1", "-m"),
+                new Pair<>("2", "-s"), new Pair<>("3", jobModel.getSimulation())
         ));
         //cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId,job.jobId));
         Timeout timeout = new Timeout(6, TimeUnit.SECONDS);

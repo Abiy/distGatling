@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <link rel="stylesheet" href="./bower_components/bootstrap-css-only/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./bower_components/nvd3/build/nv.d3.css" />
 </head>
 <body ng-app="gatling">
 <div class="container">
@@ -29,9 +30,15 @@
     </div>
     <ng-view></ng-view>
 </div>
+
 <script type="text/javascript" src="./bower_components/angular/angular.min.js"></script>
 <script type="text/javascript" src="./bower_components/angular-route/angular-route.js"></script>
 <script type="text/javascript" src="./bower_components/angular-resource/angular-resource.min.js"></script>
+
+<script type="text/javascript" src="./bower_components/d3/d3.min.js"></script>
+<script type="text/javascript" src="./bower_components/nvd3/build/nv.d3.min.js"></script>
+<script type="text/javascript" src="./bower_components/angular-nvd3/dist/angular-nvd3.js"></script>
+
 <script type="text/javascript" src="./app/app.js"></script>
 <script type="text/javascript" src="./app/cluster/controller.js"></script>
 <script type="text/javascript" src="./app/job/controller.js"></script>
