@@ -73,6 +73,7 @@ public class RestController {
     public Response getServerInfo() {
         Master.ServerInfo info = serverRepository.getServerStatus(new Master.ServerInfo());
         log.info("Processing  get entity request{}", info);
+
         List<ValuePair> workers = info.getWorkers().entrySet().stream().map(stateEntry ->
                 new ValuePair(stateEntry.getValue().status.toString(),
                         stateEntry.getValue().ref.path().name().toString(),
