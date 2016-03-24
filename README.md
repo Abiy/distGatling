@@ -53,3 +53,4 @@ After joining the cluster, CW workers are responsible for
 After unzipping the download bundle 
     Run master.sh to start the Cluster Master, take a note of the master ip and port
     Run worker.sh to start the Cluster worker for each node you intend to include to the cluster, each worker should be assigned the correct master contact point
+    -Dakka.contact-points=akka.tcp://PerformanceSystem@10.165.150.249:2551/system/receptionist

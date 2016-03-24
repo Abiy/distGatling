@@ -101,7 +101,8 @@ public class ScriptExecutor extends WorkExecutor {
                 log.info("command: {}",cmdLine);
                 int exitResult = executor.execute(cmdLine);
                 Worker.Result result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),  null, job);
-                if(executor.isFailure(exitResult)){
+                log.info("Exit code: {}",exitResult);
+                if(executor.isFailure(exitResult) || exitResult==1){
                     log.info("Script Executor Failed, job: " + job.jobId);
                     getSender().tell(new Worker.WorkFailed(result), getSelf());
                     return;

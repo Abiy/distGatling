@@ -83,7 +83,7 @@ public abstract class MasterWorkerProtocol {
     public static final class WorkFailed implements Serializable {
         public final String workerId;
         public final String workId;
-        public transient final Object result;
+        public final Object result;
 
         public WorkFailed(String workerId, String workId,Object result) {
             this.workerId = workerId;
@@ -95,7 +95,8 @@ public abstract class MasterWorkerProtocol {
         public String toString() {
             return "WorkFailed{" +
                     "workerId='" + workerId + '\'' +
-                    ", jobId='" + workId + '\'' +
+                    ", workId='" + workId + '\'' +
+                    ", result=" + result +
                     '}';
         }
     }

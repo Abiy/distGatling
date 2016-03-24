@@ -208,8 +208,8 @@ public class Master extends UntypedPersistentActor {
     private void onWorkFailed(MasterWorkerProtocol.WorkFailed cmd) {
         final String workId = cmd.workId;
         final String workerId = cmd.workerId;
+        log.info("Work {} failed by worker {}", workId, workerId);
         if (jobDatabase.isInProgress(workId)) {
-            log.info("Work {} failed by worker {}", workId, workerId);
             changeWorkerToIdle(workerId, workId);
             persist(new JobState.JobFailed(workId, cmd.result), event -> {
                 jobDatabase = jobDatabase.updated(event);

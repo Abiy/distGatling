@@ -112,7 +112,7 @@ public final class JobState {
         tmp_workInProgress.remove(jobFailed.workId);
         jobsInProgress = tmp_workInProgress;
         acceptedJobIds = acceptedJobIds_tmp;
-        doneJobIds = new HashSet<String>(jobState.doneJobIds);
+        doneJobIds = new HashSet<>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
 
         completedJobs = new ConcurrentLinkedQueue<>(jobState.completedJobs);
