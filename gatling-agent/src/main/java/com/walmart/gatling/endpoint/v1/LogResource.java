@@ -24,7 +24,7 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
 /**
- * Created by ahailemichael on 7/6/15.
+ * Created walmart
  */
 @Path("/log/")
 @Produces(MediaType.APPLICATION_JSON)

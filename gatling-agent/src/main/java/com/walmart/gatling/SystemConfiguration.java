@@ -65,7 +65,7 @@ public class SystemConfiguration {
    }
 
     @Bean
-    public ActorSystem createActorSystemWithMaster(AgentConfig agentConfig){
+    public ActorSystem createActorSystemWithAgent(AgentConfig agentConfig){
         return WorkerFactory.startWorkersWithExecutors(agentConfig);
     }
 

@@ -150,17 +150,17 @@ public class Worker extends UntypedActor {
                         return stop();
                     else if (t instanceof DeathPactException)
                         return stop();
-                    else if (t instanceof Exception) {
+                    else if (t instanceof RuntimeException) {
                         if (currentJobId!=null) {
-                            log.info("Exception, Work is failed for "+ currentJobId);
+                            log.info("RuntimeException, Work is failed for "+ currentJobId);
                             sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Result(-1,"","","",null)));
                         }
                         getContext().become(idle);
                         return restart();
                     }
-                    else if (t instanceof RuntimeException) {
+                    else if (t instanceof Exception) {
                         if (currentJobId!=null) {
-                            log.info("RuntimeException, Work is failed for "+ currentJobId);
+                            log.info("Exception, Work is failed for "+ currentJobId);
                             sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Result(-1,"","","",null)));
                         }
                         getContext().become(idle);
