@@ -136,7 +136,7 @@ public class RestController {
     public Response postReport(@Context UriInfo uriInfo,@PathParam("id") String trackingId) {
         try {
             ReportExecutor.ReportResult res =  serverRepository.generateReport(trackingId);
-           log.info("report result: {}",res);
+            log.info("report result: {}",res);
             return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", res.result)).build();
         } catch (Exception e) {
             log.error("Error while submitting user report request for: {}, {}",trackingId,e);
