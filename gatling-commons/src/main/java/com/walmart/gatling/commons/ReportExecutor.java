@@ -73,13 +73,11 @@ public class ReportExecutor extends WorkExecutor {
         FileOutputStream outFile = null;
         FileOutputStream errorFile = null;
         try {
-            //loop through all results and write files
+            //download all files adn
             int i=0;
             for (Worker.Result result : job.results) {
-                String file = dir  + i++ + ".log";
-                FileUtils.touch(new File(file));
-                System.out.println("File: " + file);
-                FileUtils.writeStringToFile(new File(file), result.metrics);
+                String destFile = dir  + i++ + ".log";
+                DownloadFile.downloadFile(result.metrics,destFile);
             }
             String outPath = agentConfig.getJob().getOutPath(taskEvent.getJobName(), job.reportJob.trackingId);
             String errPath = agentConfig.getJob().getErrorPath(taskEvent.getJobName(), job.reportJob.trackingId);

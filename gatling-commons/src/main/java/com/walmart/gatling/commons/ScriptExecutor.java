@@ -108,8 +108,8 @@ public class ScriptExecutor extends WorkExecutor {
                     return;
                 }
                 else{
-                    log.info("Script Executor Completed, job: " + job.jobId);
-                    result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),getMetrics(job), job);
+                    result = new Worker.Result(exitResult,agentConfig.getUrl(errPath),agentConfig.getUrl(outPath),agentConfig.getUrl(getMetricsPath(job)), job);
+                    log.info("Script Executor Completed, job: " + result);
                     getSender().tell(new Worker.WorkComplete(result), getSelf());
                     return;
                 }
@@ -132,6 +132,25 @@ public class ScriptExecutor extends WorkExecutor {
         }
     }
 
+    /**
+     * Assumes there will only be one file in the directory
+     * @param job
+     * @return
+     */
+    public String getMetricsPath(Master.Job job) {
+        File dir = new File(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
+        log.info("Directory for metrics: {}", dir.getAbsolutePath());
+        List<File> files = (List<File>) FileUtils.listFiles(dir, logFilter, logFilter);
+        log.info("Files for metrics: {}", files);
+        String result = files.stream().filter(f->f.getName().endsWith(".log")).findFirst().get().getAbsolutePath();
+        return result;
+    }
+
+    /**
+     * Assumes there will only be one file in the directory
+     * @param job
+     * @return
+     */
     public String getMetrics(Master.Job job) {
         File dir = new File(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
         log.info("Directory for metrics: {}", dir.getAbsolutePath());
