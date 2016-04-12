@@ -70,6 +70,26 @@ public class AgentConfig {
         return result;
     }
 
+    public String getMasterUrl(String filePath) {
+        String host = logServer.getHostName();
+        if (StringUtils.isEmpty(logServer.getHostName())) {
+            try {
+                host = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                ;
+            }
+        }
+        String result = StringUtils.EMPTY;
+        final String ENCODING = "UTF-8";
+        try {
+            result = String.format("http://%s:%s/gatling/lib/stream?filePath=%s", host, Integer.toString(logServer.getPort()), URLEncoder.encode(filePath, ENCODING));
+        } catch (UnsupportedEncodingException e) {
+            ;
+        }
+
+        return result;
+    }
+
     public void setContactPoint(String contactPoint) {
         this.contactPoint = contactPoint;
     }

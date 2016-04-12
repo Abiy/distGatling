@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +48,16 @@ public class ScriptExecutor extends WorkExecutor {
         else if (message instanceof Master.FileJob) {
             Master.FileJob fileJob = (Master.FileJob) message;
             try {
-                FileUtils.touch(new File(agentConfig.getJob().getPath(),fileJob.uploadFileRequest.getFileName()));
-                FileUtils.writeStringToFile(new File(agentConfig.getJob().getPath(),fileJob.uploadFileRequest.getFileName()),fileJob.content);
-                getSender().tell(new Worker.FileUploadComplete(fileJob.uploadFileRequest,HostUtils.lookupIp()), getSelf());
+                if(fileJob.content!=null) {
+                    FileUtils.touch(new File(agentConfig.getJob().getPath(), fileJob.uploadFileRequest.getFileName()));
+                    FileUtils.writeStringToFile(new File(agentConfig.getJob().getPath(), fileJob.uploadFileRequest.getFileName()), fileJob.content);
+                    getSender().tell(new Worker.FileUploadComplete(fileJob.uploadFileRequest, HostUtils.lookupIp()), getSelf());
+                }
+                else if (fileJob.remotePath!=null){
+                    FileUtils.touch(new File(agentConfig.getJob().getPath(), fileJob.uploadFileRequest.getFileName()));
+                    FileUtils.copyURLToFile(new URL(fileJob.remotePath),new File(agentConfig.getJob().getPath(), fileJob.uploadFileRequest.getFileName()));
+                    getSender().tell(new Worker.FileUploadComplete(fileJob.uploadFileRequest, HostUtils.lookupIp()), getSelf());
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);

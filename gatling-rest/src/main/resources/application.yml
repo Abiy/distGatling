@@ -1,6 +1,9 @@
 server:
   port: 8080
 
+multipart:
+  max-file-size: 10Mb
+
 actor:
   numberOfActors: 1
   port: 2555

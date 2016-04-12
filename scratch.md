@@ -4,3 +4,5 @@
 
 sh agent.sh -Dserver.port=8091 -Dakka.contact-points=akka.tcp://PerformanceSystem@10.165.150.249:2551/system/receptionist -Dactor.port=2556
 
+sh master.sh -Dserver.port=8080 
+

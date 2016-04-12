@@ -44,6 +44,7 @@ public class Master extends UntypedPersistentActor {
     private final FiniteDuration workTimeout;
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private final Cancellable cleanupTask;
+    private final AgentConfig agentConfig;
 
     private HashMap<String, WorkerState> workers = new HashMap<>();
     private Set<String> fileTracker = new HashSet<>();
@@ -52,6 +53,7 @@ public class Master extends UntypedPersistentActor {
 
     public Master(FiniteDuration workTimeout, AgentConfig agentConfig) {
         this.workTimeout = workTimeout;
+        this.agentConfig = agentConfig;
         this.reportExecutor = getContext().watch(getContext().actorOf(Props.create(ReportExecutor.class, agentConfig), "report"));
         ClusterClientReceptionist.get(getContext().system()).registerService(getSelf());
         this.cleanupTask = getContext().system().scheduler().schedule(workTimeout.div(2), workTimeout.div(2), getSelf(), CleanupTick, getContext().dispatcher(), getSelf());
@@ -287,8 +289,14 @@ public class Master extends UntypedPersistentActor {
         if (unsentFile.isPresent()) {
             String tId = unsentFile.get().split("_")[0];
             UploadFile uploadFile = fileDtabase.get(tId);
-            String content = FileUtils.readFileToString(new File(uploadFile.path));
-            getSender().tell(new FileJob(content, uploadFile), getSelf());
+            if(uploadFile.type.equalsIgnoreCase("lib")){
+                String soonToBeRemotePath = agentConfig.getMasterUrl(uploadFile.path);
+                getSender().tell(new FileJob(null, uploadFile, soonToBeRemotePath), getSelf());
+            }
+            else {
+                String content = FileUtils.readFileToString(new File(uploadFile.path));
+                getSender().tell(new FileJob(content, uploadFile, null), getSelf());
+            }
         }
     }
 
@@ -450,19 +458,22 @@ public class Master extends UntypedPersistentActor {
 
     public static final class FileJob implements Serializable {
         public final String content;//task
+        public final String remotePath;//task
         public final String jobId;
         public final UploadFile uploadFileRequest;
 
-        public FileJob(String content, UploadFile uploadFileRequest) {
+        public FileJob(String content, UploadFile uploadFileRequest,String remotePath) {
             this.jobId = UUID.randomUUID().toString();
             this.uploadFileRequest = uploadFileRequest;
             this.content = content;
+            this.remotePath = remotePath;
         }
 
         @Override
         public String toString() {
             return "FileJob{" +
                     "content='" + content + '\'' +
+                    ", remotePath='" + remotePath + '\'' +
                     ", jobId='" + jobId + '\'' +
                     ", uploadFileRequest=" + uploadFileRequest +
                     '}';
@@ -482,7 +493,7 @@ public class Master extends UntypedPersistentActor {
         }
 
         public String getFileName() {
-            if(type.equalsIgnoreCase("conf"))
+            if(type.equalsIgnoreCase("conf") || type.equalsIgnoreCase("lib"))
                 return type + "/" + name;
             return "user-files/" + type + "/" + name;
         }
