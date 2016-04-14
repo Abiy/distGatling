@@ -52,7 +52,7 @@ public class SystemConfiguration {
         agentConfig.setJob(jobInfo);
 
         AgentConfig.LogServer logServer = new AgentConfig.LogServer();
-        logServer.setHostName(HostUtils.lookupHost());
+        logServer.setHostName(HostUtils.lookupIp());
         logServer.setPort(clientPort);
         agentConfig.setLogServer(logServer);
 
