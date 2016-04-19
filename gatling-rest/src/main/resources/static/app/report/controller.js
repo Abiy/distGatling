@@ -6,6 +6,7 @@ angular.module('gatling.report',[]).
         $scope.trackingId = $routeParams.id;
         $scope.report= '';
         $scope.inProgress= false;
+        $scope.showError= false;
 
 
           $scope.submitReport = function(){
@@ -13,8 +14,19 @@ angular.module('gatling.report',[]).
                    $http.post('/gatling/server/report/'+$scope.trackingId,{})
                    .success(function(data){
                        console.log(data);
-                       $scope.report = data.report;
+                       if(data.length >0){
+                        $scope.report = data.report;
+                        $scope.inProgress = false;
+                       }
+                       else{
+                        $scope.showError = true;
+                        $scope.inProgress = false;
+                       }
+                   })
+                   .error(function(data){
+                       console.log('Error: This could be because the job is cancelled or the reporting the job timing out.');
+                       $scope.showError = true;
                        $scope.inProgress = false;
-                   });
+                      });
                }
     }])

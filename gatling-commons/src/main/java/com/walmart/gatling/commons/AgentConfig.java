@@ -51,47 +51,39 @@ public class AgentConfig {
     }
 
     public String getUrl(String filePath) {
-        String host = logServer.getHostName();
-        if (StringUtils.isEmpty(logServer.getHostName())) {
-            try {
-                host = InetAddress.getLocalHost().getHostName();
-            } catch (UnknownHostException e) {
-                ;
-            }
-        }
-        String result = StringUtils.EMPTY;
-        final String ENCODING = "UTF-8";
-        try {
-            result = String.format("http://%s:%s/api/log/stream?filePath=%s", host, Integer.toString(logServer.getPort()), URLEncoder.encode(filePath, ENCODING));
-        } catch (UnsupportedEncodingException e) {
-            ;
-        }
-
-        return result;
+        return getGenericUrl("api/log/stream","filePath",filePath);
     }
 
     public String getMasterUrl(String filePath) {
-        String host = logServer.getHostName();
-        if (StringUtils.isEmpty(logServer.getHostName())) {
-            try {
-                host = InetAddress.getLocalHost().getHostName();
-            } catch (UnknownHostException e) {
-                ;
-            }
-        }
-        String result = StringUtils.EMPTY;
-        final String ENCODING = "UTF-8";
-        try {
-            result = String.format("http://%s:%s/gatling/lib/stream?filePath=%s", host, Integer.toString(logServer.getPort()), URLEncoder.encode(filePath, ENCODING));
-        } catch (UnsupportedEncodingException e) {
-            ;
-        }
+        return getGenericUrl("gatling/lib/stream","filePath",filePath);
+    }
 
-        return result;
+    public String getAbortUrl() {
+        return getGenericUrl("gatling/server/abort","trackingId",StringUtils.EMPTY);
     }
 
     public void setContactPoint(String contactPoint) {
         this.contactPoint = contactPoint;
+    }
+
+    public String getGenericUrl(String path,String queryStringKey,String queryStringValue) {
+        String host = logServer.getHostName();
+        if (StringUtils.isEmpty(logServer.getHostName())) {
+            try {
+                host = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                ;
+            }
+        }
+        String result = StringUtils.EMPTY;
+        final String ENCODING = "UTF-8";
+        try {
+            result = String.format("http://%s:%s/%s?%s=%s", host, Integer.toString(logServer.getPort()),path, queryStringKey,URLEncoder.encode(queryStringValue, ENCODING));
+        } catch (UnsupportedEncodingException e) {
+            ;
+        }
+
+        return result;
     }
 
     @XmlRootElement

@@ -50,6 +50,7 @@ public class Master extends UntypedPersistentActor {
     private Set<String> fileTracker = new HashSet<>();
     private JobState jobDatabase = new JobState();
     private Map<String, UploadFile> fileDtabase = new HashMap<>();
+    private Set<String> cancelRequests = new HashSet<>();
 
     public Master(FiniteDuration workTimeout, AgentConfig agentConfig) {
         this.workTimeout = workTimeout;
@@ -189,9 +190,14 @@ public class Master extends UntypedPersistentActor {
     }
 
     private void onTrackingInfo(Object cmd) {
+        TrackingInfo trackingInfo = (TrackingInfo) cmd;
         log.info("Accepted tracking info request: {}", cmd);
-        TrackingResult result = jobDatabase.getTrackingInfo(((TrackingInfo) cmd).trackingId);
+        TrackingResult result = jobDatabase.getTrackingInfo(trackingInfo.trackingId);
         log.info("Complete tracking info request: {}", result);
+        if(trackingInfo.cancel) {
+            cancelRequests.add(trackingInfo.trackingId);
+        }
+        result.setCancelled(cancelRequests.contains(trackingInfo.trackingId));
         getSender().tell(result, getSelf());
     }
 
@@ -437,12 +443,14 @@ public class Master extends UntypedPersistentActor {
         public final String jobId;
         public final String roleId;
         public final String trackingId;
+        public String abortUrl;
 
-        public Job(String roleId, Object job, String trackingId) {
+        public Job(String roleId, Object job, String trackingId,String abortUrl) {
             this.jobId = UUID.randomUUID().toString();
             this.roleId = roleId;
             this.taskEvent = job;
             this.trackingId = trackingId;
+            this.abortUrl = abortUrl;
         }
 
         @Override
@@ -550,16 +558,23 @@ public class Master extends UntypedPersistentActor {
     }
 
     public static final class TrackingInfo implements Serializable {
-        public String trackingId;
+        public final String trackingId;
+        public final boolean cancel;
 
         public TrackingInfo(String trackingId) {
             this.trackingId = trackingId;
+            this.cancel = false;
+        }
+        public TrackingInfo(String trackingId,boolean cancel) {
+            this.trackingId = trackingId;
+            this.cancel = cancel;
         }
 
         @Override
         public String toString() {
             return "TrackingInfo{" +
                     "trackingId='" + trackingId + '\'' +
+                    ", cancel=" + cancel +
                     '}';
         }
     }

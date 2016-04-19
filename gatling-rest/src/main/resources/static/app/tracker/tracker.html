@@ -12,7 +12,9 @@
     <div class="form-group" ng-show="pendingCount>0 && inProgressCount==0">
         <p> No Worker Available</p>
     </div>
-
+    <div class="form-group" ng-show="cancelled==true">
+        <p> Cancelled:  {{cancelled}}</p>
+    </div>
     <div class="form-group" ng-show="pendingCount==0 && inProgressCount==0">
         <p> Job Completed</p><a ng-href="#/report/{{trackingId}}">View Report</a>
     </div>
@@ -62,3 +64,7 @@
 </div>
 
 <div class="alert alert-info" role="alert" ></div>
+
+<div class="form-group" ng-show="cancelled==false">
+    <button name="cancel" class="btn btn-primary" ng-click="cancelJob()">Cancel</button>
+</div>

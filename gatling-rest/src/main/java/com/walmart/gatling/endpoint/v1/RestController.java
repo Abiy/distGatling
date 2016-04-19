@@ -43,7 +43,6 @@ import javax.ws.rs.core.UriInfo;
 public class RestController {
 
     private final Logger log = LoggerFactory.getLogger(RestController.class);
-
     private ServerRepository serverRepository;
     private DomainService domainService;
 
@@ -112,18 +111,18 @@ public class RestController {
 
 
     @GET
-    @Path("/track/{id}")
-    @Produces("application/json")
-    @Timed
-    @Metered(name="meter-getTrack")
-    public Response getTrack(@Context UriInfo uriInfo,@PathParam("id") String trackingId) {
+      @Path("/track/{id}")
+      @Produces("application/json")
+      @Timed
+      @Metered(name="meter-getTrack")
+      public Response getTrack(@Context UriInfo uriInfo,@PathParam("id") String trackingId) {
         TrackingResult result;
         try {
             result = serverRepository.getTrackingInfo(trackingId);
             return Response.status(Response.Status.ACCEPTED).entity( ImmutableMap.of("trackingInfo",result)).build();
         } catch (Exception e) {
-            log.error("Error while submitting user tracking request for: {}, {}",trackingId,e);
-            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Could not submit the job to the cluster master.").build();
+            log.error("Error fetching tracking info for: {}, {}",trackingId,e);
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Error fetching tracking info.").build();
         }
 
     }
@@ -140,7 +139,40 @@ public class RestController {
             return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", res.result)).build();
         } catch (Exception e) {
             log.error("Error while submitting user report request for: {}, {}",trackingId,e);
-            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Could not submit the job to the cluster master.").build();
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Error while submitting user report request.").build();
+        }
+
+    }
+
+    @POST
+    @Path("/abort/{id}")
+    @Produces("application/json")
+    @Timed
+    @Metered(name="meter-postCancel")
+    public Response postCancel(@Context UriInfo uriInfo,@PathParam("id") String trackingId) {
+        try {
+            boolean res = serverRepository.abortJob(trackingId);
+            log.info("Cancel result: {}",res);
+            return Response.status(Response.Status.CREATED).entity(ImmutableMap.of("cancelled", res)).build();
+        } catch (Exception e) {
+            log.error("Error while submitting cancel job request for: {}, {}",trackingId,e);
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Error while submitting cancel job request.").build();
+        }
+
+    }
+    @GET
+    @Path("/abort")
+    @Produces("application/json")
+    @Timed
+    @Metered(name="meter-getAbortStatus")
+    public Response getAbortStatus(@Context UriInfo uriInfo,@QueryParam("trackingId") String trackingId) {
+        boolean result;
+        try {
+            result = serverRepository.getTrackingInfo(trackingId).isCancelled();
+            return Response.status(Response.Status.ACCEPTED).entity( result).build();
+        } catch (Exception e) {
+            log.error("Error while submitting abort status request for: {}, {}",trackingId,e);
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Error while submitting abort status request.").build();
         }
 
     }

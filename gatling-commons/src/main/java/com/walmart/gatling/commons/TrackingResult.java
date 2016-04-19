@@ -12,12 +12,20 @@ public class TrackingResult {
 
     private final long pendingCount;
     private final long inProgressCount;
+    private boolean cancelled;
     private List<TaskTrackingInfo> Completed;
     private List<TaskTrackingInfo> Failed;
-
     public TrackingResult(long pendingCount, long inProgressCount) {
         this.pendingCount = pendingCount;
         this.inProgressCount = inProgressCount;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     public long getPendingCount() {

@@ -21,6 +21,10 @@
         <a ng-href="{{report}}">report</a>
     </div>
 
+    <div class="col-xs-4" ng-show="showError==true">
+        <label style="color:red"> Error generating report: This could be because the job is cancelled or the reporting the job timing out.</label>
+    </div>
+
 </div>
 
 <div class="alert alert-info" role="alert" ></div>

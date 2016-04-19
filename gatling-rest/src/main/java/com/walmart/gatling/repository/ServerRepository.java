@@ -1,5 +1,7 @@
 package com.walmart.gatling.repository;
 
+import com.walmart.gatling.commons.AgentConfig;
+import com.walmart.gatling.commons.HostUtils;
 import com.walmart.gatling.commons.Master;
 import com.walmart.gatling.commons.MasterClientActor;
 import com.walmart.gatling.commons.ReportExecutor;
@@ -8,11 +10,16 @@ import com.walmart.gatling.commons.TrackingResult;
 import com.walmart.gatling.domain.DomainService;
 import com.walmart.gatling.endpoint.v1.JobModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -36,11 +43,13 @@ public class ServerRepository {
 
     private DomainService domainService;
     private ActorRef router;
+    private AgentConfig agentConfig;
 
     @Autowired
-    public ServerRepository(DomainService domainService, ActorRef router) {
+    public ServerRepository(DomainService domainService, ActorRef router,AgentConfig agentConfig) {
         this.domainService = domainService;
         this.router = router;
+        this.agentConfig = agentConfig;
     }
 
     private Object sendToMaster(Object message,int timeoutInSeconds) {
@@ -81,7 +90,7 @@ public class ServerRepository {
         Timeout timeout = new Timeout(6, TimeUnit.SECONDS);
         int success=0;
         for(int i=0;i<jobModel.getCount();i++) {
-            Future<Object> future = ask(router, new Master.Job (jobModel.getRoleId(), taskEvent, trackingId), timeout);
+            Future<Object> future = ask(router, new Master.Job (jobModel.getRoleId(), taskEvent, trackingId,agentConfig.getAbortUrl()), timeout);
             Object result =  Await.result(future, timeout.duration());
             if(result instanceof MasterClientActor.Ok) {
                 success++;
@@ -103,6 +112,15 @@ public class ServerRepository {
             return info;
         }
         return new TrackingResult(0,0);
+    }
+
+    public boolean abortJob(String trackingId) {
+        Object result = sendToMaster(new Master.TrackingInfo(trackingId,true),60);
+        if(result!=null && result instanceof TrackingResult) {
+            TrackingResult info = (TrackingResult)result;
+            return info.isCancelled();
+        }
+        return false;
     }
 
     public ReportExecutor.ReportResult generateReport(String trackingId) {
@@ -141,4 +159,6 @@ public class ServerRepository {
         }
         return null;
     }
+
+
 }
