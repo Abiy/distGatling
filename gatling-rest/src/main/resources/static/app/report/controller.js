@@ -13,15 +13,9 @@ angular.module('gatling.report',[]).
                     $scope.inProgress = true;
                    $http.post('/gatling/server/report/'+$scope.trackingId,{})
                    .success(function(data){
-                       console.log(data);
-                       if(data.length >0){
+                        console.log(data);
                         $scope.report = data.report;
                         $scope.inProgress = false;
-                       }
-                       else{
-                        $scope.showError = true;
-                        $scope.inProgress = false;
-                       }
                    })
                    .error(function(data){
                        console.log('Error: This could be because the job is cancelled or the reporting the job timing out.');

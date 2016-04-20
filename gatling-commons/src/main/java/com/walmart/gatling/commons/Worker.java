@@ -41,7 +41,7 @@ public class Worker extends UntypedActor {
 
     private final Procedure<Object> working = new Procedure<Object>() {
         public void apply(Object message) {
-            log.info("Work received. Result {}.", message);
+            //log.info("Work received. Result {}.", message);
             if (message instanceof WorkComplete) {
                 Object result = ((WorkComplete) message).result;
                 //log.info("Work is complete. Result {}.", result);

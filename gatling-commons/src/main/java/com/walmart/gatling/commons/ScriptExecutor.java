@@ -70,7 +70,7 @@ public class ScriptExecutor extends WorkExecutor {
     public void onReceive(Object message) {
         //log.info("Script worker received task: {}", message);
         if (message instanceof Master.Job) {
-            Cancellable abortLoop = getContext().system().scheduler().schedule(Duration.Zero(), Duration.create(30, TimeUnit.SECONDS),
+            Cancellable abortLoop = getContext().system().scheduler().schedule(Duration.Zero(), Duration.create(60, TimeUnit.SECONDS),
                     () -> {
                         Master.Job job = (Master.Job) message;
                         if (executor!=null && getAbortStatus(job.abortUrl, job.trackingId)) {
@@ -118,7 +118,7 @@ public class ScriptExecutor extends WorkExecutor {
     }
 
     private boolean getAbortStatus(String abortUrl, String trackingId) {
-        log.info("getting abot status: {}{}" , abortUrl,trackingId );
+        log.info("Getting abort status: {}{}" , abortUrl,trackingId );
         URL url = null;
         try {
             url = new URL(abortUrl  + trackingId);
