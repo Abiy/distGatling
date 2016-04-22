@@ -6,3 +6,5 @@ sh agent.sh -Dserver.port=8091 -Dakka.contact-points=akka.tcp://PerformanceSyste
 
 sh master.sh -Dserver.port=8080 
 
+zip -r gatling-bundle.zip gatling-charts-highcharts-bundle-2.1.7
+
