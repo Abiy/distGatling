@@ -60,7 +60,6 @@ public class ScriptExecutor extends WorkExecutor {
     };
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private AgentConfig agentConfig;
-    private DefaultExecutor executor;
 
     public ScriptExecutor(AgentConfig agentConfig) {
         this.agentConfig = agentConfig;
@@ -73,9 +72,7 @@ public class ScriptExecutor extends WorkExecutor {
             Cancellable abortLoop = getContext().system().scheduler().schedule(Duration.Zero(), Duration.create(60, TimeUnit.SECONDS),
                     () -> {
                         Master.Job job = (Master.Job) message;
-                        if (executor!=null && getAbortStatus(job.abortUrl, job.trackingId)) {
-                            executor.getWatchdog().destroyProcess();
-                        }
+                        runCancelJob(job);
                     }, getContext().system().dispatcher());
             ActorRef sender = getSender();
             ExecutorService pool = Executors.newFixedThreadPool(1);
@@ -134,6 +131,23 @@ public class ScriptExecutor extends WorkExecutor {
         return false;
     }
 
+    private void runCancelJob(Master.Job message) {
+       if(getAbortStatus(message.abortUrl,message.trackingId)) {
+           CommandLine cmdLine = new CommandLine("/bin/bash");
+           cmdLine.addArgument(agentConfig.getJob().getJobArtifact("cancel"));
+           cmdLine.addArgument(message.jobId);
+           DefaultExecutor killExecutor = new DefaultExecutor();
+           ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
+           killExecutor.setWatchdog(watchdog);
+           try {
+               log.info("Cancel command: {}", cmdLine);
+               killExecutor.execute(cmdLine);
+           } catch (IOException e) {
+               log.error(e,"Error cancelling job");
+           }
+       }
+    }
+
     private Object runJob(Object message) {
         Master.Job job = (Master.Job) message;
         TaskEvent taskEvent = (TaskEvent) job.taskEvent;
@@ -158,7 +172,7 @@ public class ScriptExecutor extends WorkExecutor {
         cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
 
         cmdLine.setSubstitutionMap(map);
-        executor = new DefaultExecutor();
+        DefaultExecutor executor = new DefaultExecutor();
         executor.setExitValues(agentConfig.getJob().getExitValues());
         ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
         executor.setWatchdog(watchdog);
