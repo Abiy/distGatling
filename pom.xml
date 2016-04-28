@@ -15,7 +15,6 @@
         <module>gatling-agent</module>
         <module>gatling-commons</module>
         <module>gatling-bundle</module>
-        <module>auto-metrics</module>
     </modules>
 
     <parent>
