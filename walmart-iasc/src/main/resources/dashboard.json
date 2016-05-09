@@ -140,7 +140,7 @@
             ],
             "timeFrom": null,
             "timeShift": null,
-            "title": "Location Service Fly TPS",
+            "title": "Location Service Fly TPS2",
             "tooltip": {
               "shared": true,
               "value_type": "cumulative"
@@ -163,7 +163,7 @@
     "style": "dark",
     "tags": [],
     "timezone": "browser",
-    "title": "LocationServiceFly2",
+    "title": "LocationServiceFly3",
     "version": 5
   },
   "overwrite": true

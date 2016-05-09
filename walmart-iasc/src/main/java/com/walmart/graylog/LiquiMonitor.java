@@ -26,9 +26,9 @@ public class LiquiMonitor {
      *  This connection manager must be used if more than one thread will be using the HttpClient.
      * @throws IOException
      */
-    public static void configure() throws IOException {
+    public static void configure() {
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-        cm.setMaxTotal(100);
+        cm.setMaxTotal(5);
         final RequestConfig requestConfig = RequestConfig.custom()
                 .setSocketTimeout(3000)
                 .setConnectTimeout(500).build();
@@ -37,13 +37,10 @@ public class LiquiMonitor {
                 .setConnectionManager(cm)
                 .setDefaultRequestConfig(requestConfig)
                 .build();
+        log.info("Loading configuration from: {}.conf",CONFIG_NAME);
         final Config config = ConfigFactory.load(CONFIG_NAME);
 
         new MonitorService(config,httpClient).configureAppAlerts();
-    }
-
-    public String getFile(String fileName){
-        return  this.getClass().getResource(fileName).getFile();
     }
 
 }
