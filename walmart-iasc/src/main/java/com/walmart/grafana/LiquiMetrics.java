@@ -27,8 +27,8 @@ import rx.apache.http.ObservableHttp;
  */
 public class LiquiMetrics {
 
-    private static final Logger log = LoggerFactory.getLogger(LiquiMetrics.class);
-    private static final String CONFIG_NAME = "grafana";
+    private static final Logger log = LoggerFactory.getLogger(com.walmart.grafana.LiquiMetrics.class);
+    private static final String CONFIG_NAME = "monitor";
 
     private LiquiMetrics(){
         //Do not initialize this class

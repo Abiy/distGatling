@@ -1,7 +1,7 @@
 package com.walmart.grafana;
 
 /**
- * Created by ahailem on 4/27/16.
+ * Created by walmart
  */
 public class FileFinder {
     public String getFile(String fileName){

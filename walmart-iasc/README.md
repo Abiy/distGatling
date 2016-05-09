@@ -28,3 +28,44 @@ Request request = new Request.Builder()
 
 Response response = client.newCall(request).execute();
 
+## Alerting as a code:
+
+Every Application should create its own stream in graylog following the steps listed below:
+
+  - Get The list of all streams 
+  - Loop through the streams and find out if the stream for the current application already exists
+  - if stream does not exist, create the stream with the routing rules
+  - update the alert settings 
+  - update alert receiver
+  - activate stream
+  
+Information about the alerting system should come from a local config supplied by the target application and ccm.
+
+  - graylog username and password or authorization token
+  - streamName or title, should be unique per application
+  - Routing rules (every rule either ORed or ANDed)
+  - alert setup
+  - alert receiver
+  
+POST /streams HTTP/1.1
+Host: graylog.graylog-dev.cps-graylog.rmnim.qa.cloud.wal-mart.com:12900
+Content-Type: application/json
+Authorization: Basic YWRtaW46d2FsbWFydC1ncmF5bG9n
+Cache-Control: no-cache
+Postman-Token: 7a9eb8ae-7a1d-39e3-0d85-73e6ef915d56
+
+{
+  "title": "Abiy Api test",
+  "description": "error for container",
+  "rules": [
+    {
+          "field": "message",
+          "type": 2,
+          "inverted": false,
+          "value": " ERROR "
+        }
+  ],
+  "content_pack": null,
+  "matching_type": "OR"
+}
+

@@ -26,12 +26,12 @@
         </encoder>
     </appender>
 
-    <root level="DEBUG">
+    <root level="TRACE">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
     </root>
     
-    <logger name="com.walmart.grafana" level="DEBUG" />
-    <logger name="org.apache.http.wire" level="INFO"/>
+    <!--<logger name="com.walmart.grafana" level="DEBUG" />-->
+    <logger name="org.apache.http.wire" level="TRACE"/>
 
 </configuration>
