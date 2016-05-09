@@ -12,8 +12,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.nio.entity.NStringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,7 @@ public class MonitorService {
     public String createStream(String jsonStream)  {
         final HttpPost request = getHttpPost(config, (host, port) -> getGraylogStreamApiUrl(host, port));
         try {
-            NStringEntity entity = new NStringEntity(jsonStream);
+            StringEntity entity = new StringEntity(jsonStream);
             request.setEntity(entity);
         } catch (UnsupportedEncodingException e) {
             log.error("Error creating a stream: {}",e);
@@ -195,7 +195,7 @@ public class MonitorService {
             try {
                 AlertConditions alertConditions = new AlertConditions(config.getConfig("graylog.stream.alert_conditions"));
                 //read config and build alert condition
-                NStringEntity entity = new NStringEntity(mapper.writeValueAsString(alertConditions));
+                StringEntity entity = new StringEntity(mapper.writeValueAsString(alertConditions));
                 request.setEntity(entity);
             } catch (UnsupportedEncodingException|JsonProcessingException e) {
                 log.error("updateStreamAlertConditions: Error updating a stream alert condition: {}",e);
@@ -219,7 +219,7 @@ public class MonitorService {
             final HttpPost request = getHttpPost(config, (host, port) -> getAlertReceiversApiUrl(host, port, alertReceiver));
             try {
                 //read config and build alert condition
-                NStringEntity entity = new NStringEntity(mapper.writeValueAsString(alertReceiver));
+                StringEntity entity = new StringEntity(mapper.writeValueAsString(alertReceiver));
                 request.setEntity(entity);
             } catch (UnsupportedEncodingException | JsonProcessingException e) {
                 log.error("updateStreamAlertReceivers: Error updating stream alert receivers: {}",e);

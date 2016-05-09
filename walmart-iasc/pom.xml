@@ -19,10 +19,11 @@
             <version>1.1.3</version>
         </dependency>
         <dependency>
-            <groupId>com.netflix.rxjava</groupId>
-            <artifactId>rxjava-apache-http</artifactId>
-            <version>0.20.7</version>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.2</version>
         </dependency>
+
         <dependency>
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
@@ -43,7 +44,7 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.1.7</version>
-            <scope>provided</scope>
+            <!--<scope>provided</scope>-->
         </dependency>
     </dependencies>
 

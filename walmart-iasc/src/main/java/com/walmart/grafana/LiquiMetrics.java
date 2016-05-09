@@ -11,10 +11,10 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.nio.entity.NStringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,11 +73,11 @@ public class LiquiMetrics {
         }
     }
 
-    private static NStringEntity getnStringEntity() throws IOException {
+    private static StringEntity getnStringEntity() throws IOException {
         FileFinder finder = new FileFinder();
         File file = new File(finder.getFile("/dashboard.json"));
         String content = FileUtils.readFileToString(file, Charsets.toCharset(StandardCharsets.UTF_8));
-        return new NStringEntity(content);
+        return new StringEntity(content);
     }
 
 
