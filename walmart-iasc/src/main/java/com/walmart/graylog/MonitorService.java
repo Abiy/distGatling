@@ -42,7 +42,7 @@ public class MonitorService {
     }
 
     public void configureAppAlerts()  {
-        Observable.fromCallable(() -> doAlertConfiguration())
+        Observable.fromCallable(() -> configureMonitors())
                 .map(s -> getGraylogStreamObject(s, mapper))
                 .doOnError(e -> log.error("Error parsing graylog content: {}", e))
                 .subscribe(graylogStream -> {
@@ -50,28 +50,16 @@ public class MonitorService {
                 });
     }
 
-    public String doAlertConfiguration()  {
+    public String configureMonitors()  {
         final HttpGet request = getHttpGet(config, (host, port) -> getGraylogStreamApiUrl(host,port));
-        //CloseableHttpResponse response = null;
         try (CloseableHttpResponse response = httpClient.execute(request)){
             String jsonString = IOUtils.toString(response.getEntity().getContent(), Charsets.UTF_8);
-            log.info(jsonString);
+            log.info("Starting app monitor configuration , existing monitors: {}",jsonString);
             return jsonString;
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error configuring app monitors: {}", e);
         }
         return null;
-    }
-    public void doCreateStream(String jsonStream){
-        Observable.fromCallable(() -> createStream(jsonStream))
-                .doOnError(e -> log.error("Error parsing graylog content: {}", e))
-                .map(s -> getStreamIdObject(s, mapper))
-                .doOnNext(streamId -> updateStreamAlertConditions(streamId, config))
-                .doOnNext(streamId -> updateStreamAlertReceivers(streamId, config))
-                .doOnNext(streamId -> updateStreamStatus(streamId, config))
-                .subscribe(streamId -> {
-                    log.info("Stream id: {} was created and configured. ", streamId.getStream_id());
-                });
     }
 
     public String createStream(String jsonStream)  {
@@ -84,7 +72,7 @@ public class MonitorService {
         }
         try (CloseableHttpResponse response = httpClient.execute(request)){
             String jsonString = IOUtils.toString(response.getEntity().getContent(), Charsets.UTF_8);
-            log.info(jsonString);
+            log.info("Response for create stream: {}", jsonString);
             return jsonString;
         } catch (IOException e) {
             log.error("Error creating a stream: {}", e);
@@ -125,6 +113,13 @@ public class MonitorService {
         }
     }
 
+    /**
+     * GET /streams
+     * POST /streams
+     * @param host
+     * @param port
+     * @return
+     */
     public static URI getGraylogStreamApiUrl(String host,String port) {
         String url = "http://%s:%s/streams";
         String result = String.format(url,host,port);
@@ -153,7 +148,7 @@ public class MonitorService {
 
 
     /**
-     * POST /streams/{streamId}/alerts/receivers
+     * POST /streams/{streamId}/resume
      */
     public static URI getStartStreamApiUrl(String host,String port,String streamId) {
         String url = "http://%s:%s/streams/%s/resume";
@@ -167,26 +162,34 @@ public class MonitorService {
      * @param config
      */
     private  void processStreams(GraylogStream graylogStream,Config config){
-        log.info("processStreams: Running process stream: {} ");
+        log.info("processStreams: Running process stream... ");
         String targeTitle = config.getString("graylog.stream.title");
         Optional<Stream> targetStream = graylogStream.findStream(targeTitle);
         if(!targetStream.isPresent()){
             try {
-                String content = mapper.writeValueAsString(new Stream(config));
-                doCreateStream(content);
-                log.info(content);
+                String jsonStream = mapper.writeValueAsString(new Stream(config));
+                Observable.fromCallable(() -> createStream(jsonStream))
+                        .doOnError(e -> log.error("Error creating graylog stream: {}", e))
+                        .map(s -> getStreamIdObject(s, mapper))
+                        .doOnNext(streamId -> updateStreamAlertConditions(streamId, config))
+                        .doOnNext(streamId -> updateStreamAlertReceivers(streamId, config))
+                        .doOnNext(streamId -> updateStreamStatus(streamId, config))
+                        .doOnCompleted(() -> log.info("Alert configuration for the specified target application completed."))
+                        .subscribe(streamId -> {
+                            log.info("Stream id: {} was created and configured. ", streamId.getStream_id());
+                        });
             } catch (JsonProcessingException e) {
                 log.error("processStreams: Error processing stream content: {}", e);
             }
 
         }
         else {
-            //update the stream
+            log.info("Alerts for the specified target application is already configured.");
         }
     }
 
     private  void updateStreamAlertConditions(StreamId streamId, Config config){
-        log.info("Running update stream: {} ");
+        log.info("Running update for stream alert condition: {} ",streamId);
         if(streamId.isValidStream()){
             final HttpPost request = getHttpPost(config, (host, port) -> getAlertConditionsApiUrl(host, port, streamId.getStream_id()));
             try {
@@ -194,22 +197,23 @@ public class MonitorService {
                 //read config and build alert condition
                 NStringEntity entity = new NStringEntity(mapper.writeValueAsString(alertConditions));
                 request.setEntity(entity);
-            } catch (UnsupportedEncodingException e) {
-                log.error("updateStreamAlertConditions: Error creating a stream: {}",e);
-            } catch (JsonProcessingException e) {
-                log.error(" updateStreamAlertConditions: Error creating a stream: {}", e);
+            } catch (UnsupportedEncodingException|JsonProcessingException e) {
+                log.error("updateStreamAlertConditions: Error updating a stream alert condition: {}",e);
             }
             try (CloseableHttpResponse response = httpClient.execute(request)){
                 String jsonString = IOUtils.toString(response.getEntity().getContent(), Charsets.UTF_8);
                 log.info("updateStreamAlertConditions result : {}",jsonString);
             } catch (IOException e) {
-                log.error("updateStreamAlertConditions: Error creating a stream: {}", e);
+                log.error("updateStreamAlertConditions: Error updating a stream alert condition: {}",e);
             }
+        }
+        else {
+            log.error("updateStreamAlertConditions: Error Invalid stream id");
         }
     }
 
     private  void updateStreamAlertReceivers(StreamId streamId, Config config){
-        log.info("Running  updateStreamAlertReceivers: {} ");
+        log.info("Running  updating stream alert receivers: {} ",streamId);
         if(streamId.isValidStream()){
             AlertReceiver alertReceiver = new AlertReceiver(config.getConfig("graylog.stream.alert_receivers"),streamId.getStream_id());
             final HttpPost request = getHttpPost(config, (host, port) -> getAlertReceiversApiUrl(host, port, alertReceiver));
@@ -217,17 +221,19 @@ public class MonitorService {
                 //read config and build alert condition
                 NStringEntity entity = new NStringEntity(mapper.writeValueAsString(alertReceiver));
                 request.setEntity(entity);
-            } catch (UnsupportedEncodingException e) {
-                log.error("updateStreamAlertReceivers: Error creating a stream: {}",e);
-            } catch (JsonProcessingException e) {
-                log.error(" updateStreamAlertReceivers: Error creating a stream: {}", e);
+            } catch (UnsupportedEncodingException | JsonProcessingException e) {
+                log.error("updateStreamAlertReceivers: Error updating stream alert receivers: {}",e);
             }
+
             try (CloseableHttpResponse response = httpClient.execute(request)){
                 String jsonString = IOUtils.toString(response.getEntity().getContent(), Charsets.UTF_8);
                 log.info(jsonString);
             } catch (IOException e) {
-                log.error("updateStreamAlertReceivers: Error creating a stream: {}", e);
+                log.error("updateStreamAlertReceivers: Error updating stream alert receivers: {}",e);
             }
+        }
+        else {
+            log.error("updateStreamAlertReceivers: Error Invalid stream id");
         }
     }
 
@@ -236,11 +242,18 @@ public class MonitorService {
         if(streamId.isValidStream()){
             final HttpPost request = getHttpPost(config, (host, port) -> getStartStreamApiUrl(host, port, streamId.getStream_id()));
             try (CloseableHttpResponse response = httpClient.execute(request)){
-                String jsonString = IOUtils.toString(response.getEntity().getContent(), Charsets.UTF_8);
-                log.info(jsonString);
+                if(response.getStatusLine().getStatusCode()>=200 && response.getStatusLine().getStatusCode()<300){
+                    log.info("updateStreamStatus: stream {} successfully activated.",streamId);
+                }
+                else {
+                    log.error("updateStreamStatus: returned invalid http status code.");
+                }
             } catch (IOException e) {
                 log.error("updateStreamStatus: Error starting stream a stream: {}", e);
             }
+        }
+        else {
+            log.error("updateStreamStatus: Error Invalid stream id");
         }
     }
 

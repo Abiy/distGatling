@@ -17,4 +17,9 @@ public class StreamId {
     public boolean isValidStream(){
         return  getStream_id()!=null && getStream_id().length()>=0;
     }
+
+    @Override
+    public String toString() {
+        return stream_id;
+    }
 }
