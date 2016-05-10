@@ -55,3 +55,6 @@ After including the above dependency, you can start the auto dashboard creation 
     will create and configure you grafana dashboard and also setups your application alerting based 
     on your graylog collected log data.
     
+Sample Files: 
+    [monitor.conf](src/main/resources/monitor.conf)
+    [dashboard.json](src/main/resources/dashboard.json)
