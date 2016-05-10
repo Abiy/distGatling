@@ -44,7 +44,7 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.1.7</version>
-            <!--<scope>provided</scope>-->
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -57,27 +57,47 @@
     </distributionManagement>
     <build>
         <plugins>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-shade-plugin</artifactId>-->
-                <!--<version>2.4.3</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<phase>package</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>shade</goal>-->
-                        <!--</goals>-->
-                        <!--<configuration>-->
-                            <!--<relocations>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.fasterxml.jackson</pattern>
+                                    <shadedPattern>walmart.jackson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>io.reactivex</pattern>
+                                    <shadedPattern>walmart.io.reactivex</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.http</pattern>
+                                    <shadedPattern>walmart.org.apache.http</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.commons</pattern>
+                                    <shadedPattern>walmart.org.apache.commons</shadedPattern>
+                                </relocation>
                                 <!--<relocation>-->
-                                    <!--<pattern>com.fasterxml.jackson</pattern>-->
-                                    <!--<shadedPattern>com.walmart.common.jackson</shadedPattern>-->
+                                    <!--<pattern>org.slf4j</pattern>-->
+                                    <!--<shadedPattern>walmart.org.slf4j</shadedPattern>-->
                                 <!--</relocation>-->
-                            <!--</relocations>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
+                                <relocation>
+                                    <pattern>com.typesafe.config</pattern>
+                                    <shadedPattern>walmart.com.typesafe.config</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -89,6 +109,16 @@
             </plugin>
         </plugins>
 
+        <resources>
+            <resource>
+                <directory>src/resources</directory>
+                <excludes>
+                    <exclude>dashboard.json</exclude>
+                    <exclude>logback.xml</exclude>
+                    <exclude>monitor.conf</exclude>
+                </excludes>
+            </resource>
+        </resources>
     </build>
 
 

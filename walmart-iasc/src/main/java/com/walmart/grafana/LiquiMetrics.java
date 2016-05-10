@@ -50,7 +50,7 @@ public class LiquiMetrics {
         cm.setMaxTotal(1);
         final RequestConfig requestConfig = RequestConfig.custom()
                 .setSocketTimeout(3000)
-                .setConnectTimeout(500).build();
+                .setConnectTimeout(5000).build();
 
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setConnectionManager(cm)

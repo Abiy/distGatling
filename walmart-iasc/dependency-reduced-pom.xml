@@ -2,9 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.walmart.store</groupId>
-  <artifactId>auto-metrics</artifactId>
-  <version>1.0.SNAPSHOT</version>
+  <artifactId>walmart-iasc</artifactId>
+  <version>1.0-SNAPSHOT</version>
   <build>
+    <resources>
+      <resource>
+        <directory>src/resources</directory>
+        <excludes>
+          <exclude>dashboard.json</exclude>
+          <exclude>logback.xml</exclude>
+          <exclude>monitor.conf</exclude>
+        </excludes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
@@ -19,7 +29,23 @@
               <relocations>
                 <relocation>
                   <pattern>com.fasterxml.jackson</pattern>
-                  <shadedPattern>com.walmart.common.jackson</shadedPattern>
+                  <shadedPattern>walmart.jackson</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>io.reactivex</pattern>
+                  <shadedPattern>walmart.io.reactivex</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.http</pattern>
+                  <shadedPattern>walmart.org.apache.http</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.commons</pattern>
+                  <shadedPattern>walmart.org.apache.commons</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.typesafe.config</pattern>
+                  <shadedPattern>walmart.com.typesafe.config</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
@@ -36,6 +62,20 @@
       </plugin>
     </plugins>
   </build>
+  <dependencies>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.1.7</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>logback-core</artifactId>
+          <groupId>ch.qos.logback</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
   <distributionManagement>
     <snapshotRepository>
       <id>nexus-snapshot</id>
