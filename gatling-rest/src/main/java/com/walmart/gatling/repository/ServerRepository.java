@@ -131,7 +131,7 @@ public class ServerRepository {
         taskEvent.setParameters(Arrays.asList(
                 new Pair<>("0", "-ro")
         ));
-        Object result = sendToMaster(new Master.Report(trackingId,taskEvent),120);
+        Object result = sendToMaster(new Master.Report(trackingId,taskEvent),180);
 
         log.info("Report generated {}",result);
         if(result!=null && result instanceof ReportExecutor.ReportResult) {
