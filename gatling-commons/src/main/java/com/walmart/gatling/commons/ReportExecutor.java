@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
@@ -76,12 +78,18 @@ public class ReportExecutor extends WorkExecutor {
         try {
             List<String> resultFiles = new ArrayList<>(job.results.size());
             //download all files adn
-            int i=0;
+            /*int i=0;
             for (Worker.Result result : job.results) {
                 String destFile = dir  + i++ + ".log";
                 resultFiles.add(destFile);
                 DownloadFile.downloadFile(result.metrics,destFile);
-            }
+            }*/
+            AtomicInteger index = new AtomicInteger();
+            job.results.parallelStream().forEach(result -> {
+                String destFile = dir  + index.incrementAndGet() + ".log";
+                resultFiles.add(destFile);
+                DownloadFile.downloadFile(result.metrics,destFile);
+            });
             String outPath = agentConfig.getJob().getOutPath(taskEvent.getJobName(), job.reportJob.trackingId);
             String errPath = agentConfig.getJob().getErrorPath(taskEvent.getJobName(), job.reportJob.trackingId);
             //create the std and err files
