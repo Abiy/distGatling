@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class ReportExecutor extends WorkExecutor {
         for (Pair<String, String> pair : taskEvent.getParameters()) {
             cmdLine.addArgument(pair.getValue());
         }
-        String dir = agentConfig.getJob().getLogDirectory()+ job.reportJob.trackingId + "/";
+        String dir = agentConfig.getJob().getLogDirectory()+ "reports/" + job.reportJob.trackingId + "/";
         cmdLine.addArgument(dir);
 
         cmdLine.setSubstitutionMap(map);
@@ -73,10 +74,12 @@ public class ReportExecutor extends WorkExecutor {
         FileOutputStream outFile = null;
         FileOutputStream errorFile = null;
         try {
+            List<String> resultFiles = new ArrayList<>(job.results.size());
             //download all files adn
             int i=0;
             for (Worker.Result result : job.results) {
                 String destFile = dir  + i++ + ".log";
+                resultFiles.add(destFile);
                 DownloadFile.downloadFile(result.metrics,destFile);
             }
             String outPath = agentConfig.getJob().getOutPath(taskEvent.getJobName(), job.reportJob.trackingId);
@@ -92,14 +95,17 @@ public class ReportExecutor extends WorkExecutor {
             int exitResult = executor.execute(cmdLine);
             ReportResult result ;
             if(executor.isFailure(exitResult)){
+                result = new ReportResult(dir,job.reportJob, false);
                 log.info("Report Executor Failed, result: " +job.toString());
-                getSender().tell(new ReportResult(dir,job.reportJob, false), getSelf());
             }
             else{
                 result = new ReportResult(job.reportJob.getHtml() ,job.reportJob, true);
                 log.info("Report Executor Completed, result: " +result.toString());
-                getSender().tell(result, getSelf());
             }
+            for (String resultFile : resultFiles) {
+                FileUtils.deleteQuietly(new File(resultFile));
+            }
+            getSender().tell(result, getSelf());
 
         } catch (IOException e) {
             e.printStackTrace();

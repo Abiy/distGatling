@@ -11,7 +11,7 @@ actor:
   executerType: "script"
 job:
   path: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7"
-  logDirectory: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7/report/"
+  logDirectory: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7/"
   command: "/bin/bash"
   artifact: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7/bin/{0}.sh"
 logServer:

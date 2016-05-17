@@ -16,6 +16,6 @@ public class ResourceConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/resources/**").addResourceLocations("file:"+logDirectory);
+        registry.addResourceHandler("/resources/**").addResourceLocations("file:"+logDirectory + "reports/");
     }
 }
