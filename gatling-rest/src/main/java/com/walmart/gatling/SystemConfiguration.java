@@ -15,7 +15,7 @@ import akka.actor.Props;
 import akka.routing.RoundRobinPool;
 
 /**
- * Created by walmart.
+ * Created by walmart. A spring configuration object to create beans
  */
 @Configuration
 public class SystemConfiguration {
@@ -32,6 +32,12 @@ public class SystemConfiguration {
     @Value("${server.port}")
     private int clientPort;
 
+
+    /**
+     * bean factory to create the agent configuration
+     * @param env
+     * @return
+     */
     @Bean
     public AgentConfig configBuilder(Environment env){
         AgentConfig agentConfig = new AgentConfig();
@@ -59,18 +65,33 @@ public class SystemConfiguration {
         return agentConfig;
     }
 
+    /**
+     * bean factory to create the actor system
+     * @param agentConfig
+     * @param port
+     * @param name
+     * @param isPrimary
+     * @return
+     */
     @Bean
-    public ActorSystem createActorSystemWithMaster(AgentConfig agentConfig){
-        return ClusterFactory.startMaster(2551,"backend",true,agentConfig);
+    public ActorSystem createActorSystemWithMaster(AgentConfig agentConfig,
+                                                   @Value("${master.port}") int port,
+                                                   @Value("${master.name}") String name,
+                                                   @Value("${master.primary}") boolean isPrimary) {
+
+        return ClusterFactory.startMaster(port,name,isPrimary,agentConfig);
     }
 
 
+    /**
+     * bean factory to create pool of the master client actors, the pool is used in a round robin manner
+     * @param system
+     * @param pool
+     * @return
+     */
     @Bean
-    public ActorRef createRouter(ActorSystem system){
-        ActorRef router1 = system.actorOf(new RoundRobinPool(10).props(Props.create(MasterClientActor.class,system)), "router");
+    public ActorRef createRouter(ActorSystem system,@Value("${master.client.pool}") int pool){
+        ActorRef router1 = system.actorOf(new RoundRobinPool(pool).props(Props.create(MasterClientActor.class,system)), "router");
         return router1;
-
-
-
     }
 }

@@ -58,7 +58,6 @@ public class RestController {
     @Path("/status")
     @Produces("application/json")
     @Timed
-    @Metered(name="meter-getServerStatus")
     public Entity getServerStatus() {
         Entity entity = domainService.service(1);
         return entity;
@@ -68,7 +67,6 @@ public class RestController {
     @Path("/info")
     @Produces("application/json")
     @Timed
-    @Metered(name="meter-getServerInfo")
     public Response getServerInfo() {
         Master.ServerInfo info = serverRepository.getServerStatus(new Master.ServerInfo());
         log.info("Processing  get entity request{}", info);
@@ -84,7 +82,6 @@ public class RestController {
     @Path("/upload/{id}")
     @Produces("application/json")
     @Timed
-    @Metered(name="meter-getServerInfo")
     public Response getUploadInfo(@PathParam("id") String trackingId) {
         Master.UploadInfo info = serverRepository.getUploadStatus(new Master.UploadInfo(trackingId));
         return Response.status(Response.Status.ACCEPTED).entity(info).build();
@@ -94,7 +91,6 @@ public class RestController {
     @Path("/job")
     @Produces("application/json")
     @Timed
-    @Metered(name="meter-runJob")
     public Response runJob(JobModel jobModel) {
         String result;
         try {
@@ -114,7 +110,6 @@ public class RestController {
       @Path("/track/{id}")
       @Produces("application/json")
       @Timed
-      @Metered(name="meter-getTrack")
       public Response getTrack(@Context UriInfo uriInfo,@PathParam("id") String trackingId) {
         TrackingResult result;
         try {
@@ -131,7 +126,6 @@ public class RestController {
     @Path("/report/{id}")
     @Produces("application/json")
     @Timed
-    @Metered(name="meter-postReport")
     public Response postReport(@Context UriInfo uriInfo,@PathParam("id") String trackingId) {
         try {
             ReportExecutor.ReportResult res =  serverRepository.generateReport(trackingId);
@@ -148,7 +142,6 @@ public class RestController {
     @Path("/abort/{id}")
     @Produces("application/json")
     @Timed
-    @Metered(name="meter-postCancel")
     public Response postCancel(@Context UriInfo uriInfo,@PathParam("id") String trackingId) {
         try {
             boolean res = serverRepository.abortJob(trackingId);
@@ -164,7 +157,6 @@ public class RestController {
     @Path("/abort")
     @Produces("application/json")
     @Timed
-    @Metered(name="meter-getAbortStatus")
     public Response getAbortStatus(@Context UriInfo uriInfo,@QueryParam("trackingId") String trackingId) {
         boolean result;
         try {

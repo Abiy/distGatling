@@ -1,6 +1,13 @@
 server:
   port: 8080
 
+master:
+  port: 2551
+  name: backend
+  primary: true
+
+master.client.pool: 10
+
 multipart:
   max-file-size: 10Mb
 

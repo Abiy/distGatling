@@ -24,7 +24,7 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
 /**
- * Created walmart
+ * Created by walmart
  */
 @Path("/lib/")
 @Produces(MediaType.APPLICATION_JSON)

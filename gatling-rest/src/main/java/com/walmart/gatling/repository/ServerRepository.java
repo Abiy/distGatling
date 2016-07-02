@@ -41,13 +41,11 @@ public class ServerRepository {
 
     private final Logger log = LoggerFactory.getLogger(ServerRepository.class);
 
-    private DomainService domainService;
     private ActorRef router;
     private AgentConfig agentConfig;
 
     @Autowired
-    public ServerRepository(DomainService domainService, ActorRef router,AgentConfig agentConfig) {
-        this.domainService = domainService;
+    public ServerRepository(ActorRef router, AgentConfig agentConfig) {
         this.router = router;
         this.agentConfig = agentConfig;
     }
