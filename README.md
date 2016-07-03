@@ -94,7 +94,7 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 ---
 
 # Thread metrics for the master
-<img src="/images/landing.png" width="700" height="400" alt="Pull work"/>
+<img src="/images/landing.png" width="700" height="400" alt="Thread metrics for the master"/>
 
 ---
 
