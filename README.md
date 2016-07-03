@@ -50,22 +50,25 @@ After joining the cluster, CW workers are responsible for
     
 ## Usage
 
-After unzipping the download bundle 
+After cloning or downloading the repository  
 
-    Run master.sh to start the Cluster Master, take a note of the master ip and port
+    Open terminal window and run 
+     mvn clean package
+    
+    Locate the master shell script(gatling-rest) and run master.sh to start the Cluster Master, take a note of the master ip and port
         /bin/bash master.sh -Dmaster.port=<2551> -Dserver.port=<8080>
         
 
 After starting the master using the above command, point your browser to GET http://localhost:8080/ to access the web page.
 
         
-     Run agent.sh to start the Cluster worker for each node you intend to include to the cluster, each worker should be assigned the correct master contact point
+     Locate the agent shell script(gatling-agent) and run agent.sh to start the Cluster worker for each node you intend to include to the cluster, each worker should be assigned the correct master contact point
         /bin/bash agent.sh -Dakka.contact-points=akka.tcp://PerformanceSystem@<MASTER_HOST>:<MASTER_PORT>/system/receptionist
 
 
 ##  Goal
 
-The design of distributed gatling is based Derek Wyatt's blog on Work pulling pattern and has the following goals:
+The design of distributed gatling is based on Derek Wyatt's blog on Work pulling pattern and has the following goals:
  
     - Provide a mechanism for the master to detect death of workers and reassign work if need be
     - Dynamic workers to allow for auto scaling, up/down
