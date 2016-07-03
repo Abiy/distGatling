@@ -1,4 +1,4 @@
-## Gatling
+## About Gatling
 
 Gatling is a highly capable load testing tool. It is designed for ease of use, maintainability and high performance.
 
