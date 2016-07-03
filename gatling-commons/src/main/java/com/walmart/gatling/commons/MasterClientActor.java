@@ -11,6 +11,8 @@ import akka.cluster.singleton.ClusterSingletonProxy;
 import akka.cluster.singleton.ClusterSingletonProxySettings;
 import akka.dispatch.Mapper;
 import akka.dispatch.Recover;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import akka.util.Timeout;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.Future;
@@ -19,24 +21,22 @@ import static akka.pattern.Patterns.ask;
 import static akka.pattern.Patterns.pipe;
 
 public class MasterClientActor extends UntypedActor {
+  private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+  private ActorRef masterProxy;
 
-  ActorRef masterProxy;
-
-  public  MasterClientActor(ActorSystem system){
-
+  public  MasterClientActor(ActorSystem system,String masterName){
     ClusterSingletonProxySettings proxySettings =
-            ClusterSingletonProxySettings.create(system).withRole("backend");
-    masterProxy =system.actorOf(ClusterSingletonProxy.props("/user/master", proxySettings), "masterProxy" + UUID.randomUUID());
+            ClusterSingletonProxySettings.create(system).withRole(masterName);
+    masterProxy = system.actorOf(ClusterSingletonProxy.props("/user/master", proxySettings), "masterProxy" + UUID.randomUUID());
   }
 
   public void onReceive(Object message) {
-
+    log.debug("Master client received: {}",message);
     Timeout timeout = new Timeout(120, TimeUnit.SECONDS);
-    Future<Object> f = ask(masterProxy, message, timeout);
-
+    Future<Object> future = ask(masterProxy, message, timeout);
     final ExecutionContext ec = getContext().system().dispatcher();
 
-    Future<Object> res = f.map(new Mapper<Object, Object>() {
+    Future<Object> res = future.map(new Mapper<Object, Object>() {
       @Override
       public Object apply(Object msg) {
           return new Ok(msg);

@@ -24,7 +24,9 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
 /**
- * Created walmart
+ * Created by walmart
+ * This jersey controller exposes http end points for user to view log files ,
+ * master also uses this end points to pull simulation log files that are collected to generate reports
  */
 @Path("/log/")
 @Produces(MediaType.APPLICATION_JSON)

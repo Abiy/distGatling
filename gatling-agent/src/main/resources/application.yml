@@ -1,19 +1,19 @@
 server:
-  port: 8090
+  port: 8090 # Server information for embedded jetty
 
 actor:
-  numberOfActors: 5
-  port: 2555
-  role: "script"
+  numberOfActors: 5 # Number of worker actors , controls the number of parallel simulation jobs you can run per process
+  port: 2555 # Port number for the actor system that host the worker actors
+  role: "script" # The name of the role each actor uses (role1,role2...role5 etc)
   executerType: "script"
 job:
-  path: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7"
-  logDirectory: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7/"
-  command: "/bin/bash"
-  artifact: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7/bin/{0}.sh"
-logServer:
-  port: 8090
-  hostName: ""
+  path: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling simulation, data, and conf are stored
+  logDirectory: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7/" # Base directory for logfiles(log/error and log/std)
+  command: "/bin/bash" # Base command to run gatling.sh file
+  artifact: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7/bin/{0}.sh" # Path for the location of gatling.sh
+
+# Actor identifier  that is used to join the master/cluster
+# update the host and port value to point to the cluster where the master is running on
 akka:
   contact-points: "akka.tcp://PerformanceSystem@127.0.0.1:2551/system/receptionist"
 graphite:
@@ -24,7 +24,7 @@ graphite:
 
 jersey:
     controller:
-        packages: com.walmart
+        packages: com.walmart # Base package for jersey controllers for auto registration
 
 logging.level.root: INFO
 logging.level.com.walmart: DEBUG

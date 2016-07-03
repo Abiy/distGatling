@@ -1,9 +1,5 @@
 package com.walmart.gatling.commons;
 
-/**
- * Created by walmart.
- */
-
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -11,7 +7,6 @@ import org.apache.commons.exec.LogOutputStream;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,22 +17,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import javafx.util.Pair;
 
 /**
- * Created by ahailemichael on 8/17/15.
+ * Created by walmart on 8/17/15.
  */
 public class ReportExecutor extends WorkExecutor {
-
-    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private AgentConfig agentConfig;
 
     public ReportExecutor(AgentConfig agentConfig){
-
         this.agentConfig = agentConfig;
     }
 
@@ -146,11 +137,11 @@ public class ReportExecutor extends WorkExecutor {
     public static final class ReportResult implements Serializable {
         public final Object result;
         public final Master.Report  report;
-        public final boolean Sucess ;
-        public ReportResult(Object result, Master.Report report, boolean sucess) {
+        public final boolean success;
+        public ReportResult(Object result, Master.Report report, boolean success) {
             this.result = result;
             this.report = report;
-            Sucess = sucess;
+            this.success = success;
         }
 
         @Override
@@ -158,7 +149,7 @@ public class ReportExecutor extends WorkExecutor {
             return "ReportResult{" +
                     "result=" + result +
                     ", report=" + report +
-                    ", Sucess=" + Sucess +
+                    ", Success=" + success +
                     '}';
         }
     }

@@ -1,9 +1,5 @@
 package com.walmart.gatling.commons;
 
-/**
- * Created by ahailemichael on 8/20/15.
- */
-
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -58,7 +54,6 @@ public class ScriptExecutor extends WorkExecutor {
             return true;
         }
     };
-    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private AgentConfig agentConfig;
 
     public ScriptExecutor(AgentConfig agentConfig) {
@@ -67,7 +62,7 @@ public class ScriptExecutor extends WorkExecutor {
 
     @Override
     public void onReceive(Object message) {
-        //log.info("Script worker received task: {}", message);
+        log.debug("Script worker received task: {}", message);
         if (message instanceof Master.Job) {
             Cancellable abortLoop = getContext().system().scheduler().schedule(Duration.Zero(), Duration.create(60, TimeUnit.SECONDS),
                     () -> {
@@ -81,7 +76,7 @@ public class ScriptExecutor extends WorkExecutor {
             f.onSuccess(new OnSuccess<Object>() {
                 @Override
                 public void onSuccess(Object result) throws Throwable {
-                    log.info("notify Worker job status {}",result);
+                    log.info("Notify Worker job status {}",result);
                     sender.tell(result, getSelf());
                     abortLoop.cancel();
                 }
@@ -232,7 +227,7 @@ public class ScriptExecutor extends WorkExecutor {
     /**
      * Assumes there will only be one file in the directory
      */
-    public String getMetrics(Master.Job job) {
+    private String getMetrics(Master.Job job) {
         File dir = new File(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
         log.info("Directory for metrics: {}", dir.getAbsolutePath());
         List<File> files = (List<File>) FileUtils.listFiles(dir, logFilter, logFilter);

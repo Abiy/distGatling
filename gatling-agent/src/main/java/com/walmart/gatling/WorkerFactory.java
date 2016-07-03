@@ -33,21 +33,19 @@ public class WorkerFactory {
 
         Set<ActorPath> initialContacts = new HashSet<>();
         initialContacts.add(ActorPaths.fromString(agent.getContactPoint() ));
-
-
         ClusterClientSettings settings =  ClusterClientSettings.create(system).withInitialContacts(initialContacts);
         final ActorRef clusterClient = system.actorOf(ClusterClient.props(settings), "clusterClient");
 
         for (int i=0;i<agent.getActor().getNumberOfActors();i++){
             system.actorOf(
-                    Worker.props(clusterClient, createWorkExecutor(agent.getActor().getExecuterType(), agent), agent.getActor().getRole()),
+                    Worker.props(clusterClient, createWorkExecutor(agent), agent.getActor().getRole()),
                     agent.getActor().getRole()+i);
         }
         return system;
 
     }
 
-    private static Props createWorkExecutor(String executorType, AgentConfig agentConfig){
+    private static Props createWorkExecutor(AgentConfig agentConfig){
        return Props.create(ScriptExecutor.class, agentConfig);
     }
 

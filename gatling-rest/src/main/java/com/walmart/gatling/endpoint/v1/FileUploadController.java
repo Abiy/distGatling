@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -73,12 +74,12 @@ public class FileUploadController {
                         new FileOutputStream(new File(path)));
                 FileCopyUtils.copy(file.getInputStream(), stream);
                 stream.close();
-                String trackingId = serverRepository.uploadFile(path, name, role, type);
+                Optional<String> trackingId = serverRepository.uploadFile(path, name, role, type);
                 redirectAttributes.addFlashAttribute("message",
                         "You successfully uploaded " + name + "! ");
 
                 redirectAttributes.addFlashAttribute("link",
-                        "/#/file/" + trackingId);
+                        "/#/file/" + trackingId.get());
             } catch (Exception e) {
                 redirectAttributes.addFlashAttribute("message",
                         "You failed to upload " + name + " => " + e.getMessage());

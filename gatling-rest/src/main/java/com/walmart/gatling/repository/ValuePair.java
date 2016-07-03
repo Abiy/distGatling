@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Created by ahailem on 3/4/16.
+ * Created by walmart on 3/4/16.
  */
 @XmlRootElement
 public class ValuePair {

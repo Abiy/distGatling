@@ -70,17 +70,17 @@ public class SystemConfiguration {
      * the master actor is a singleton with a persistent store
      * @param agentConfig
      * @param port
-     * @param name
+     * @param masterName
      * @param isPrimary
      * @return
      */
     @Bean
     public ActorSystem createActorSystemWithMaster(AgentConfig agentConfig,
                                                    @Value("${master.port}") int port,
-                                                   @Value("${master.name}") String name,
+                                                   @Value("${master.name}") String masterName,
                                                    @Value("${master.primary}") boolean isPrimary) {
 
-        return ClusterFactory.startMaster(port,name,isPrimary,agentConfig);
+        return ClusterFactory.startMaster(port,masterName,isPrimary,agentConfig);
     }
 
 
@@ -88,11 +88,14 @@ public class SystemConfiguration {
      * bean factory to create pool of the master client actors, the pool is used in a round robin manner
      * @param system
      * @param pool
+     * @param masterName
      * @return
      */
     @Bean
-    public ActorRef createRouter(ActorSystem system,@Value("${master.client.pool}") int pool){
-        ActorRef router1 = system.actorOf(new RoundRobinPool(pool).props(Props.create(MasterClientActor.class,system)), "router");
+    public ActorRef createRouter(ActorSystem system,
+                                 @Value("${master.client.pool}") int pool,
+                                 @Value("${master.name}") String masterName){
+        ActorRef router1 = system.actorOf(new RoundRobinPool(pool).props(Props.create(MasterClientActor.class,system,masterName)), "router");
         return router1;
     }
 }

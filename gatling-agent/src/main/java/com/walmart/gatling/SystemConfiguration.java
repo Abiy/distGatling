@@ -64,6 +64,11 @@ public class SystemConfiguration {
        return agentConfig;
    }
 
+    /**
+     * Created the actor system with workers and joins the cluster/master
+     * @param agentConfig
+     * @return
+     */
     @Bean
     public ActorSystem createActorSystemWithAgent(AgentConfig agentConfig){
         return WorkerFactory.startWorkersWithExecutors(agentConfig);

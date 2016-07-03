@@ -149,7 +149,6 @@ public class Master extends UntypedPersistentActor {
                 if (state.status.getDeadLine().isOverdue()) {
                     log.info("Work timed out: {}", state.status.getWorkId());
                     tobeRemoved.add(workerId);
-                    //workers.remove(workerId);
                 }
             }
         }
@@ -612,13 +611,13 @@ public class Master extends UntypedPersistentActor {
         }
 
         public ImmutableMap<String, WorkerState> getWorkers() {
-            return workers;
+            return workers == null? ImmutableMap.of():workers;
         }
 
         @Override
         public String toString() {
             return "ServerInfo{" +
-                    "workers=" + workers +
+                    "workers=" + getWorkers() +
                     '}';
         }
     }

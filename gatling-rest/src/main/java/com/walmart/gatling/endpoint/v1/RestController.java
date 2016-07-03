@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
@@ -55,7 +56,7 @@ public class RestController {
     @Timed
     public Response getServerInfo() {
         Master.ServerInfo info = serverRepository.getServerStatus(new Master.ServerInfo());
-        log.info("Processing  get entity request{}", info);
+        log.info("Processing  get cluster status request: {}", info);
 
         List<ValuePair> workers = info.getWorkers().entrySet().stream().map(stateEntry ->
                 new ValuePair(stateEntry.getValue().status.toString(),
@@ -69,7 +70,7 @@ public class RestController {
     @Produces("application/json")
     @Timed
     public Response getUploadInfo(@PathParam("id") String trackingId) {
-        Master.UploadInfo info = serverRepository.getUploadStatus(new Master.UploadInfo(trackingId));
+        Optional<Master.UploadInfo> info = serverRepository.getUploadStatus(new Master.UploadInfo(trackingId));
         return Response.status(Response.Status.ACCEPTED).entity(info).build();
     }
 
@@ -85,10 +86,10 @@ public class RestController {
     @Produces("application/json")
     @Timed
     public Response runJob(JobModel jobModel) {
-        String result;
+        Optional<String> result;
         try {
             result = serverRepository.submitJob(jobModel);
-            String path = "#/tracker/" + result;
+            String path = "#/tracker/" + result.get();
             return Response.status(Response.Status.ACCEPTED).entity( ImmutableMap.of("trackingPath",path)).build();
         } catch (Exception e) {
             log.error("Error while submitting user job {}, {}",jobModel,e);
@@ -133,9 +134,9 @@ public class RestController {
     @Timed
     public Response postReport(@Context UriInfo uriInfo,@PathParam("id") String trackingId) {
         try {
-            ReportExecutor.ReportResult res =  serverRepository.generateReport(trackingId);
+            Optional<ReportExecutor.ReportResult> res =  serverRepository.generateReport(trackingId);
             log.info("report result: {}",res);
-            return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", res.result)).build();
+            return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", res.get().result)).build();
         } catch (Exception e) {
             log.error("Error while submitting user report request for: {}, {}",trackingId,e);
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Error while submitting user report request.").build();

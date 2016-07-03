@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -42,6 +43,12 @@ public class ServerRepository {
         this.agentConfig = agentConfig;
     }
 
+    /**
+     * Sends the message to the master and waits for response using ask pattern
+     * @param message
+     * @param timeoutInSeconds
+     * @return
+     */
     private Object sendToMaster(Object message,int timeoutInSeconds) {
         Timeout timeout = new Timeout(timeoutInSeconds, TimeUnit.SECONDS);
         Future<Object> future = ask(router, message, timeout);
@@ -58,7 +65,13 @@ public class ServerRepository {
         return null;
     }
 
-    public Master.ServerInfo getServerStatus(Object message) {
+    /**
+     * Retrieves the cluster status from the master
+     * TODO: create a separate immutable class to represent the request and the response
+     * @param message
+     * @return
+     */
+    public Master.ServerInfo getServerStatus(Master.ServerInfo message) {
         Object result = sendToMaster(message,6);
         if(result!=null && result instanceof Master.ServerInfo) {
             Master.ServerInfo info = (Master.ServerInfo)result;
@@ -67,7 +80,14 @@ public class ServerRepository {
         return new Master.ServerInfo();
     }
 
-    public String submitJob(JobModel jobModel) throws Exception {
+    /**
+     * Generates a unique tracking and submit the job to the master via the master proxy
+     * if the job is properly submitted return the tracking identifier
+     * @param jobModel
+     * @return
+     * @throws Exception
+     */
+    public Optional<String> submitJob(JobModel jobModel) throws Exception {
         String trackingId = UUID.randomUUID().toString();
 
         TaskEvent taskEvent = new TaskEvent();
@@ -84,15 +104,15 @@ public class ServerRepository {
             Object result =  Await.result(future, timeout.duration());
             if(result instanceof MasterClientActor.Ok) {
                 success++;
-                log.debug("Ok Message from server just got here: {}", result);
+                log.debug("Ok message from server just got here, this indicates the job was successfully posted to the master: {}", result);
             }
         }
 
         if(success==jobModel.getCount()) {
             log.debug("Job Successfully submitted to master");
-            return trackingId;
+            return Optional.of(trackingId);
         }
-        return null;
+        return Optional.empty();
     }
 
     public TrackingResult getTrackingInfo(String trackingId) {
@@ -113,7 +133,7 @@ public class ServerRepository {
         return false;
     }
 
-    public ReportExecutor.ReportResult generateReport(String trackingId) {
+    public Optional<ReportExecutor.ReportResult> generateReport(String trackingId) {
 
         TaskEvent taskEvent = new TaskEvent();
         taskEvent.setJobName("gatling");
@@ -126,28 +146,41 @@ public class ServerRepository {
         log.info("Report generated {}",result);
         if(result!=null && result instanceof ReportExecutor.ReportResult) {
             log.info("Report generated accurately {}",result);
-            return (ReportExecutor.ReportResult)result;
+            return Optional.of((ReportExecutor.ReportResult) result);
         }
-        return null;
+        return Optional.empty();
     }
 
-    public String uploadFile(String path, String name, String role, String type) {
+    /**
+     * Given the path from the staging area the master instructs workers to pull new files supplied by users
+     * @param path
+     * @param name
+     * @param role
+     * @param type
+     * @return
+     */
+    public Optional<String> uploadFile(String path, String name, String role, String type) {
         String trackingId = UUID.randomUUID().toString();
         Master.UploadFile uploadFileRequest = new Master.UploadFile(trackingId,path,name,role,type);
         Object result = sendToMaster(uploadFileRequest,5);
         log.info("UploadFile request sent {}",result);
         if(result!=null && result instanceof Master.Ack) {
-            return ((Master.Ack)result).getWorkId();
+            return Optional.of(((Master.Ack) result).getWorkId());
         }
-        return null;
+        return Optional.empty();
     }
 
-    public Master.UploadInfo getUploadStatus(Master.UploadInfo uploadInfo) {
+    /**
+     * Tracks file upload status and indicates which workers have successfully pulled the new files
+     * @param uploadInfo
+     * @return
+     */
+    public Optional<Master.UploadInfo> getUploadStatus(Master.UploadInfo uploadInfo) {
         Object result = sendToMaster(uploadInfo,5);
         if(result!=null && result instanceof Master.UploadInfo) {
-            return ((Master.UploadInfo)result);
+            return Optional.of ((Master.UploadInfo)result);
         }
-        return null;
+        return Optional.empty();
     }
 
 
