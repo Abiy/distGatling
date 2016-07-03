@@ -71,7 +71,9 @@ The design of distributed gatling is based Derek Wyatt's blog on Work pulling pa
     - Dynamic workers to allow for auto scaling, up/down
     - Message that is delivered to Master is durable
 
-<img src="/images/pull_work.png" width="400" height="400" alt="Pull work model"/> 
+![Alt text](images/pull_work.png "Pull work model")
+
+ <!--- <img src="/images/pull_work.png" width="400" height="400" alt="Pull work model"/>  --->
 
 Workers pull instructions from the master, the master keeps track of which instruction is consumed by which worker. The instructions could assume one of the following forms:
    
@@ -93,25 +95,30 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 
 ---
 
-# Thread metrics for the master
-<img src="/images/landing.png" width="700" height="400" alt="Thread metrics for the master"/>
+### Thread metrics for the master
+![Alt text](images/landing.png "Thread metrics for the master")
+<!-- <img src="/images/landing.png" width="700" height="400" alt="Thread metrics for the master"/> -->
 
 ---
 
-# Upload plugins, simulations files, data and conf files
-<img src="/images/upload.png" width="700" height="400" alt="Upload plugins, simulations files, data and conf files"/>
+### Upload plugins, simulations files, data and conf files
+![Alt text](images/upload.png "Upload plugins, simulations files, data and conf files")
+<!-- <img src="/images/upload.png" width="700" height="400" alt="Upload plugins, simulations files, data and conf files"/> -->
 
 ---
 
-# Start a distributed simulation task, provide worker pool to use, simulation to run and count of parallel tasks
-<img src="/images/submit_simulation_job.png" width="700" height="400" alt="Start a distributed simulation task"/>
+### Start a distributed simulation task, provide worker pool to use, simulation to run and count of parallel tasks
+![Alt text](images/submit_simulation_job.png "Start a distributed simulation task")
+<!-- <img src="/images/submit_simulation_job.png" width="700" height="400" alt="Start a distributed simulation task"/> -->
 
 ---
 
-# Track the progress of a distributed simulation task on the cluster
-<img src="/images/running_simulation_job.png" width="700" height="400" alt="Track progress"/>
+### Track the progress of a distributed simulation task on the cluster
+![Alt text](images/running_simulation_job.png "Track task progress")
+<!-- <img src="/images/running_simulation_job.png" width="700" height="400" alt="Track progress"/> -->
 
 ---
 
-# Cluster information - shows current state of all the workers in the cluster
-<img src="/images/cluster_info.png" width="700" height="400" alt="Cluster info"/>
+### Cluster information - shows current state of all the workers in the cluster
+![Alt text](images/cluster_info.png "Cluster info")
+<!-- <img src="/images/cluster_info.png" width="700" height="400" alt="Cluster info"/> -->
