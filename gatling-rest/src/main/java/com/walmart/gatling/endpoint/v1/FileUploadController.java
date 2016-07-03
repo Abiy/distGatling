@@ -22,6 +22,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+/**
+ * Spring mvc controller which exposes the http end point that accepts user file uploads
+ * User could upload a lib files, conf files, simulation scripts and simulation data files
+ * Files are staged to a temporary directory specified using file.repository configuration property
+ */
 @Controller
 public class FileUploadController {
     private ServerRepository serverRepository;
