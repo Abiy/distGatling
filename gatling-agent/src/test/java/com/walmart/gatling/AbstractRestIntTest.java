@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
 /**
  * Abstract helper class that defines necessary web integration testing annotations and common functions.
  * 
- * @author jevans
+ * @author walmart
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)

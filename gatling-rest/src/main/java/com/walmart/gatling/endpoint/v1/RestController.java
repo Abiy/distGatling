@@ -35,10 +35,8 @@ import javax.ws.rs.core.UriInfo;
 @Component
 @Path("/server")
 public class RestController {
-
     private final Logger log = LoggerFactory.getLogger(RestController.class);
     private ServerRepository serverRepository;
-
 
     @Autowired
     public RestController(ServerRepository serverRepository) {

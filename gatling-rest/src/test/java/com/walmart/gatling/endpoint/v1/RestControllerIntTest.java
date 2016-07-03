@@ -1,34 +1,25 @@
 package com.walmart.gatling.endpoint.v1;
 
 import com.walmart.gatling.AbstractRestIntTest;
+import com.walmart.gatling.repository.ValuePair;
 
-import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Trivial integration test class that exercises the Junit spring runner and in container testing.
  * 
- * @author jevans
+ * @author walmart
  *
  */
 public class RestControllerIntTest extends AbstractRestIntTest {
-	
-//	@Autowired
-//	private DomainService domainService;
-//
-//	@Test
-//	public void testRestGetByIdMarshalsCorrectly() {
-//		Entity wireLoc = template.getForObject(rootUrl+ "/server/status", Entity.class);
-//		System.out.println(wireLoc);
-//		assertEqualsServiceValue(wireLoc);
-//	}
-//
-//	private void assertEqualsServiceValue(Entity wireLoc) {
-//		assertNotNull("Expected supplied wire Model to be non-null.", wireLoc);
-//
-//		long id = wireLoc.getId();
-//		Entity svcLoc = domainService.service(id);
-//		assertNotNull("Expected the entity with id '" + id + "'.", svcLoc);
-//		assertJsonEquals(svcLoc, wireLoc);
-//	}
+    private final Logger log = LoggerFactory.getLogger(RestControllerIntTest.class);
+
+    @Test
+    public void test(){
+        ValuePair[] info = template.getForObject(rootUrl+ "/server/info", ValuePair[].class);
+        log.debug(info.toString());
+    }
 	
 }

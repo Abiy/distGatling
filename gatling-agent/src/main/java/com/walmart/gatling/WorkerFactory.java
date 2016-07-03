@@ -11,6 +11,8 @@ import com.walmart.gatling.commons.Worker;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import akka.actor.ActorPath;
 import akka.actor.ActorPaths;
@@ -36,11 +38,12 @@ public class WorkerFactory {
         ClusterClientSettings settings =  ClusterClientSettings.create(system).withInitialContacts(initialContacts);
         final ActorRef clusterClient = system.actorOf(ClusterClient.props(settings), "clusterClient");
 
-        for (int i=0;i<agent.getActor().getNumberOfActors();i++){
-            system.actorOf(
-                    Worker.props(clusterClient, createWorkExecutor(agent), agent.getActor().getRole()),
-                    agent.getActor().getRole()+i);
-        }
+        IntStream.range(1,agent.getActor().getNumberOfActors()+1).forEach(i->
+            system.actorOf(Worker.props(clusterClient,
+                            createWorkExecutor(agent),
+                            agent.getActor().getRole()),
+                            agent.getActor().getRole()+i)
+        );
         return system;
 
     }
