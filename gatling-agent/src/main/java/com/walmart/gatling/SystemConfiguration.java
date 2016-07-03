@@ -74,12 +74,4 @@ public class SystemConfiguration {
         return WorkerFactory.startWorkersWithExecutors(agentConfig);
     }
 
-
-   // @Bean
-    public ActorRef createRouter(ActorSystem system){
-        //ActorRef router1 = system.actorOf(FromConfig.getInstance().props(Props.create(MasterClientActor.class)), "createRouter");
-        ActorRef router1 = system.actorOf(new RoundRobinPool(1).props(Props.create(MasterClientActor.class,system)), "router");
-        return router1;
-
-    }
 }
