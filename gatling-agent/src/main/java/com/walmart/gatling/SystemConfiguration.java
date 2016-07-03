@@ -15,7 +15,7 @@ import akka.actor.Props;
 import akka.routing.RoundRobinPool;
 
 /**
- * Created by walmart.
+ * Created by walmart
  */
 @Configuration
 public class SystemConfiguration {
@@ -58,14 +58,14 @@ public class SystemConfiguration {
        logServer.setHostName(HostUtils.lookupIp());
        logServer.setPort(clientPort);
        agentConfig.setLogServer(logServer);
-
        agentConfig.setContactPoint(contactPoints);
 
        return agentConfig;
    }
 
     /**
-     * Created the actor system with workers and joins the cluster/master
+     * Bean factory that creates the actor system with workers and joins the cluster/master
+     * using the contact-point property value
      * @param agentConfig
      * @return
      */
