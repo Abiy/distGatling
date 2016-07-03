@@ -39,13 +39,6 @@ public abstract class AbstractRestIntTest {
 	@Autowired
 	protected ObjectMapper mapper;
 
-	@BeforeClass
-	public static void disableCCM() {
-		System.setProperty("com.walmart.platform.config.runOnEnv", "testing");
-		System.setProperty("com.walmart.platform.config.appName", "walmart-container-service");
-		System.setProperty("scm.server.access.enabled", "false");
-		System.setProperty("scm.snapshot.enabled", "false");
-	}
 
 	protected String toJson(Object obj) {
 		try {

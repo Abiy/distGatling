@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
 /**
  * Abstract helper class that defines necessary web integration testing annotations and common functions.
  * 
- * @author jevans
+ * @author walmart
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -38,14 +38,6 @@ public abstract class AbstractRestIntTest {
 
 	@Autowired
 	protected ObjectMapper mapper;
-
-	@BeforeClass
-	public static void disableCCM() {
-		System.setProperty("com.walmart.platform.config.runOnEnv", "testing");
-		System.setProperty("com.walmart.platform.config.appName", "walmart-container-service");
-		System.setProperty("scm.server.access.enabled", "false");
-		System.setProperty("scm.snapshot.enabled", "false");
-	}
 
 	protected String toJson(Object obj) {
 		try {
