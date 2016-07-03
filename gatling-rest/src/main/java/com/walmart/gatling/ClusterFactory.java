@@ -35,9 +35,17 @@ import com.walmart.gatling.commons.Master;
 public class ClusterFactory {
 
 
+    /**
+     * Creates the actor system with the master
+     * @param port
+     * @param role
+     * @param isPrimary
+     * @param agentConfig
+     * @return
+     */
     public static ActorSystem startMaster(int port, String role, boolean isPrimary,AgentConfig agentConfig) {
         String ip = HostUtils.lookupIp();
-        String seed = String.format("akka.cluster.seed-nodes=[\"akka.tcp://%s%s", Constants.PerformanceSystem, "@"+ ip +":2551\"]");
+        String seed = String.format("akka.cluster.seed-nodes=[\"akka.tcp://%s@%s:%s\"]", Constants.PerformanceSystem, ip ,port);
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + role + "]").
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)).
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + ip)).
@@ -45,12 +53,22 @@ public class ClusterFactory {
                 withFallback(ConfigFactory.load("application"));
 
         ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);
-        ClusterFactory.getMaster("backend",isPrimary,system,agentConfig,ip);
+        ClusterFactory.getMaster(port,role,isPrimary,system,agentConfig,ip);
         return system;
     }
 
-    public static ActorRef  getMaster(String role, boolean isPrimary, ActorSystem system, AgentConfig agentConfig,String ip) {
-        String journalPath = String.format("akka.tcp://%s%s", Constants.PerformanceSystem, "@"+ ip +":2551/user/store");
+    /**
+     * Creates the master actor using cluster singleton manager in the specified actor system
+     * @param port
+     * @param role
+     * @param isPrimary
+     * @param system
+     * @param agentConfig
+     * @param ip
+     * @return
+     */
+    public static ActorRef  getMaster(int port,String role, boolean isPrimary, ActorSystem system, AgentConfig agentConfig,String ip) {
+        String journalPath = String.format("akka.tcp://%s@%s:%s/user/store", Constants.PerformanceSystem,  ip ,port);
         startupSharedJournal(system, isPrimary, ActorPath$.MODULE$.fromString(journalPath));
         FiniteDuration workTimeout = Duration.create(120, "seconds");
         final ClusterSingletonManagerSettings settings =
@@ -62,6 +80,12 @@ public class ClusterFactory {
         return ref;
     }
 
+    /**
+     * Associates a journal actor for master, the master is a persistent actor
+     * @param system
+     * @param startStore
+     * @param path
+     */
     public static void startupSharedJournal(final ActorSystem system, boolean startStore, final ActorPath path) {
         // Start the shared journal on one node (don't crash this SPOF)
         // This will not be needed with a distributed journal
@@ -71,10 +95,8 @@ public class ClusterFactory {
         // register the shared journal
 
         Timeout timeout = new Timeout(15, TimeUnit.SECONDS);
-
         ActorSelection actorSelection = system.actorSelection(path);
         Future<Object> f = Patterns.ask(actorSelection, new Identify(null), timeout);
-
         f.onSuccess(new OnSuccess<Object>() {
 
             @Override

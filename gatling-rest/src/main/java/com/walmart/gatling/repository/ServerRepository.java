@@ -1,27 +1,19 @@
 package com.walmart.gatling.repository;
 
 import com.walmart.gatling.commons.AgentConfig;
-import com.walmart.gatling.commons.HostUtils;
 import com.walmart.gatling.commons.Master;
 import com.walmart.gatling.commons.MasterClientActor;
 import com.walmart.gatling.commons.ReportExecutor;
 import com.walmart.gatling.commons.TaskEvent;
 import com.walmart.gatling.commons.TrackingResult;
-import com.walmart.gatling.domain.DomainService;
 import com.walmart.gatling.endpoint.v1.JobModel;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 

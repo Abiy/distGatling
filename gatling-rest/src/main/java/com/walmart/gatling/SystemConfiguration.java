@@ -66,7 +66,8 @@ public class SystemConfiguration {
     }
 
     /**
-     * bean factory to create the actor system
+     * bean factory to create the actor system and creating the master actor
+     * the master actor is a singleton with a persistent store
      * @param agentConfig
      * @param port
      * @param name
