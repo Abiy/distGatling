@@ -110,7 +110,7 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 
 ---
 
-### Start a distributed simulation task, provide worker pool to use, simulation to run and count of parallel tasks
+### Start a distributed simulation task - users provide  the worker pool to use, the simulation file to run and number of parallel tasks
 ![Alt text](images/submit_simulation_job.png "Start a distributed simulation task")
 <!-- <img src="/images/submit_simulation_job.png" width="700" height="400" alt="Start a distributed simulation task"/> -->
 
