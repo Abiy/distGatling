@@ -18,13 +18,13 @@ actor:
   role: "report"
   executerType: "script"
 job:
-  path: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling simulation, data, and conf are stored
+  path: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling lib, simulation, data, and conf are stored
   logDirectory: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7/" # Base directory for logfiles(log/error and log/std)
   command: "/bin/bash" # Base command to run gatling.sh file
   artifact: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7/bin/{0}.sh" # Path for the location of gatling.sh
 
 file:
-  repository: "/Users/ahailem/uploadspace/upload/" # Base directory for temporary user uploads(simulation files,conf,data files and lib files)
+  repository: "/Users/ahailem/uploadspace/upload/" # Base directory used as a temporary staging area for user file uploads(simulation files,conf,data files and lib files)
 
 graphite: #Graphite configuration for master api metrics
     host: localhost
@@ -37,7 +37,7 @@ jersey:
         packages: com.walmart # Base package for jersey controllers for auto registration
 
 logging.level.root: INFO
-logging.level.com.walmart: DEBUG
+logging.level.com.walmart.gatling: DEBUG
 
 ---
 
@@ -49,12 +49,12 @@ spring:
 spring:
     profiles: integration
 
-logging.level.com.walmart: INFO
+logging.level.com.walmart.gatling: INFO
     
 ---
 
 spring:
     profiles: production
 
-logging.level.com.walmart: INFO
+logging.level.com.walmart.gatling: INFO
 

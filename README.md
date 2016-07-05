@@ -1,11 +1,11 @@
 ## About Gatling
 
-Gatling is a highly capable load testing tool. It is designed for ease of use, maintainability and high performance.
+[Gatling](https://gatling.io) is a highly capable load testing tool. It is designed for ease of use, maintainability and high performance.
 
 Out of the box, Gatling comes with excellent support of the HTTP protocol that makes it a tool of choice for load testing any HTTP server. As the core engine is actually 
 protocol agnostic, it is perfectly possible to implement support for other protocols. For example, Gatling currently also ships JMS support.
 
-The Quickstart has an overview of the most important concepts, walking you through the setup of a simple scenario for load testing an HTTP server.
+The [Quickstart](http://gatling.io/docs/2.2.2/quickstart.html#quickstart) has an overview of the most important concepts, walking you through the setup of a simple scenario for load testing an HTTP server.
 
 Having scenarios that are defined in code and are resource efficient are the two requirements that motivated the development of Gatling. Based on an expressive DSL, the scenarios
 are self explanatory. They are easy to maintain and can be kept in a version control system.
@@ -50,19 +50,32 @@ After joining the cluster, CW workers are responsible for
     
 ## Usage
 
-After cloning or downloading the repository  
+Download Gatling bundle as a .zip file [here](http://gatling.io/#/resources/download). Unzip the file in a directory of your choosing. 
+                        
+After cloning or downloading the repository of gatling cluster runner
+    
+    1. Update the application.yml file settings 
+    
+    job:
+      path: "/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling lib, simulation, data, and conf are stored
+      logDirectory: "/workspace/gatling-charts-highcharts-bundle-2.1.7/" # Base directory for log files(log/error and log/std)
+      command: "/bin/bash" # Base command to run gatling.sh file
+      artifact: "/workspace/gatling-charts-highcharts-bundle-2.1.7/bin/{0}.sh" # Path for the location of gatling.sh
 
-    Open terminal window and run 
+    2. Open terminal window and run 
+    
      mvn clean package
     
-    Locate the master shell script(gatling-rest) and run master.sh to start the Cluster Master, take a note of the master ip and port
+    3. Locate the master shell script(under gatling-rest) and run master.sh to start the Cluster Master, take a note of the master ip and port
+        
         /bin/bash master.sh -Dmaster.port=<2551> -Dserver.port=<8080>
         
 
 After starting the master using the above command, point your browser to GET http://localhost:8080/ to access the web page.
 
         
-     Locate the agent shell script(gatling-agent) and run agent.sh to start the Cluster worker for each node you intend to include to the cluster, each worker should be assigned the correct master contact point
+    4. Locate the agent shell script(under gatling-agent) and run agent.sh to start the Cluster worker on each node you intend to include in the cluster, each worker should be assigned the correct master contact point
+        
         /bin/bash agent.sh -Dakka.contact-points=akka.tcp://PerformanceSystem@<MASTER_HOST>:<MASTER_PORT>/system/receptionist
 
 
@@ -73,6 +86,10 @@ The design of distributed gatling is based on Derek Wyatt's blog on Work pulling
     - Provide a mechanism for the master to detect death of workers and reassign work if need be
     - Dynamic workers to allow for auto scaling, up/down
     - Message that is delivered to Master is durable
+    
+Multiple teams across your enterprise can share the same cluster, each worker/agent is given a role name via actor.role config property or -Dactor.role parameter. 
+When you submit a distributed simulation task you must provide a valid worker role, this allows the system to run the simulation task on the pool of workers labeled with the same role name.
+We recommend labeling all your workers with the same name initially and resort to partitioning your workers only when multiple teams start stepping on each other foot. 
 
 ![Alt text](images/pull_work.png "Pull work model")
 
@@ -116,7 +133,7 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 
 ---
 
-### Track the progress of a distributed simulation task on the cluster
+### Track the progress of a distributed simulation task on the cluster, after all the distributed tasks complete a button will appear on this page to allow you generate and view the gatling report
 ![Alt text](images/running_simulation_job.png "Track task progress")
 <!-- <img src="/images/running_simulation_job.png" width="700" height="400" alt="Track progress"/> -->
 

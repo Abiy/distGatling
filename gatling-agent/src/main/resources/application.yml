@@ -16,6 +16,7 @@ job:
 # update the host and port value to point to the cluster where the master is running on
 akka:
   contact-points: "akka.tcp://PerformanceSystem@127.0.0.1:2551/system/receptionist"
+
 graphite:
     host: localhost
     port: 2003
@@ -27,7 +28,7 @@ jersey:
         packages: com.walmart # Base package for jersey controllers for auto registration
 
 logging.level.root: INFO
-logging.level.com.walmart: DEBUG
+logging.level.com.walmart.gatling: DEBUG
 
 ---
 
@@ -39,7 +40,7 @@ spring:
 spring:
     profiles: integration
 
-logging.level.com.walmart: INFO
+logging.level.com.walmart.gatling: INFO
     
 ---
 
