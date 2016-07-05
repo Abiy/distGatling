@@ -111,9 +111,6 @@ In addition to marking the worker as dead and the job as failed, the master also
 If the worker become alive after recovery it should re-join the cluster and re-register with the master.  
 
 
----
-
-
 ## Screen Shots 
 
 ---
