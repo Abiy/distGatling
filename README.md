@@ -26,7 +26,7 @@ Gatling doesn’t have a cluster mode yet, but you can achieve similar results m
 Distributed Gatling is a walmart Technology in house solution that was created to enable developers and QA engineers to run gatling simulation tests in a distributed/cluster environment.  
 The solution is cloud native and has two components, Cluster Master and Cluster Worker.
 
-# Cluster Master (CM)
+## Cluster Master (CM)
 
 The Cluster Master  provides users interfaces and REST API's for basic operation related to running , tracking and consolidating performance reports,  Master is also responsible for
     - Handling user request
@@ -39,7 +39,7 @@ The Cluster Master  provides users interfaces and REST API's for basic operation
    
 Different projects could share the same cluster and run side by side on the same cluster with  complete isolation
 
-# Cluster Worker(CW)
+## Cluster Worker(CW)
 
 After joining the cluster, CW workers are responsible for 
     - Running performance tests
