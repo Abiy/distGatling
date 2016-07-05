@@ -80,6 +80,7 @@ After starting the master using the above command, point your browser to GET htt
         /bin/bash agent.sh -Dakka.contact-points=<MASTER_HOST>:<MASTER_PORT>
 
 
+
 ##  Goal
 
 The design of distributed gatling is based on Derek Wyatt's blog on Work pulling pattern and has the following goals:
@@ -111,6 +112,7 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 
 
 ---
+
 
 ## Screen Shots 
 
