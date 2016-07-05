@@ -19,7 +19,7 @@ Sometimes, generating some very heavy load from a single machine might lead to s
 
 In this case, you might want to use several Gatling instances hosted on multiple machines.
 
-Gatling doesn’t have a cluster mode yet, but you can achieve similar results manually:
+Gatling doesn’t have a cluster mode yet, hence the need for this project.
 
 ## Distributed Gatling
 
