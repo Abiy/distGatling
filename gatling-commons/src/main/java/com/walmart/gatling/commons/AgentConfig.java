@@ -7,6 +7,10 @@ import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -19,12 +23,17 @@ public class AgentConfig {
     private Actor actor;
     private Job job;
     private LogServer logServer;
+    private String contactPoint;
 
-    public String getContactPoint() {
-        return contactPoint;
+    public Stream<String> getContactPoint() {
+        String[] contacts = contactPoint.split(",") ;
+        return Stream.of(contacts)
+                .map(p -> String.format("akka.tcp://%s@%s/system/receptionist",Constants.PerformanceSystem, p));
     }
 
-    private String contactPoint;
+    public void setContactPoint(String contactPoint) {
+        this.contactPoint = contactPoint;
+    }
 
     public LogServer getLogServer() {
         return logServer;
@@ -60,10 +69,6 @@ public class AgentConfig {
 
     public String getAbortUrl() {
         return getGenericUrl("gatling/server/abort","trackingId",StringUtils.EMPTY);
-    }
-
-    public void setContactPoint(String contactPoint) {
-        this.contactPoint = contactPoint;
     }
 
     public String getGenericUrl(String path,String queryStringKey,String queryStringValue) {

@@ -10,7 +10,9 @@ import com.walmart.gatling.commons.WorkExecutor;
 import com.walmart.gatling.commons.Worker;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -33,8 +35,10 @@ public class WorkerFactory {
 
         ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);
 
-        Set<ActorPath> initialContacts = new HashSet<>();
-        initialContacts.add(ActorPaths.fromString(agent.getContactPoint() ));
+        Set<ActorPath> initialContacts = new HashSet<>(agent.getContactPoint()
+                    .map(p->ActorPaths.fromString(p))
+                    .collect(Collectors.toList()));
+
         ClusterClientSettings settings =  ClusterClientSettings.create(system).withInitialContacts(initialContacts);
         final ActorRef clusterClient = system.actorOf(ClusterClient.props(settings), "clusterClient");
 

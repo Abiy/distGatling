@@ -77,7 +77,7 @@ After starting the master using the above command, point your browser to GET htt
         
     4. Locate the agent shell script(under gatling-agent) and run agent.sh to start the Cluster worker on each node you intend to include in the cluster, each worker should be assigned the correct master contact point
         
-        /bin/bash agent.sh -Dakka.contact-points=akka.tcp://PerformanceSystem@<MASTER_HOST>:<MASTER_PORT>/system/receptionist
+        /bin/bash agent.sh -Dakka.contact-points=<MASTER_HOST>:<MASTER_PORT>
 
 
 ##  Goal

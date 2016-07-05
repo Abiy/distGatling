@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import java.util.List;
+
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
@@ -58,7 +60,7 @@ public class SystemConfiguration {
        logServer.setHostName(HostUtils.lookupIp());
        logServer.setPort(clientPort);
        agentConfig.setLogServer(logServer);
-       agentConfig.setContactPoint(contactPoints);
+       agentConfig.setContactPoint( contactPoints);
 
        return agentConfig;
    }
