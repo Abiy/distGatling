@@ -29,6 +29,7 @@ The solution is cloud native and has two components, Cluster Master and Cluster 
 ## Cluster Master (CM)
 
 The Cluster Master  provides users interfaces and REST API's for basic operation related to running , tracking and consolidating performance reports,  Master is also responsible for
+
     - Handling user request
     - Tracking and monitoring the health of Cluster Workers 
     - Submitting Gatling simulation tasks to distributed workers
