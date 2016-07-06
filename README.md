@@ -139,6 +139,12 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 
 ---
 
+### Generate a report  - collects all simulation log and generates a gatling performance report
+![Alt text](images/generate_report.png "Generate report")
+<!-- <img src="/images/cluster_info.png" width="700" height="400" alt="Cluster info"/> -->
+
+---
+
 ### Cluster information - shows current state of all the workers in the cluster
 ![Alt text](images/cluster_info.png "Cluster info")
 <!-- <img src="/images/cluster_info.png" width="700" height="400" alt="Cluster info"/> -->
