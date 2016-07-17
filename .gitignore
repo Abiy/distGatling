@@ -16,3 +16,5 @@
 log/
 target/
 /bin/
+shared-journal/
+gatling-rest/shared-journal/
