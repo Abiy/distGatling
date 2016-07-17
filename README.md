@@ -101,8 +101,6 @@ We recommend labeling all your workers with the same name initially and resort t
 
 ![Alt text](images/pull_work.png "Pull work model")
 
- <!--- <img src="/images/pull_work.png" width="400" height="400" alt="Pull work model"/>  --->
-
 Workers pull instructions from the master, the master keeps track of which instruction is consumed by which worker. The instructions could assume one of the following forms:
    
     - FileRequest
