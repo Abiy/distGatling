@@ -22,15 +22,6 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.2.7.RELEASE</version>
     </parent>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>nexus-snapshot</id>
-            <name>Walmart Snapshots</name>
-            <url>http://repo.wal-mart.com/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <dependencies>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
