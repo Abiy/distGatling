@@ -57,9 +57,15 @@ public class WorkerMasterTest extends MasterTest {
             {
                 master.tell(new MasterWorkerProtocol.WorkerRequestsFile("worker-testWorkerRequestsFile","projectName","127.0.0.1"), getRef());//send request
                 expectNoMsg();
-                master.tell(new Master.UploadFile("trId","/path","file","role","lib"), getRef());//send request
-                final Master.Ack ack = expectMsgClass(Master.Ack.class);//assert ack
-                Assert.assertEquals("trId", ack.getWorkId());
+
+                master.tell(new Master.UploadFile("trId1","/path","file","role","lib"), getRef());//send request
+                Master.Ack ack = expectMsgClass(Master.Ack.class);//assert ack
+                Assert.assertEquals("trId1", ack.getWorkId());
+
+                master.tell(new Master.UploadFile("trId2","/path","file","role","lib"), getRef());//send request
+                ack = expectMsgClass(Master.Ack.class);//assert ack
+                Assert.assertEquals("trId2", ack.getWorkId());
+
                 master.tell(new MasterWorkerProtocol.WorkerRequestsFile("worker-testWorkerRequestsFile", "projectName", "127.0.0.1"), getRef());//send request
                 final Master.FileJob fileJob = expectMsgClass(Master.FileJob.class);//assert ack
             }
@@ -81,7 +87,76 @@ public class WorkerMasterTest extends MasterTest {
                 master.tell(new MasterWorkerProtocol.WorkerRequestsWork("worker-1", PROJECT_NAME), getRef());//send request
                 final Master.Job job1 = expectMsgClass(Master.Job.class);//assert Job
                 Assert.assertEquals(PROJECT_NAME, job1.roleId);
+                //worker sends progress
+                master.tell(new MasterWorkerProtocol.WorkInProgress("worker-1",job1.jobId), getRef());//send request
+                expectNoMsg();
+                //track job
+                master.tell(new Master.TrackingInfo(job.trackingId), getRef());//send request
+                TrackingResult trackingResult = expectMsgClass(TrackingResult.class);
+                Assert.assertEquals(1,trackingResult.getInProgressCount());
+                Assert.assertEquals(0,trackingResult.getPendingCount());
+                //worker sends job completed msg
+                master.tell(new MasterWorkerProtocol.WorkIsDone("worker-1", job1.jobId, new Worker.Result(1, "", "", null, job)), getRef());//send update
+                expectMsgClass(Master.Ack.class);//assert ack
+                //Check Idempotency works
+                master.tell(new MasterWorkerProtocol.WorkIsDone("worker-1", job1.jobId, new Worker.Result(1, "", "", null, job)), getRef());//send update
+                expectMsgClass(Master.Ack.class);//assert ack
+                //track job after completed
+                master.tell(new Master.TrackingInfo(job.trackingId), getRef());//send request
+                trackingResult = expectMsgClass(TrackingResult.class);
+                Assert.assertEquals(0,trackingResult.getInProgressCount());
+                Assert.assertEquals(0, trackingResult.getPendingCount());
+                Assert.assertEquals(false,trackingResult.isCancelled());
             }
         };
     }
+
+    @Test
+    public void testWorkCoordinationWhenJobFails() {
+        new JavaTestKit(system) {
+            {
+                //submit job
+                Master.Job job = getJob();
+                master.tell(job, getRef());//send job
+                expectMsgClass(Master.Ack.class);//assert ack
+                //register worker
+                master.tell(new MasterWorkerProtocol.RegisterWorker("worker-2"), getRef());
+                expectMsgEquals(MasterWorkerProtocol.WorkIsReady.getInstance());
+                //request work
+                master.tell(new MasterWorkerProtocol.WorkerRequestsWork("worker-2", PROJECT_NAME), getRef());//send request
+                final Master.Job job1 = expectMsgClass(Master.Job.class);//assert Job
+                Assert.assertEquals(PROJECT_NAME, job1.roleId);
+                //worker sends progress
+                master.tell(new MasterWorkerProtocol.WorkInProgress("worker-2",job1.jobId), getRef());//send request
+                expectNoMsg();
+                //track job
+                master.tell(new Master.TrackingInfo(job.trackingId), getRef());//send request
+                TrackingResult trackingResult = expectMsgClass(TrackingResult.class);
+                Assert.assertEquals(1,trackingResult.getInProgressCount());
+                Assert.assertEquals(0,trackingResult.getPendingCount());
+                //worker sends job completed msg
+                master.tell(new MasterWorkerProtocol.WorkFailed("worker-2", job1.jobId, new Worker.Result(1, "", "", null, job)), getRef());//send update
+                //track job after completed
+                ignoreNoMsg();
+                master.tell(new Master.TrackingInfo(job.trackingId), getRef());//send request
+                trackingResult = expectMsgClass(TrackingResult.class);
+                Assert.assertEquals(0,trackingResult.getInProgressCount());
+                Assert.assertEquals(0, trackingResult.getPendingCount());
+                Assert.assertEquals(false,trackingResult.isCancelled());
+                Assert.assertEquals(1,trackingResult.getFailed().size());
+                Assert.assertEquals(0,trackingResult.getCompleted().size());
+            }
+        };
+    }
+
+    @Test
+    public void testWorkerSendsFileUploadComplete() {
+        new JavaTestKit(system) {
+            {
+                master.tell(new Worker.FileUploadComplete(new Master.UploadFile("trId","/path","file","role","lib"),"127.0.0.1"), getRef());//send request
+                expectNoMsg();
+            }
+        };
+    }
+
 }
