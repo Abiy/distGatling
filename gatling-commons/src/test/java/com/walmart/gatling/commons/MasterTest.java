@@ -21,68 +21,91 @@ package com.walmart.gatling.commons;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.PoisonPill;
 import akka.actor.Props;
-import akka.cluster.singleton.ClusterSingletonManager;
-import akka.testkit.TestActorRef;
+import akka.persistence.SnapshotOffer;
+import akka.persistence.journal.leveldb.LeveldbJournal;
+import akka.persistence.journal.leveldb.LeveldbStore;
+import akka.persistence.journal.leveldb.SharedLeveldbJournal;
+import akka.persistence.journal.leveldb.SharedLeveldbStore;
+import akka.testkit.JavaTestKit;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-import static akka.pattern.Patterns$.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Created by ahailem on 7/6/16.
+ * Created by walmart
  */
 public class MasterTest {
 
-    private ActorSystem system;
-    private ActorRef masterRef;
-    private AgentConfig agentConfig;
+    protected static AgentConfig agentConfig;
+    protected static ActorSystem system;
+    protected static ActorRef master;
 
-    @Before
-    public  void setupActorSystem() throws Exception {
+    @BeforeClass
+    public static void setupActorSystem() throws Exception {
 
-        AgentConfig agentConfig = new AgentConfig();
-        system = startMaster(agentConfig);
-        //masterRef = system.actorOf(Master.props(FiniteDuration.Zero(), agentConfig), "master");
-
+        FileUtils.deleteDirectory(new File("journal"));
+        FileUtils.deleteDirectory(new File("shared-journal"));
+        FileUtils.deleteDirectory(new File("snapshots"));
+        //file.isDirectory()
+        agentConfig = new AgentConfig();
+        AgentConfig.LogServer log = new AgentConfig.LogServer();
+        log.setHostName("127.0.0.1");
+        log.setPort(8080);
+        agentConfig.setLogServer(log);
+        system = startMaster();
+        final Props props = Master.props(new FiniteDuration(20, TimeUnit.SECONDS), agentConfig);
+        master = system.actorOf(props, "master");
     }
 
-    @Test
-    public void testRegisterWorker() throws Exception {
-        final Props props = Master.props(FiniteDuration.Zero(), agentConfig);
-        final TestActorRef<Master> ref = TestActorRef.create(system, props, "master");
-        final Future<Object> future = akka.pattern.Patterns.ask(ref, new MasterWorkerProtocol.RegisterWorker("worker1"), 3000);
-        assertTrue(future.isCompleted());
-        assertEquals(MasterWorkerProtocol.WorkIsReady.getInstance().hashCode(), Await.result(future, Duration.Zero()).hashCode());
+    @AfterClass
+    public static void teardownClass() {
+        JavaTestKit.shutdownActorSystem(system);
+        system = null;
     }
 
-    public static ActorSystem startMaster(AgentConfig agentConfig) {
-        String ip = HostUtils.lookupIp();
-        String seed = String.format("akka.cluster.seed-nodes=[\"akka.tcp://%s@%s:%s\"]", Constants.PerformanceSystem, ip, 2552);
+    public static ActorSystem startMaster() {
+        String ip = "127.0.0.1";
+        String seed = String.format("akka.cluster.seed-nodes=[\"akka.tcp://%s@%s:%s\"]", Constants.PerformanceSystem, ip, 2551);
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[backend]").
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=2551")).
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + ip)).
                 withFallback(ConfigFactory.parseString(seed)).
                 withFallback(ConfigFactory.load("application"));
 
-        ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);
+        system = ActorSystem.create(Constants.PerformanceSystem, conf);
+        system.actorOf(Props.create(SharedLeveldbStore.class), "store");
         return system;
     }
 
-    @After
-    public void closeActorSystem() {
-         system.shutdown();
+
+    protected Master.Job getJob() {
+        String id = UUID.randomUUID().toString();
+        TaskEvent taskEvent = new TaskEvent();
+        taskEvent.setJobName("gatling");
+        taskEvent.setRoleName("role1");
+        taskEvent.setJobInstanceId(id);
+        Master.Job job = new Master.Job("projectName", taskEvent, id, "");
+        return job;
     }
+
 }
+
+

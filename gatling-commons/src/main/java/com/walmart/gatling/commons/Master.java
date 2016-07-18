@@ -40,15 +40,11 @@ import akka.cluster.Cluster;
 import akka.cluster.client.ClusterClientReceptionist;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import akka.japi.pf.FI;
-import akka.japi.pf.ReceiveBuilder;
 import akka.persistence.UntypedPersistentActor;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
-import scala.PartialFunction;
 import scala.collection.JavaConversions;
 import scala.concurrent.duration.Deadline;
 import scala.concurrent.duration.FiniteDuration;
-import scala.runtime.BoxedUnit;
 
 public class Master extends UntypedPersistentActor {
 
