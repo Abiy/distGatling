@@ -165,10 +165,16 @@ public class Master extends UntypedPersistentActor {
                     tobeRemoved.add(workerId);
                 }
             }
+            persist(new JobState.JobTimedOut(state.status.getWorkId()), event -> {
+                // remove from in progress to pending
+                jobDatabase = jobDatabase.updated(event);
+                notifyWorkers();
+            });
         }
         for (String workerId : tobeRemoved) {
             workers.remove(workerId);
         }
+
     }
 
     private void onJob(Job cmd) {
