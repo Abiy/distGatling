@@ -59,7 +59,7 @@ After joining the cluster, CW workers are responsible for
 
 Download Gatling bundle as a .zip file [here](http://gatling.io/#/resources/download). Unzip the file in a directory of your choosing. 
                         
-After cloning or downloading the repository of gatling cluster runner
+After cloning or downloading the repository of distGatling ,follow the following steps to start the cluster
     
     1. Update the application.yml file settings 
     
