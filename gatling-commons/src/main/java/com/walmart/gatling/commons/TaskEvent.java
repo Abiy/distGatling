@@ -31,22 +31,34 @@ import javafx.util.Pair;
  */
 public class TaskEvent implements Serializable {
 
-    private String roleName;
     private List<Pair<String, String>> parameters;
-    private String instance;
-    private String status;
-    private String jobInstanceId;
     private String jobName;
-    private String outputPath;
-    private int retry;
-    private int retryDelayInSeconds;
+    private long startTimeStamp;
+    private long endTimeStamp;
+    private String workerId;
+    private String errorLogPath;
+    private String stdLogPath;
+    private String status;//Master.JobStatusString
+    private String taskJobId;
+    private JobSummary.JobInfo jobInfo;
 
-    public String getRoleName() {
-        return roleName;
+    public TaskEvent() {
     }
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
+    public String getTaskJobId() {
+        return taskJobId;
+    }
+
+    public void setTaskJobId(String taskJobId) {
+        this.taskJobId = taskJobId;
+    }
+
+    public JobSummary.JobInfo getJobInfo() {
+        return jobInfo;
+    }
+
+    public void setJobInfo(JobSummary.JobInfo jobInfo) {
+        this.jobInfo = jobInfo;
     }
 
     public List<Pair<String, String>> getParameters() {
@@ -57,12 +69,52 @@ public class TaskEvent implements Serializable {
         this.parameters = parameters;
     }
 
-    public String getInstance() {
-        return instance;
+    public String getJobName() {
+        return jobName;
     }
 
-    public void setInstance(String instance) {
-        this.instance = instance;
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
+    public long getStartTimeStamp() {
+        return startTimeStamp;
+    }
+
+    public void setStartTimeStamp(long startTimeStamp) {
+        this.startTimeStamp = startTimeStamp;
+    }
+
+    public long getEndTimeStamp() {
+        return endTimeStamp;
+    }
+
+    public void setEndTimeStamp(long endTimeStamp) {
+        this.endTimeStamp = endTimeStamp;
+    }
+
+    public String getWorkerId() {
+        return workerId;
+    }
+
+    public void setWorkerId(String workerId) {
+        this.workerId = workerId;
+    }
+
+    public String getErrorLogPath() {
+        return errorLogPath;
+    }
+
+    public void setErrorLogPath(String errorLogPath) {
+        this.errorLogPath = errorLogPath;
+    }
+
+    public String getStdLogPath() {
+        return stdLogPath;
+    }
+
+    public void setStdLogPath(String stdLogPath) {
+        this.stdLogPath = stdLogPath;
     }
 
     public String getStatus() {
@@ -72,46 +124,4 @@ public class TaskEvent implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
-
-    public String getJobInstanceId() {
-        return jobInstanceId;
-    }
-
-    public void setJobInstanceId(String jobInstanceId) {
-        this.jobInstanceId = jobInstanceId;
-    }
-
-    public String getJobName() {
-        return jobName;
-    }
-
-    public void setJobName(String jobName) {
-        this.jobName = jobName;
-    }
-
-    public String getOutputPath() {
-        return outputPath;
-    }
-
-    public void setOutputPath(String outputPath) {
-        this.outputPath = outputPath;
-    }
-
-    public int getRetry() {
-        return retry;
-    }
-
-    public void setRetry(int retry) {
-        this.retry = retry;
-    }
-
-    public int getRetryDelayInSeconds() {
-        return retryDelayInSeconds;
-    }
-
-    public void setRetryDelayInSeconds(int retryDelayInSeconds) {
-        this.retryDelayInSeconds = retryDelayInSeconds;
-    }
-
-
 }

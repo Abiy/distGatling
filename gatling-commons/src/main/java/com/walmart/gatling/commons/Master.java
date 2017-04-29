@@ -18,6 +18,7 @@
 
 package com.walmart.gatling.commons;
 
+import jersey.repackaged.com.google.common.collect.ImmutableList;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -59,11 +60,10 @@ public class Master extends UntypedPersistentActor {
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private final Cancellable cleanupTask;
     private final AgentConfig agentConfig;
-
     private HashMap<String, WorkerState> workers = new HashMap<>();
     private Set<String> fileTracker = new HashSet<>();
     private JobState jobDatabase = new JobState();
-    private Map<String, UploadFile> fileDtabase = new HashMap<>();
+    private Map<String, UploadFile> fileDatabase = new HashMap<>();
     private Set<String> cancelRequests = new HashSet<>();
 
     public Master(FiniteDuration workTimeout, AgentConfig agentConfig) {
@@ -100,7 +100,7 @@ public class Master extends UntypedPersistentActor {
             log.info("Replayed {}", arg0.getClass().getSimpleName());
         } else if (arg0 instanceof UploadFile) {
             //UploadFile request = (UploadFile)arg0;
-            //fileDtabase.put(request.trackingId, request);
+            //fileDatabase.put(request.trackingId, request);
             log.info("Replayed {}", arg0.getClass().getSimpleName());
         }
     }
@@ -145,11 +145,18 @@ public class Master extends UntypedPersistentActor {
             onUploadFile(cmd);
         } else if (cmd instanceof Job) {
             onJob((Job) cmd);
-        } else if (cmd == CleanupTick) {
+        } else if (cmd instanceof JobSummaryInfo) {
+            onJobSummary();
+        }
+        else if (cmd == CleanupTick) {
             onCleanupTick();
         } else {
             unhandled(cmd);
         }
+    }
+
+    private void onJobSummary() {
+        getSender().tell(ImmutableList.copyOf(jobDatabase.getJobSummary().values()), getSelf());
     }
 
     private void onCleanupTick() {
@@ -164,12 +171,12 @@ public class Master extends UntypedPersistentActor {
                     log.info("Work timed out: {}", state.status.getWorkId());
                     tobeRemoved.add(workerId);
                 }
+                persist(new JobState.JobTimedOut(state.status.getWorkId()), event -> {
+                    // remove from in progress to pending
+                    jobDatabase = jobDatabase.updated(event);
+                    notifyWorkers();
+                });
             }
-            persist(new JobState.JobTimedOut(state.status.getWorkId()), event -> {
-                // remove from in progress to pending
-                jobDatabase = jobDatabase.updated(event);
-                notifyWorkers();
-            });
         }
         for (String workerId : tobeRemoved) {
             workers.remove(workerId);
@@ -198,7 +205,7 @@ public class Master extends UntypedPersistentActor {
         UploadFile request = (UploadFile) cmd;
         persist(request, event -> {
             getSender().tell(new Ack(request.trackingId), getSelf());
-            fileDtabase.put(request.trackingId, request);
+            fileDatabase.put(request.trackingId, request);
         });
     }
 
@@ -284,24 +291,26 @@ public class Master extends UntypedPersistentActor {
     private void onWorkerRequestsWork(Object cmd) {
         log.info("Worker requested work: {}", cmd);
         if (jobDatabase.hasJob()) {
-            MasterWorkerProtocol.WorkerRequestsWork msg = ((MasterWorkerProtocol.WorkerRequestsWork) cmd);
-            final String workerId = msg.workerId;
+            MasterWorkerProtocol.WorkerRequestsWork workReqMsg = ((MasterWorkerProtocol.WorkerRequestsWork) cmd);
+            final String workerId = workReqMsg.workerId;
             final WorkerState state = workers.get(workerId);
             if (state != null && state.status.isIdle()) {
-                final Job job = jobDatabase.nextJob();
-                boolean jobWorkerRoleMatched = msg.role.equalsIgnoreCase(job.roleId);
-                if (jobWorkerRoleMatched) {
-                    persist(new JobState.JobStarted(job.jobId), event -> {
-                        jobDatabase = jobDatabase.updated(event);
-                        log.info("Giving worker {} some taskEvent {}", workerId, event.workId);
-                        workers.put(workerId, state.copyWithStatus(new Busy(event.workId, workTimeout.fromNow())));
-                        getSender().tell(job, getSelf());
-                    });
-                } else {
-                    persist(new JobState.JobPostponed(job.jobId), event -> {
-                        jobDatabase = jobDatabase.updated(event);
-                        log.info("Postponing work: {}", workerId);
-                    });
+                for (int i=0; i<jobDatabase.getPendingJobsCount(); i++) {
+                    final Job job = jobDatabase.nextJob();//nextJob for the partition/role
+                    boolean jobWorkerRoleMatched = workReqMsg.role.equalsIgnoreCase(job.roleId);
+                    if (jobWorkerRoleMatched) {
+                        persist(new JobState.JobStarted(job.jobId, workerId), event -> {
+                            jobDatabase = jobDatabase.updated(event);
+                            log.info("Giving worker {} some taskEvent {}", workerId, event.workId);
+                            workers.put(workerId, state.copyWithStatus(new Busy(event.workId, workTimeout.fromNow())));
+                            getSender().tell(job, getSelf());
+                        });
+                    } else {
+                        persist(new JobState.JobPostponed(job.jobId), event -> {
+                            jobDatabase = jobDatabase.updated(event);
+                            log.info("Postponing work: {}", workerId);
+                        });
+                    }
                 }
             }
         }
@@ -309,11 +318,11 @@ public class Master extends UntypedPersistentActor {
 
     private void onWorkerRequestsFile(MasterWorkerProtocol.WorkerRequestsFile cmd) throws IOException {
         MasterWorkerProtocol.WorkerRequestsFile msg = cmd;
-        Set<String> trackingIds = fileDtabase.keySet();
+        Set<String> trackingIds = fileDatabase.keySet();
         Optional<String> unsentFile = trackingIds.stream().map(p -> p.concat("_").concat(msg.host)).filter(p -> !fileTracker.contains(p)).findFirst();
         if (unsentFile.isPresent()) {
             String tId = unsentFile.get().split("_")[0];
-            UploadFile uploadFile = fileDtabase.get(tId);
+            UploadFile uploadFile = fileDatabase.get(tId);
             if(uploadFile.type.equalsIgnoreCase("lib")){
                 String soonToBeRemotePath = agentConfig.getMasterUrl(uploadFile.path);
                 getSender().tell(new FileJob(null, uploadFile, soonToBeRemotePath), getSelf());
@@ -617,6 +626,9 @@ public class Master extends UntypedPersistentActor {
                     ", hosts=" + hosts +
                     '}';
         }
+    }
+
+    public static final class JobSummaryInfo implements Serializable {
     }
 
     public static final class ServerInfo implements Serializable {

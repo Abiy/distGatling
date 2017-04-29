@@ -18,3 +18,7 @@ target/
 /bin/
 shared-journal/
 gatling-rest/shared-journal/
+
+/gatling-ui/node_modules
+/gatling-ui/npm-debug.log
+/gatling-ui/assets/css/light-bootstrap-dashboard.css.map

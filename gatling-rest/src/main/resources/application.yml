@@ -9,7 +9,7 @@ master:
 master.client.pool: 10 # The number of active actors that can talk to the master via master singleton proxy
 
 multipart:
-  max-file-size: 10Mb  # Max file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
+  max-file-size: 20Mb  # Max file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
 
 #Actor configurations for the actors used during report generation
 actor:
@@ -27,7 +27,7 @@ file:
   repository: "/Users/ahailem/uploadspace/upload/" # Base directory used as a temporary staging area for user file uploads(simulation files,conf,data files and lib files)
 
 graphite: #Graphite configuration for master api metrics
-    host: localhost
+    host: graphite.prod-cdc6-graphite.rmnim-monitoring.rmnim.prod.walmart.com
     port: 2003
     prefix: gatling.master
     frequency-in-seconds: 10000000

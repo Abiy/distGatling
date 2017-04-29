@@ -19,14 +19,21 @@
 package com.walmart.gatling.endpoint.v1;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 /**
  * Created by walmart
  */
 @XmlRootElement
-public class JobModel {
+public class SimulationJobModel {
 
-    private  String roleId;
+    private String partitionAccessKey;
+    private String user;
+    /***
+     * The unique partition name/id
+     */
+    private String roleId;
     private String simulation;
     private String jobId;
     private short count;
@@ -41,6 +48,10 @@ public class JobModel {
 
     public String getRoleId() {
         return roleId;
+    }
+
+    public long getSubmittedTime() {
+        return LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
     }
 
     public void setRoleId(String roleId) {
@@ -61,5 +72,21 @@ public class JobModel {
 
     public void setJobId(String jobId) {
         this.jobId = jobId;
+    }
+
+    public String getPartitionAccessKey() {
+        return partitionAccessKey;
+    }
+
+    public void setPartitionAccessKey(String partitionAccessKey) {
+        this.partitionAccessKey = partitionAccessKey;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }
