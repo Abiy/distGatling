@@ -16,14 +16,10 @@
   ~   limitations under the License.
   ~
   -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <properties>
-        <wm.loc.ver>1.0-SNAPSHOT</wm.loc.ver>
-    </properties>
     <groupId>com.walmart.store</groupId>
     <artifactId>distributed-gatling</artifactId>
     <packaging>pom</packaging>
@@ -33,7 +29,10 @@
         <module>gatling-agent</module>
         <module>gatling-commons</module>
     </modules>
-
+    <properties>
+        <!--<akka.version>2.4.2</akka.version>-->
+        <akka.version>2.5.0</akka.version>
+    </properties>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -86,17 +85,17 @@
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_2.11</artifactId>
-            <version>2.4.2</version>
+            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-cluster_2.11</artifactId>
-            <version>2.4.2</version>
+            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-contrib_2.11</artifactId>
-            <version>2.4.2</version>
+            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>org.fusesource.leveldbjni</groupId>
@@ -107,7 +106,7 @@
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-testkit_2.11</artifactId>
-            <version>2.4.2</version>
+            <version>${akka.version}</version>
         </dependency>
     </dependencies>
     <build>

@@ -19,8 +19,6 @@
 package com.walmart.gatling.commons;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +27,16 @@ import java.util.Optional;
  * Created by walmart on 4/28/17.
  */
 public class JobSummary implements Serializable {
+
+    private List<TaskEvent> taskInfoList;
+    private JobInfo jobInfo;
+
+    public JobSummary() {
+    }
+
+    public JobSummary(JobInfo jobInfo) {
+        taskInfoList = new ArrayList<>(jobInfo.count);
+    }
 
     public List<TaskEvent> getTaskInfoList() {
         return taskInfoList;
@@ -46,87 +54,60 @@ public class JobSummary implements Serializable {
         this.jobInfo = jobInfo;
     }
 
-    private List<TaskEvent> taskInfoList;
-    private JobInfo jobInfo;
-
-    public JobSummary() {
-    }
-
-    public JobSummary(JobInfo jobInfo){
-        taskInfoList = new ArrayList<>(jobInfo.count);
-    }
-
-    public void addTask(TaskEvent taskInfo){
+    public void addTask(TaskEvent taskInfo) {
         getTaskInfoList().add(taskInfo);
     }
 
-    public void addTask(List<TaskEvent> taskInfoList){
+    public void addTask(List<TaskEvent> taskInfoList) {
         getTaskInfoList().addAll(taskInfoList);
     }
 
-    public String getStatus(){
-        if(getTaskInfoList().stream().allMatch(p->p.getStatus().equalsIgnoreCase(JobState.JobStatusString.COMPLETED)))
+    public String getStatus() {
+        if (getTaskInfoList().stream().allMatch(p -> p.getStatus().equalsIgnoreCase(JobState.JobStatusString.COMPLETED)))
             return JobState.JobStatusString.COMPLETED;
 
-        if(getTaskInfoList().stream().anyMatch(p->p.getStatus().equalsIgnoreCase(JobState.JobStatusString.FAILED)))
+        if (getTaskInfoList().stream().anyMatch(p -> p.getStatus().equalsIgnoreCase(JobState.JobStatusString.FAILED)))
             return JobState.JobStatusString.FAILED;
 
-        if(getTaskInfoList().stream().anyMatch(p->p.getStatus().equalsIgnoreCase(JobState.JobStatusString.PENDING)))
+        if (getTaskInfoList().stream().anyMatch(p -> p.getStatus().equalsIgnoreCase(JobState.JobStatusString.PENDING)))
             return JobState.JobStatusString.PENDING;
 
-        if(getTaskInfoList().stream().anyMatch(p->p.getStatus().equalsIgnoreCase(JobState.JobStatusString.TIMEDOUT)))
+        if (getTaskInfoList().stream().anyMatch(p -> p.getStatus().equalsIgnoreCase(JobState.JobStatusString.TIMEDOUT)))
             return JobState.JobStatusString.TIMEDOUT;
 
-        if(getTaskInfoList().stream().anyMatch(p->p.getStatus().equalsIgnoreCase(JobState.JobStatusString.STARTED)))
+        if (getTaskInfoList().stream().anyMatch(p -> p.getStatus().equalsIgnoreCase(JobState.JobStatusString.STARTED)))
             return JobState.JobStatusString.STARTED;
 
-        if(getTaskInfoList().stream().allMatch(p -> p.getStatus().equalsIgnoreCase(JobState.JobStatusString.ACCEPTED)))
+        if (getTaskInfoList().stream().allMatch(p -> p.getStatus().equalsIgnoreCase(JobState.JobStatusString.ACCEPTED)))
             return JobState.JobStatusString.ACCEPTED;
 
         return JobState.JobStatusString.FAILED;
 
     }
 
-    public boolean runningJob(){
-      return   getStatus().equalsIgnoreCase(JobState.JobStatusString.STARTED);
+    public boolean runningJob() {
+        return getStatus().equalsIgnoreCase(JobState.JobStatusString.STARTED);
     }
 
-    public boolean completedJob(){
-        return   getStatus().equalsIgnoreCase(JobState.JobStatusString.COMPLETED);
+    public boolean completedJob() {
+        return getStatus().equalsIgnoreCase(JobState.JobStatusString.COMPLETED);
     }
 
-    public boolean failedJob(){
-        return   getStatus().equalsIgnoreCase(JobState.JobStatusString.FAILED);
-    }
-
-    public void addTask(String status, TaskEvent taskEvent, String taskJobId) {
-        Optional<TaskEvent> task = getTaskInfoList().stream().filter(p -> p.getTaskJobId().equalsIgnoreCase(taskJobId)).findFirst();
-        if (status.equalsIgnoreCase(JobState.JobStatusString.ACCEPTED)){
-            taskEvent.setStartTimeStamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
-            taskEvent.setTaskJobId(taskJobId);
-            taskEvent.setStatus(JobState.JobStatusString.ACCEPTED);
-            addTask(taskEvent);
-        }
-        else if (task.isPresent() && status.equalsIgnoreCase(JobState.JobStatusString.STARTED)){
-            task.get().setStatus(JobState.JobStatusString.STARTED);
-        }
-        else if (task.isPresent() && status.equalsIgnoreCase(JobState.JobStatusString.STARTED)){
-            task.get().setStatus(JobState.JobStatusString.STARTED);
-        }
+    public boolean failedJob() {
+        return getStatus().equalsIgnoreCase(JobState.JobStatusString.FAILED);
     }
 
     public boolean containsWork(String workId) {
-        return getTaskInfoList().stream().anyMatch(p->p.getTaskJobId().equalsIgnoreCase(workId));
+        return getTaskInfoList().stream().anyMatch(p -> p.getTaskJobId().equalsIgnoreCase(workId));
     }
 
 
     public Optional<TaskEvent> getByWork(String workId) {
-        return getTaskInfoList().stream().filter(p->p.getTaskJobId().equalsIgnoreCase(workId)).findFirst();
+        return getTaskInfoList().stream().filter(p -> p.getTaskJobId().equalsIgnoreCase(workId)).findFirst();
     }
 
 
-
-    public static final class JobInfo implements Serializable{
+    public static final class JobInfo implements Serializable {
         public String partitionAccessKey;
         public String user;
         public String partitionName;
@@ -205,7 +186,6 @@ public class JobSummary implements Serializable {
             }
         }
     }
-
 
 
 }

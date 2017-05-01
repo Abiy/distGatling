@@ -18,8 +18,20 @@
 
 package com.walmart.gatling.commons;
 
+import akka.actor.ActorRef;
+import akka.actor.Cancellable;
+import akka.actor.Props;
+import akka.cluster.Cluster;
+import akka.cluster.client.ClusterClientReceptionist;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
+import akka.persistence.AbstractPersistentActor;
 import jersey.repackaged.com.google.common.collect.ImmutableList;
+import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
+import scala.collection.JavaConversions;
+import scala.concurrent.duration.Deadline;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,20 +46,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import akka.actor.ActorRef;
-import akka.actor.Cancellable;
-import akka.actor.Props;
-import akka.cluster.Cluster;
-import akka.cluster.client.ClusterClientReceptionist;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
-import akka.persistence.UntypedPersistentActor;
-import jersey.repackaged.com.google.common.collect.ImmutableMap;
-import scala.collection.JavaConversions;
-import scala.concurrent.duration.Deadline;
-import scala.concurrent.duration.FiniteDuration;
-
-public class Master extends UntypedPersistentActor {
+public class Master extends AbstractPersistentActor {
 
     public static final Object CleanupTick = new Object() {
         @Override
@@ -93,17 +92,7 @@ public class Master extends UntypedPersistentActor {
         }
     }
 
-    @Override
-    public void onReceiveRecover(Object arg0) throws Exception {
-        if (arg0 instanceof JobDomainEvent) {
-            jobDatabase = jobDatabase.updated((JobDomainEvent) arg0);
-            log.info("Replayed {}", arg0.getClass().getSimpleName());
-        } else if (arg0 instanceof UploadFile) {
-            //UploadFile request = (UploadFile)arg0;
-            //fileDatabase.put(request.trackingId, request);
-            log.info("Replayed {}", arg0.getClass().getSimpleName());
-        }
-    }
+
 
     @Override
     public String persistenceId() {
@@ -116,44 +105,41 @@ public class Master extends UntypedPersistentActor {
 
     }
 
+    @Override
+    public Receive createReceiveRecover() {
+        return receiveBuilder()
+                .match(JobDomainEvent.class, p->{
+                    jobDatabase = jobDatabase.updated(p);
+                    log.info("Replayed {}", p.getClass().getSimpleName());
+                })
+                .match(UploadFile.class,p->{
+                    log.info("Replayed {}", p.getClass().getSimpleName());
+                })
+                .build();
+    }
 
     @Override
-    public void onReceiveCommand(Object cmd) throws Exception {
-        if (cmd instanceof MasterWorkerProtocol.RegisterWorker) {
-            onRegisterWorker((MasterWorkerProtocol.RegisterWorker) cmd);
-        } else if (cmd instanceof MasterWorkerProtocol.WorkerRequestsFile) {
-            onWorkerRequestsFile((MasterWorkerProtocol.WorkerRequestsFile) cmd);
-        } else if (cmd instanceof MasterWorkerProtocol.WorkerRequestsWork) {
-            onWorkerRequestsWork(cmd);
-        } else if (cmd instanceof Worker.FileUploadComplete) {
-            onFileUploadComplete((Worker.FileUploadComplete) cmd);
-        } else if (cmd instanceof MasterWorkerProtocol.WorkInProgress) {
-            onWorkInProgress((MasterWorkerProtocol.WorkInProgress) cmd);
-        } else if (cmd instanceof MasterWorkerProtocol.WorkIsDone) {
-            onWorkIsDone((MasterWorkerProtocol.WorkIsDone) cmd);
-        } else if (cmd instanceof MasterWorkerProtocol.WorkFailed) {
-            onWorkFailed((MasterWorkerProtocol.WorkFailed) cmd);
-        } else if (cmd instanceof UploadInfo) {
-            onUploadInfo(cmd);
-        } else if (cmd instanceof ServerInfo) {
-            onServerInfo(cmd);
-        } else if (cmd instanceof TrackingInfo) {
-            onTrackingInfo(cmd);
-        } else if (cmd instanceof Report) {
-            onReport(cmd);
-        } else if (cmd instanceof UploadFile) {
-            onUploadFile(cmd);
-        } else if (cmd instanceof Job) {
-            onJob((Job) cmd);
-        } else if (cmd instanceof JobSummaryInfo) {
-            onJobSummary();
-        }
-        else if (cmd == CleanupTick) {
-            onCleanupTick();
-        } else {
-            unhandled(cmd);
-        }
+    public Receive createReceive() {
+        return  receiveBuilder()
+                .match(MasterWorkerProtocol.RegisterWorker.class, cmd -> onRegisterWorker(cmd))
+                .match(MasterWorkerProtocol.WorkerRequestsFile.class, cmd -> onWorkerRequestsFile(cmd))
+                .match(MasterWorkerProtocol.WorkerRequestsWork.class, cmd -> onWorkerRequestsWork(cmd))
+                .match(Worker.FileUploadComplete.class, cmd -> onFileUploadComplete(cmd))
+                .match(MasterWorkerProtocol.WorkInProgress.class, cmd -> onWorkInProgress(cmd))
+                .match(MasterWorkerProtocol.WorkIsDone.class, cmd -> onWorkIsDone(cmd))
+                .match(MasterWorkerProtocol.WorkFailed.class, cmd -> onWorkFailed(cmd))
+                .match(UploadInfo.class, cmd -> onUploadInfo(cmd))
+                .match(ServerInfo.class, cmd -> onServerInfo(cmd))
+                .match(TrackingInfo.class, cmd -> onTrackingInfo(cmd))
+                .match(Report.class, cmd -> onReport(cmd))
+                .match(UploadFile.class, cmd -> onUploadFile(cmd))
+                .match(Job.class, cmd -> onJob(cmd))
+                .match(JobSummaryInfo.class, cmd -> onJobSummary())
+                .matchEquals(CleanupTick, cmd -> onCleanupTick())
+                .matchAny(cmd -> unhandled(cmd))
+                .build();
     }
+
 
     private void onJobSummary() {
         getSender().tell(ImmutableList.copyOf(jobDatabase.getJobSummary().values()), getSelf());
@@ -170,12 +156,12 @@ public class Master extends UntypedPersistentActor {
                 if (state.status.getDeadLine().isOverdue()) {
                     log.info("Work timed out: {}", state.status.getWorkId());
                     tobeRemoved.add(workerId);
+                    persist(new JobState.JobTimedOut(state.status.getWorkId()), event -> {
+                        // remove from in progress to pending
+                        jobDatabase = jobDatabase.updated(event);
+                        notifyWorkers();
+                    });
                 }
-                persist(new JobState.JobTimedOut(state.status.getWorkId()), event -> {
-                    // remove from in progress to pending
-                    jobDatabase = jobDatabase.updated(event);
-                    notifyWorkers();
-                });
             }
         }
         for (String workerId : tobeRemoved) {
@@ -295,23 +281,23 @@ public class Master extends UntypedPersistentActor {
             final String workerId = workReqMsg.workerId;
             final WorkerState state = workers.get(workerId);
             if (state != null && state.status.isIdle()) {
-                for (int i=0; i<jobDatabase.getPendingJobsCount(); i++) {
+                //for (int i=0; i<jobDatabase.getPendingJobsCount(); i++) {
                     final Job job = jobDatabase.nextJob();//nextJob for the partition/role
                     boolean jobWorkerRoleMatched = workReqMsg.role.equalsIgnoreCase(job.roleId);
-                    if (jobWorkerRoleMatched) {
-                        persist(new JobState.JobStarted(job.jobId, workerId), event -> {
-                            jobDatabase = jobDatabase.updated(event);
-                            log.info("Giving worker {} some taskEvent {}", workerId, event.workId);
-                            workers.put(workerId, state.copyWithStatus(new Busy(event.workId, workTimeout.fromNow())));
-                            getSender().tell(job, getSelf());
-                        });
-                    } else {
-                        persist(new JobState.JobPostponed(job.jobId), event -> {
-                            jobDatabase = jobDatabase.updated(event);
-                            log.info("Postponing work: {}", workerId);
+                if (jobWorkerRoleMatched) {
+                    persist(new JobState.JobStarted(job.jobId, workerId), event -> {
+                        jobDatabase = jobDatabase.updated(event);
+                        log.info("Giving worker {} some taskEvent {}", workerId, event.workId);
+                        workers.put(workerId, state.copyWithStatus(new Busy(event.workId, workTimeout.fromNow())));
+                        getSender().tell(job, getSelf());
+                    });
+                } else {
+                    persist(new JobState.JobPostponed(job.jobId), event -> {
+                        jobDatabase = jobDatabase.updated(event);
+                        log.info("Postponing work: {}", workerId);
                         });
                     }
-                }
+                //}
             }
         }
     }

@@ -18,25 +18,18 @@
 
 package com.walmart.gatling.endpoint.v1;
 
-import com.google.common.collect.ImmutableMap;
-
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableMap;
 import com.walmart.gatling.commons.JobSummary;
 import com.walmart.gatling.commons.Master;
 import com.walmart.gatling.commons.ReportExecutor;
 import com.walmart.gatling.commons.TrackingResult;
 import com.walmart.gatling.repository.ServerRepository;
 import com.walmart.gatling.repository.ValuePair;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -47,6 +40,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 /**
@@ -80,7 +76,7 @@ public class RestController {
                 new ValuePair(stateEntry.getValue().status.toString(),
                         stateEntry.getValue().ref.path().name().toString(),
                         stateEntry.getKey())).collect(Collectors.toList());
-        return Response.status(Response.Status.ACCEPTED).entity(workers).build();
+        return Response.status(Response.Status.OK).entity(workers).build();
     }
 
     @GET
@@ -91,7 +87,7 @@ public class RestController {
         List<JobSummary> summaries = serverRepository.getJobSummary();
         log.info("Processing  get cluster job summary request.");
         List<JobSummary> result = summaries.stream().filter(s -> s.runningJob()).collect(Collectors.toList());
-        return Response.status(Response.Status.ACCEPTED).entity(result).build();
+        return Response.status(Response.Status.OK).entity(result).build();
     }
 
     @GET
@@ -101,7 +97,7 @@ public class RestController {
     public Response getJobSummary() {
         List<JobSummary> summaries = serverRepository.getJobSummary();
         log.info("Processing  get cluster job summary request.");
-        return Response.status(Response.Status.ACCEPTED).entity(summaries).build();
+        return Response.status(Response.Status.OK).entity(summaries).build();
     }
 
     @GET

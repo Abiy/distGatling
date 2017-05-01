@@ -78,8 +78,8 @@ public final class JobState {
 
 
     public JobState(JobState jobState, JobStarted workStarted) {
-        ConcurrentLinkedDeque<Master.Job> tmp_pendingJob = new ConcurrentLinkedDeque<Master.Job>(jobState.pendingJobs);
-        Map<String, Master.Job> tmp_workInProgress = new HashMap<String, Master.Job>(jobState.jobsInProgress);
+        ConcurrentLinkedDeque<Master.Job> tmp_pendingJob = new ConcurrentLinkedDeque<>(jobState.pendingJobs);
+        Map<String, Master.Job> tmp_workInProgress = new HashMap<>(jobState.jobsInProgress);
 
         Master.Job job = tmp_pendingJob.removeFirst();
         if (!job.jobId.equals(workStarted.workId)) {
@@ -89,7 +89,6 @@ public final class JobState {
 
         jobsInProgress = tmp_workInProgress;
         acceptedJobIds = new HashSet<String>(jobState.acceptedJobIds);
-        ;
         doneJobIds = new HashSet<String>(jobState.doneJobIds);
         pendingJobs = tmp_pendingJob;
         failedJobs = new ConcurrentLinkedQueue<>(jobState.failedJobs);
