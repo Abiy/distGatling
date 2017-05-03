@@ -20,15 +20,19 @@ package com.walmart.gatling.endpoint.v1;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
+import com.walmart.gatling.PageUtils;
 import com.walmart.gatling.commons.JobSummary;
 import com.walmart.gatling.commons.Master;
 import com.walmart.gatling.commons.ReportExecutor;
 import com.walmart.gatling.commons.TrackingResult;
 import com.walmart.gatling.repository.ServerRepository;
-import com.walmart.gatling.repository.ValuePair;
+import com.walmart.gatling.repository.WorkerModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -40,7 +44,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -69,35 +75,135 @@ public class RestController {
     @Produces("application/json")
     @Timed
     public Response getServerInfo() {
-        Master.ServerInfo info = serverRepository.getServerStatus(new Master.ServerInfo());
-        log.info("Processing  get cluster status request: {}", info);
-
-        List<ValuePair> workers = info.getWorkers().entrySet().stream().map(stateEntry ->
-                new ValuePair(stateEntry.getValue().status.toString(),
-                        stateEntry.getValue().ref.path().name().toString(),
-                        stateEntry.getKey())).collect(Collectors.toList());
+        List<WorkerModel> workers = getWorkersInfo();
         return Response.status(Response.Status.OK).entity(workers).build();
     }
 
     @GET
-    @Path("/running")
+    @Path("/workers/host")
     @Produces("application/json")
     @Timed
-    public Response getRunningSummary() {
-        List<JobSummary> summaries = serverRepository.getJobSummary();
-        log.info("Processing  get cluster job summary request.");
-        List<JobSummary> result = summaries.stream().filter(s -> s.runningJob()).collect(Collectors.toList());
+    public Response getWorkerHostInfo() {
+        List<WorkerModel> workers = getWorkersInfo();
+        Map<String, Long> result = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getHost, Collectors.counting()));
         return Response.status(Response.Status.OK).entity(result).build();
     }
 
     @GET
-    @Path("/summary")
+    @Path("/workers/partition")
     @Produces("application/json")
     @Timed
-    public Response getJobSummary() {
-        List<JobSummary> summaries = serverRepository.getJobSummary();
+    public Response getWorkerPartitionInfo() {
+        List<WorkerModel> workers = getWorkersInfo();
+        Map<String, Long> result = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getRole, Collectors.counting()));
+        return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+    @GET
+    @Path("/workers/status")
+    @Produces("application/json")
+    @Timed
+    public Response getWorkerStatusInfo() {
+        List<WorkerModel> workers = getWorkersInfo();
+        Map<String, Long> result = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getStatus, Collectors.counting()));
+        return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+    @GET
+    @Path("/dashboard")
+    @Timed
+    public Response getDashboardInfo() {
+        DashboardModel dashboard = new DashboardModel();
+        List<WorkerModel> workers = getWorkersInfo();
+        Map<String, Long> status = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getStatus, Collectors.counting()));
+        dashboard.setStatus(status);
+        Map<String, Long> partition = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getRole, Collectors.counting()));
+        dashboard.setPartition(partition);
+        Map<String, Long> host = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getHost, Collectors.counting()));
+        dashboard.setHost(host);
+
+        Map<String, Long> partitionStatus = workers.stream()
+                .collect(Collectors.groupingBy(p->p.getRole() + ":" + p.getStatus(), Collectors.counting()));
+        dashboard.setPartitionStatus(partitionStatus);
+        return Response.status(Response.Status.OK).entity(dashboard).build();
+    }
+
+    @GET
+    @Path("/workers/partition/status")
+    @Produces("application/json")
+    @Timed
+    public Response getWorkerPartitionStatusInfo() {
+        List<WorkerModel> workers = getWorkersInfo();
+        Map<String, Long> result = workers.stream()
+                .collect(Collectors.groupingBy(p->p.getRole() + ":" + p.getStatus(), Collectors.counting()));
+        return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+    private List<WorkerModel> getWorkersInfo() {
+        Master.ServerInfo info = serverRepository.getServerStatus(new Master.ServerInfo());
+        log.info("Processing  get cluster status request: {}", info);
+        return info.getWorkers().entrySet().stream().map(stateEntry ->
+                new WorkerModel(stateEntry.getValue().status.toString(),
+                        stateEntry.getValue().ref.path().name().toString(),
+                        stateEntry.getKey())).collect(Collectors.toList());
+    }
+
+    @GET
+    @Path("/running/summary")
+    @Produces("application/json")
+    @Timed
+    public Response getRunningSummary(@QueryParam("size") int size,@QueryParam("page") int page) {
+        PageRequest  pageRequest = PageUtils.getPageRequest(size, page, null);
+        List<JobSummary> summaries = serverRepository.getJobSummary().stream().filter(s -> s.runningJob()).collect(Collectors.toList());
+        List<JobSummary> pagedResult = summaries.stream()
+                .filter(p->p.runningJob())
+                .sorted((o1, o2) -> Long.valueOf(o2.getStartTime()).compareTo(Long.valueOf(o1.getStartTime())))
+                .skip(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
+                .collect(Collectors.toList());
+
+        Page<JobSummary> result = new PageImpl<>(pagedResult, pageRequest, summaries.size());
         log.info("Processing  get cluster job summary request.");
-        return Response.status(Response.Status.OK).entity(summaries).build();
+        return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+
+    @GET
+    @Path("/completed/summary")
+    @Produces("application/json")
+    @Timed
+    public Response getCompletedJobSummary(@QueryParam("size") int size,@QueryParam("page") int page ) {
+        PageRequest  pageRequest = PageUtils.getPageRequest(size, page,null);
+        List<JobSummary> summaries = serverRepository.getJobSummary();
+        List<JobSummary> pagedResult = summaries.stream()
+                .filter(p->!p.runningJob())
+                .sorted((o1, o2) -> Long.valueOf(o2.getStartTime()).compareTo(Long.valueOf(o1.getStartTime())))
+                .skip(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
+                .collect(Collectors.toList());
+        Page<JobSummary> result = new PageImpl<>(pagedResult, pageRequest, summaries.size());
+        log.info("Processing  get cluster job summary request.");
+        return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+    @GET
+    @Path("/detail/{trackingId}")
+    @Produces("application/json")
+    @Timed
+    public Response getJobDetail(@PathParam("trackingId") String trackingId ) {
+        List<JobSummary> summaries = serverRepository.getJobSummary();
+        Optional<JobSummary> summary = summaries.stream().filter(p -> p.getJobInfo().trackingId.equalsIgnoreCase(trackingId)).findFirst();
+        log.info("Processing  get job detail.");
+        if(summary.isPresent())
+            return Response.status(Response.Status.OK).entity(summary.get()).build();
+        else
+            return Response.status(Response.Status.BAD_REQUEST).entity("The Specified tracking id is not available.").build();
     }
 
     @GET

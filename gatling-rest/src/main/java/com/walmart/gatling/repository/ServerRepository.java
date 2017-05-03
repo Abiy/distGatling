@@ -110,24 +110,24 @@ public class ServerRepository {
      */
     public Optional<String> submitSimulationJob(SimulationJobModel simulationJobModel) throws Exception {
         String trackingId = UUID.randomUUID().toString();
-
-        TaskEvent taskEvent = new TaskEvent();
-        taskEvent.setJobName("gatling"); //the gatling.sh script is the gateway for simulation files
-        taskEvent.setJobInfo(JobSummary.JobInfo.newBuilder()
+        List<Pair<String, String>> parameters = Arrays.asList(new Pair<>("0", "-nr"), new Pair<>("1", "-m"),
+                new Pair<>("2", "-s"), new Pair<>("3", simulationJobModel.getSimulation()));
+        JobSummary.JobInfo jobinfo = JobSummary.JobInfo.newBuilder()
                 .withCount(simulationJobModel.getCount())
                 .withJobName("gatling")
                 .withPartitionAccessKey(simulationJobModel.getPartitionAccessKey())
                 .withPartitionName(simulationJobModel.getRoleId())
                 .withTrackingId(trackingId)
                 .withUser(simulationJobModel.getUser())
-                .build());
-
-        taskEvent.setParameters(Arrays.asList(new Pair<>("0", "-nr"), new Pair<>("1", "-m"),
-                new Pair<>("2", "-s"), new Pair<>("3", simulationJobModel.getSimulation())));
+                .build();
         //cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId,job.jobId));
         Timeout timeout = new Timeout(6, TimeUnit.SECONDS);
         int success = 0;
         for (int i = 0; i < simulationJobModel.getCount(); i++) {
+            TaskEvent taskEvent = new TaskEvent();
+            taskEvent.setJobName("gatling"); //the gatling.sh script is the gateway for simulation files
+            taskEvent.setJobInfo(jobinfo);
+            taskEvent.setParameters(parameters);
             Future<Object> future = ask(router, new Master.Job(simulationJobModel.getRoleId(), taskEvent, trackingId, agentConfig.getAbortUrl()), timeout);
             Object result = Await.result(future, timeout.duration());
             if (result instanceof MasterClientActor.Ok) {

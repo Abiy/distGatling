@@ -11,17 +11,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
 var dashboard_routes_1 = require('./dashboard.routes');
-var http_1 = require('@angular/http');
 var common_1 = require('@angular/common');
-var http_2 = require('@angular/http');
+var http_1 = require('@angular/http');
 var DashboardModule = (function () {
     function DashboardModule() {
     }
     DashboardModule = __decorate([
         core_1.NgModule({
             imports: [
-                http_2.JsonpModule,
-                http_1.HttpModule,
+                http_1.JsonpModule,
                 common_1.CommonModule,
                 router_1.RouterModule.forChild(dashboard_routes_1.MODULE_ROUTES)
             ],

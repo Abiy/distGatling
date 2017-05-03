@@ -1,7 +1,7 @@
 /*
  *
  *   Copyright 2016 Walmart Technology
- *  
+ *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -16,28 +16,23 @@
  *
  */
 
-package com.walmart.gatling.endpoint.v1;
-
-import com.walmart.gatling.AbstractRestIntTest;
-import com.walmart.gatling.repository.WorkerModel;
+package com.walmart.gatling.repository;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static org.junit.Assert.*;
 
 /**
- * Trivial integration test class that exercises the Junit spring runner and in container testing.
- * 
- * @author walmart
- *
+ * Created by walmart on 5/3/17.
  */
-public class RestControllerIntTest extends AbstractRestIntTest {
-    private final Logger log = LoggerFactory.getLogger(RestControllerIntTest.class);
+public class ValuePairTest {
 
     @Test
-    public void test(){
-        WorkerModel[] info = template.getForObject(rootUrl+ "/server/info", WorkerModel[].class);
-        log.debug(info.toString());
+    public void testRoleExtractor(){
+        String path = "akka.tcp://PerformanceSystem@10.165.150.120:2555/user/script4#-1964952736";
+        WorkerModel pair = new WorkerModel("Idle",path,"workerId");
+        System.out.println(pair.getRole());
+        assertEquals("script", pair.getRole().replaceAll("[0-9]", ""));
     }
-	
+
 }

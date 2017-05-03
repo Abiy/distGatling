@@ -2,65 +2,43 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card" >
+                <div class="card">
                     <div class="header">
-                        <h4 class="title">Striped Table with Hover</h4>
-                        <p class="category">Here is a subtitle for this table</p>
+                        <h4 class="title text-primary">COMPLETED JOBS IN THE CLUSTER</h4>
+                        <p class="category">Includes jobs that are completed.</p>
                     </div>
                     <div class="content table-responsive table-full-width">
                         <table class="table table-hover table-striped">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Salary</th>
-                                    <th>Country</th>
-                                    <th>City</th>
+                                    <th>JOB NAME</th>
+                                    <th>USER</th>
+                                    <th>PARTITION NAME</th>
+                                    <th>PARALLELISM</th>
+                                    <th>START TIME</th>
+                                    <th>END TIME</th>
+                                    <th>STATUS</th>
                                 </tr>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Dakota Rice</td>
-                                    <td>$36,738</td>
-                                    <td>Niger</td>
-                                    <td>Oud-Turnhout</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Minerva Hooper</td>
-                                    <td>$23,789</td>
-                                    <td>Curaçao</td>
-                                    <td>Sinaai-Waas</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Sage Rodriguez</td>
-                                    <td>$56,142</td>
-                                    <td>Netherlands</td>
-                                    <td>Baileux</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>Philip Chaney</td>
-                                    <td>$38,735</td>
-                                    <td>Korea, South</td>
-                                    <td>Overland Park</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>Doris Greene</td>
-                                    <td>$63,542</td>
-                                    <td>Malawi</td>
-                                    <td>Feldkirchen in Kärnten</td>
-                                </tr>
-                                <tr>
-                                    <td>6</td>
-                                    <td>Mason Porter</td>
-                                    <td>$78,615</td>
-                                    <td>Chile</td>
-                                    <td>Gloucester</td>
+                            </thead>
+                            <tbody *ngIf="pagedResult">
+                                <tr *ngFor="let summary of pagedResult.content" routerLinkActive="active" (click)="navigateToJobDetail(summary.jobInfo.trackingId)">
+
+                                    <td>{{summary.jobInfo.jobName}}</td>
+                                    <td>{{summary.jobInfo.user}}</td>
+                                    <td>{{summary.jobInfo.partitionName}}</td>
+                                    <td>{{summary.jobInfo.count}}</td>
+                                    <td>{{summary.startTime * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                    <td>{{summary.endTime * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                    <td [ngClass]="{'text-success':isSuccess(summary.status),'text-danger':isFailed(summary.status),'text-primary':isNormalStatus(summary.status) }">{{summary.status}}</td>
                                 </tr>
                             </tbody>
+                            <tfoot>
+                                <tr *ngIf="pagedResult">
+                                    <th> <a class="btn" (click)="onPrev()"> &lt;&lt;Prev</a></th>
+                                    <th>  {{currentPage}} of {{pagedResult.totalPages}} </th>
+                                    <th> <a class="btn" (click)="onNext()"> Next&gt;&gt;</a></th>
+                                </tr>
+                            </tfoot>
                         </table>
 
                     </div>

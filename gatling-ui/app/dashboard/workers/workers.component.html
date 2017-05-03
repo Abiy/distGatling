@@ -18,7 +18,7 @@
                                 </tr>
                             <tbody>
                                 <tr *ngFor="let worker of workers" routerLinkActive="active" >
-                                    <td>{{worker.status}}</td>
+                                    <td class="text-primary text-uppercase icon-azure">{{worker.status}}</td>
                                     <td>{{worker.host}}</td>
                                     <td>{{worker.workerId}}</td>
                                     <td>{{worker.actor}}</td>

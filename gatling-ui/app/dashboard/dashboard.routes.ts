@@ -5,6 +5,7 @@ import { RunningComponent } from './running/running.component';
 import { CompletedComponent } from './completed/completed.component';
 import { WorkersComponent } from './workers/workers.component';
 import { MasterComponent } from './master/master.component';
+import { DetailComponent } from './detail/detail.component';
 
 
 export const MODULE_ROUTES: Route[] =[
@@ -14,7 +15,8 @@ export const MODULE_ROUTES: Route[] =[
     { path: 'completed', component: CompletedComponent },
     { path: 'workers', component: WorkersComponent },
     { path: 'master', component: MasterComponent },
-    { path: 'run', component: RunComponent }
+    { path: 'run', component: RunComponent },
+    { path: 'detail/:trackingId', component: DetailComponent }
 
 ]
 
@@ -24,5 +26,6 @@ export const MODULE_COMPONENTS = [
     CompletedComponent,
     WorkersComponent,
     MasterComponent,
-    RunComponent
+    RunComponent,
+    DetailComponent
 ]

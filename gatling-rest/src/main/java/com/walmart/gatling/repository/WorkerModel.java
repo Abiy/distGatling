@@ -26,13 +26,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  * Created by walmart on 3/4/16.
  */
 @XmlRootElement
-public class ValuePair {
+public class WorkerModel {
     private String status;
     private String host;
     private String actor;
     private String workerId;
+    private String role;
 
-    public ValuePair(String status, String actor, String workerId)  {
+    public WorkerModel(String status, String actor, String workerId)  {
         this.status = status;
         try {
             this.actor = java.net.URLDecoder.decode(actor, "UTF-8");
@@ -41,6 +42,15 @@ public class ValuePair {
         }
         this.workerId = workerId;
         this.host = this.actor.split("@")[1].split(":")[0];
+        this.role = this.actor.split("/")[4].split("#")[0].replaceAll("[0-9]","");
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getActor() {

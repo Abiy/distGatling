@@ -36,6 +36,7 @@ public class JobSummary implements Serializable {
 
     public JobSummary(JobInfo jobInfo) {
         taskInfoList = new ArrayList<>(jobInfo.count);
+        this.jobInfo = jobInfo;
     }
 
     public List<TaskEvent> getTaskInfoList() {
@@ -62,6 +63,20 @@ public class JobSummary implements Serializable {
         getTaskInfoList().addAll(taskInfoList);
     }
 
+    public long getStartTime() {
+        Optional<TaskEvent> task = getTaskInfoList().stream().min((t1, t2) -> Long.valueOf(t1.getStartTimeStamp()).compareTo(Long.valueOf(t2.getStartTimeStamp())));
+        if (task.isPresent())
+            return task.get().getStartTimeStamp();
+        return 0l;
+    }
+
+    public long getEndTime() {
+        Optional<TaskEvent> task = getTaskInfoList().stream().max((t1, t2) -> Long.valueOf(t1.getEndTimeStamp()).compareTo(Long.valueOf(t2.getEndTimeStamp())));
+        if (task.isPresent())
+            return task.get().getEndTimeStamp();
+        return 0l;
+    }
+
     public String getStatus() {
         if (getTaskInfoList().stream().allMatch(p -> p.getStatus().equalsIgnoreCase(JobState.JobStatusString.COMPLETED)))
             return JobState.JobStatusString.COMPLETED;
@@ -86,7 +101,9 @@ public class JobSummary implements Serializable {
     }
 
     public boolean runningJob() {
-        return getStatus().equalsIgnoreCase(JobState.JobStatusString.STARTED);
+        String status = getStatus();
+        return status.equalsIgnoreCase(JobState.JobStatusString.STARTED) || status.equalsIgnoreCase(JobState.JobStatusString.ACCEPTED) ||
+                status.equalsIgnoreCase(JobState.JobStatusString.PENDING);
     }
 
     public boolean completedJob() {

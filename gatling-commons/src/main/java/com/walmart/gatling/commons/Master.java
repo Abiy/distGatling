@@ -93,7 +93,6 @@ public class Master extends AbstractPersistentActor {
     }
 
 
-
     @Override
     public String persistenceId() {
         for (String role : JavaConversions.asJavaIterable((Cluster.get(getContext().system()).selfRoles()))) {
@@ -108,11 +107,11 @@ public class Master extends AbstractPersistentActor {
     @Override
     public Receive createReceiveRecover() {
         return receiveBuilder()
-                .match(JobDomainEvent.class, p->{
+                .match(JobDomainEvent.class, p -> {
                     jobDatabase = jobDatabase.updated(p);
                     log.info("Replayed {}", p.getClass().getSimpleName());
                 })
-                .match(UploadFile.class,p->{
+                .match(UploadFile.class, p -> {
                     log.info("Replayed {}", p.getClass().getSimpleName());
                 })
                 .build();
@@ -120,7 +119,7 @@ public class Master extends AbstractPersistentActor {
 
     @Override
     public Receive createReceive() {
-        return  receiveBuilder()
+        return receiveBuilder()
                 .match(MasterWorkerProtocol.RegisterWorker.class, cmd -> onRegisterWorker(cmd))
                 .match(MasterWorkerProtocol.WorkerRequestsFile.class, cmd -> onWorkerRequestsFile(cmd))
                 .match(MasterWorkerProtocol.WorkerRequestsWork.class, cmd -> onWorkerRequestsWork(cmd))
@@ -206,7 +205,7 @@ public class Master extends AbstractPersistentActor {
         log.info("Accepted tracking info request: {}", cmd);
         TrackingResult result = jobDatabase.getTrackingInfo(trackingInfo.trackingId);
         log.info("Complete tracking info request: {}", result);
-        if(trackingInfo.cancel) {
+        if (trackingInfo.cancel) {
             cancelRequests.add(trackingInfo.trackingId);
         }
         result.setCancelled(cancelRequests.contains(trackingInfo.trackingId));
@@ -274,16 +273,16 @@ public class Master extends AbstractPersistentActor {
         fileTracker.add(result.result.trackingId + "_" + result.host);
     }
 
-    private void onWorkerRequestsWork(Object cmd) {
+    private void onWorkerRequestsWork(MasterWorkerProtocol.WorkerRequestsWork cmd) {
         log.info("Worker requested work: {}", cmd);
         if (jobDatabase.hasJob()) {
-            MasterWorkerProtocol.WorkerRequestsWork workReqMsg = ((MasterWorkerProtocol.WorkerRequestsWork) cmd);
+            MasterWorkerProtocol.WorkerRequestsWork workReqMsg = cmd;
             final String workerId = workReqMsg.workerId;
             final WorkerState state = workers.get(workerId);
             if (state != null && state.status.isIdle()) {
                 //for (int i=0; i<jobDatabase.getPendingJobsCount(); i++) {
-                    final Job job = jobDatabase.nextJob();//nextJob for the partition/role
-                    boolean jobWorkerRoleMatched = workReqMsg.role.equalsIgnoreCase(job.roleId);
+                final Job job = jobDatabase.nextJob();//nextJob for the partition/role
+                boolean jobWorkerRoleMatched = workReqMsg.role.equalsIgnoreCase(job.roleId);
                 if (jobWorkerRoleMatched) {
                     persist(new JobState.JobStarted(job.jobId, workerId), event -> {
                         jobDatabase = jobDatabase.updated(event);
@@ -295,8 +294,8 @@ public class Master extends AbstractPersistentActor {
                     persist(new JobState.JobPostponed(job.jobId), event -> {
                         jobDatabase = jobDatabase.updated(event);
                         log.info("Postponing work: {}", workerId);
-                        });
-                    }
+                    });
+                }
                 //}
             }
         }
@@ -309,11 +308,10 @@ public class Master extends AbstractPersistentActor {
         if (unsentFile.isPresent()) {
             String tId = unsentFile.get().split("_")[0];
             UploadFile uploadFile = fileDatabase.get(tId);
-            if(uploadFile.type.equalsIgnoreCase("lib")){
+            if (uploadFile.type.equalsIgnoreCase("lib")) {
                 String soonToBeRemotePath = agentConfig.getMasterUrl(uploadFile.path);
                 getSender().tell(new FileJob(null, uploadFile, soonToBeRemotePath), getSelf());
-            }
-            else {
+            } else {
                 String content = FileUtils.readFileToString(new File(uploadFile.path));
                 getSender().tell(new FileJob(content, uploadFile, null), getSelf());
             }
@@ -405,7 +403,7 @@ public class Master extends AbstractPersistentActor {
 
         @Override
         public String toString() {
-            return "Busy{" + "work=" + workId + ", deadline=" + deadline + '}';
+            return "Busy";
         }
     }
 
@@ -459,7 +457,7 @@ public class Master extends AbstractPersistentActor {
         public final String trackingId;
         public String abortUrl;
 
-        public Job(String roleId, Object job, String trackingId,String abortUrl) {
+        public Job(String roleId, Object job, String trackingId, String abortUrl) {
             this.jobId = UUID.randomUUID().toString();
             this.roleId = roleId;
             this.taskEvent = job;
@@ -484,7 +482,7 @@ public class Master extends AbstractPersistentActor {
         public final String jobId;
         public final UploadFile uploadFileRequest;
 
-        public FileJob(String content, UploadFile uploadFileRequest,String remotePath) {
+        public FileJob(String content, UploadFile uploadFileRequest, String remotePath) {
             this.jobId = UUID.randomUUID().toString();
             this.uploadFileRequest = uploadFileRequest;
             this.content = content;
@@ -515,7 +513,7 @@ public class Master extends AbstractPersistentActor {
         }
 
         public String getFileName() {
-            if(type.equalsIgnoreCase("conf") || type.equalsIgnoreCase("lib"))
+            if (type.equalsIgnoreCase("conf") || type.equalsIgnoreCase("lib"))
                 return type + "/" + name;
             return "user-files/" + type + "/" + name;
         }
@@ -579,7 +577,8 @@ public class Master extends AbstractPersistentActor {
             this.trackingId = trackingId;
             this.cancel = false;
         }
-        public TrackingInfo(String trackingId,boolean cancel) {
+
+        public TrackingInfo(String trackingId, boolean cancel) {
             this.trackingId = trackingId;
             this.cancel = cancel;
         }
@@ -629,7 +628,7 @@ public class Master extends AbstractPersistentActor {
         }
 
         public ImmutableMap<String, WorkerState> getWorkers() {
-            return workers == null? ImmutableMap.of():workers;
+            return workers == null ? ImmutableMap.of() : workers;
         }
 
         @Override

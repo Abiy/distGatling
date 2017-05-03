@@ -10,9 +10,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var initDemo = require('../../../assets/js/charts.js');
-var initNotify = require('../../../assets/js/notify.js');
+var workers_service_1 = require('../../services/workers.service');
 var HomeComponent = (function () {
-    function HomeComponent() {
+    function HomeComponent(workerService) {
+        this.workerService = workerService;
     }
     HomeComponent.prototype.ngOnInit = function () {
         // $.getScript('../../../assets/js/bootstrap-checkbox-radio-switch.js');
@@ -23,16 +24,27 @@ var HomeComponent = (function () {
             var $checkbox = $(this);
             $checkbox.checkbox();
         });
-        initDemo();
-        initNotify();
+        this.fetchDashboardData();
+        //initNotify();
+    };
+    HomeComponent.prototype.fetchDashboardData = function () {
+        var _this = this;
+        this.workerService.getDashboardData().subscribe(function (data) {
+            _this.dashboardData = data;
+            _this.initDashboard(data);
+        }, function (error) { return _this.errorMessage = error; });
+    };
+    HomeComponent.prototype.initDashboard = function (data) {
+        initDemo(data);
     };
     HomeComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
             selector: 'home-cmp',
-            templateUrl: 'home.component.html'
+            templateUrl: 'home.component.html',
+            providers: [workers_service_1.WorkerService]
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [workers_service_1.WorkerService])
     ], HomeComponent);
     return HomeComponent;
 }());

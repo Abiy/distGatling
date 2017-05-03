@@ -65,13 +65,16 @@ public final class JobState {
         completedJobs = new ConcurrentLinkedQueue<>(jobState.completedJobs);
         jobSummary = new HashMap<>(jobState.jobSummary);
         //job summary
+        JobSummary summary = jobSummary.get(workAccepted.job.trackingId);
         TaskEvent taskInfo = (TaskEvent) workAccepted.job.taskEvent;
-        JobSummary summary = new JobSummary(taskInfo.getJobInfo());
+        if(summary == null){
+            summary = new JobSummary(taskInfo.getJobInfo());
+            jobSummary.put(workAccepted.job.trackingId, summary);
+        }
         taskInfo.setStartTimeStamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
         taskInfo.setTaskJobId(workAccepted.job.jobId);
         taskInfo.setStatus(JobStatusString.PENDING);
         summary.addTask(taskInfo);
-        jobSummary.put(workAccepted.job.trackingId, summary);
 
 
     }

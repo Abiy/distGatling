@@ -13,7 +13,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var http_1 = require('@angular/http');
-var Rx_1 = require('rxjs/Rx');
+var Observable_1 = require('rxjs/Observable');
+require('rxjs/add/operator/catch');
 require('rxjs/add/operator/map');
 var WorkerService = (function () {
     function WorkerService(_http, _jsonp) {
@@ -24,6 +25,31 @@ var WorkerService = (function () {
     WorkerService.prototype.getWorkers = function () {
         return this._http.get(this.baseUrl + "/gatling/server/info", this.jsonHeaders())
             .map(this.extractData)
+            .catch(this.handleError);
+    };
+    WorkerService.prototype.getRunning = function (pageNum) {
+        return this._http.get(this.baseUrl + "/gatling/server/running/summary?size=15&page=" + pageNum, this.jsonHeaders())
+            .map(this.extractPagedResult)
+            .catch(this.handleError);
+    };
+    WorkerService.prototype.getCompleted = function (pageNum) {
+        return this._http.get(this.baseUrl + "/gatling/server/completed/summary?size=15&page=" + pageNum, this.jsonHeaders())
+            .map(this.extractPagedResult)
+            .catch(this.handleError);
+    };
+    WorkerService.prototype.getJobDetail = function (trackingId) {
+        return this._http.get(this.baseUrl + "/gatling/server/detail/" + trackingId, this.jsonHeaders())
+            .map(this.extractJobDetailResult)
+            .catch(this.handleError);
+    };
+    WorkerService.prototype.getMasterMetrics = function () {
+        return this._http.get(this.baseUrl + "/metrics", this.jsonHeaders())
+            .map(this.extractPagedResult)
+            .catch(this.handleError);
+    };
+    WorkerService.prototype.getDashboardData = function () {
+        return this._http.get(this.baseUrl + "/gatling/server/dashboard", this.jsonHeaders())
+            .map(this.extractPagedResult)
             .catch(this.handleError);
     };
     WorkerService.prototype.jsonHeaders = function () {
@@ -38,11 +64,27 @@ var WorkerService = (function () {
         console.log('extracting data');
         return res.json();
     };
+    WorkerService.prototype.extractPagedResult = function (res) {
+        var body = res.json();
+        return body || {};
+    };
+    WorkerService.prototype.extractJobDetailResult = function (res) {
+        var body = res.json();
+        return body || {};
+    };
     WorkerService.prototype.handleError = function (error) {
-        var errMsg = (error.message) ? error.message :
-            error.status ? error.status + " - " + error.statusText : 'Server error';
-        console.error('err' + errMsg); // log to console instead
-        return Rx_1.Observable.throw(errMsg);
+        // In a real world app, you might use a remote logging infrastructure
+        var errMsg;
+        if (error instanceof http_1.Response) {
+            var body = error.json() || '';
+            var err = body.error || JSON.stringify(body);
+            errMsg = error.status + " - " + (error.statusText || '') + " " + err;
+        }
+        else {
+            errMsg = error.message ? error.message : error.toString();
+        }
+        console.error(errMsg);
+        return Observable_1.Observable.throw(errMsg);
     };
     WorkerService = __decorate([
         core_1.Injectable(), 

@@ -9,30 +9,64 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var initDemo = require('../../../assets/js/charts.js');
-var initNotify = require('../../../assets/js/notify.js');
+var workers_service_1 = require('../../services/workers.service');
+var router_1 = require('@angular/router');
 var MasterComponent = (function () {
-    function MasterComponent() {
+    function MasterComponent(workerService, router) {
+        this.workerService = workerService;
+        this.router = router;
     }
     MasterComponent.prototype.ngOnInit = function () {
-        // $.getScript('../../../assets/js/bootstrap-checkbox-radio-switch.js');
-        // $.getScript('../../../assets/js/gatling.js');
-        $('[data-toggle="checkbox"]').each(function () {
-            if ($(this).data('toggle') == 'switch')
-                return;
-            var $checkbox = $(this);
-            $checkbox.checkbox();
-        });
-        initDemo();
-        initNotify();
+        this.fetchData();
+    };
+    MasterComponent.prototype.fetchData = function () {
+        var _this = this;
+        this.workerService.getMasterMetrics().subscribe(function (data) { return _this.metrics = _this.transform(data); }, function (error) { return _this.errorMessage = error; });
+    };
+    MasterComponent.prototype.transform = function (dict) {
+        var a = [];
+        for (var key in dict) {
+            if (dict.hasOwnProperty(key)) {
+                a.push({ key: key, val: dict[key] });
+            }
+        }
+        return a;
+    };
+    MasterComponent.prototype.getMemoryMetrics = function (input) {
+        var result = [];
+        for (var _i = 0, input_1 = input; _i < input_1.length; _i++) {
+            var entry = input_1[_i];
+            if (entry.key.startsWith("memory.heap."))
+                result.push(entry);
+        }
+        return result;
+    };
+    MasterComponent.prototype.getThreadMetrics = function (input) {
+        var result = [];
+        for (var _i = 0, input_2 = input; _i < input_2.length; _i++) {
+            var entry = input_2[_i];
+            if (entry.key.startsWith("threads."))
+                result.push(entry);
+        }
+        return result;
+    };
+    MasterComponent.prototype.getGcMetrics = function (input) {
+        var result = [];
+        for (var _i = 0, input_3 = input; _i < input_3.length; _i++) {
+            var entry = input_3[_i];
+            if (entry.key.startsWith("gc."))
+                result.push(entry);
+        }
+        return result;
     };
     MasterComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
             selector: 'home-cmp',
-            templateUrl: 'master.component.html'
+            templateUrl: 'master.component.html',
+            providers: [workers_service_1.WorkerService]
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [workers_service_1.WorkerService, router_1.Router])
     ], MasterComponent);
     return MasterComponent;
 }());

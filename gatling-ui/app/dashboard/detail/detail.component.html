@@ -1,0 +1,68 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title text-primary">JOB TASKS</h4>
+                        <p class="category">The partition access key is not displayed for security.</p>
+                    <div class="content table-responsive table-full-width">
+                        <div  *ngIf="jobSummary">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label class="text-primary">Job Name: </label>
+                                        <span>{{jobSummary.jobInfo.jobName}}</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="text-primary">Job Partition Name: </label>
+                                        <span >{{jobSummary.jobInfo.partitionName}}</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="text-primary">PARALLELISM:</label>
+                                        <span>{{jobSummary.jobInfo.count}}</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="text-primary">Job STATUS: </label>
+                                        <span [ngClass]="{'text-success':isSuccess(jobSummary.status),'text-danger':isFailed(jobSummary.status),'text-primary':isNormalStatus(jobSummary.status) }">{{jobSummary.status}}</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="text-primary">Job User: </label>
+                                        <span>{{jobSummary.jobInfo.user}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>JOB NAME</th>
+                                    <th>TASK ID</th>
+                                    <th>START TIME</th>
+                                    <th>END TIME</th>
+                                    <th>WORKER ID</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            <tbody *ngIf="jobSummary">
+                                <tr *ngFor="let taskEvent of jobSummary.taskInfoList" routerLinkActive="active"  >
+                                    <td>{{taskEvent.jobName}}</td>
+                                    <td>{{taskEvent.taskJobId}}</td>
+                                    <td>{{taskEvent.startTimeStamp * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                    <td>{{taskEvent.endTimeStamp * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                    <td>{{taskEvent.workerId}}</td>
+                                    <td [ngClass]="{'text-success':isSuccess(taskEvent.status),'text-danger':isFailed(taskEvent.status),'text-primary':isNormalStatus(taskEvent.status) }">{{taskEvent.status}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
