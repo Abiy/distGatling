@@ -162,6 +162,11 @@ public class Master extends AbstractPersistentActor {
                     });
                 }
             }
+            else {
+                if (state.status.getDeadLine().isOverdue()) { //we missed pings from worker or worker is dead
+                    tobeRemoved.add(workerId);
+                }
+            }
         }
         for (String workerId : tobeRemoved) {
             workers.remove(workerId);
@@ -229,7 +234,7 @@ public class Master extends AbstractPersistentActor {
         final String workerId = cmd.workerId;
         log.info("Work {} failed by worker {}", workId, workerId);
         if (jobDatabase.isInProgress(workId)) {
-            changeWorkerToIdle(workerId, workId);
+            changeWorkerToIdle(workerId);
             persist(new JobState.JobFailed(workId, cmd.result), event -> {
                 jobDatabase = jobDatabase.updated(event);
                 notifyWorkers();
@@ -247,7 +252,7 @@ public class Master extends AbstractPersistentActor {
             log.info("Work {} not in progress, reported as done by worker {}", workId, workerId);
         } else {
             log.info("Work {} is done by worker {}", workId, workerId);
-            changeWorkerToIdle(workerId, workId);
+            changeWorkerToIdle(workerId);
             persist(new JobState.JobCompleted(workId, cmd.result), event -> {
                 jobDatabase = jobDatabase.updated(event);
                 getSender().tell(new Ack(event.workId), getSelf());
@@ -275,9 +280,9 @@ public class Master extends AbstractPersistentActor {
 
     private void onWorkerRequestsWork(MasterWorkerProtocol.WorkerRequestsWork cmd) {
         log.info("Worker requested work: {}", cmd);
+        MasterWorkerProtocol.WorkerRequestsWork workReqMsg = cmd;
+        final String workerId = workReqMsg.workerId;
         if (jobDatabase.hasJob()) {
-            MasterWorkerProtocol.WorkerRequestsWork workReqMsg = cmd;
-            final String workerId = workReqMsg.workerId;
             final WorkerState state = workers.get(workerId);
             if (state != null && state.status.isIdle()) {
                 //for (int i=0; i<jobDatabase.getPendingJobsCount(); i++) {
@@ -295,9 +300,13 @@ public class Master extends AbstractPersistentActor {
                         jobDatabase = jobDatabase.updated(event);
                         log.info("Postponing work: {}", workerId);
                     });
+                    workers.put(workerId, workers.get(workerId).copyWithStatus(new Idle(workTimeout.fromNow())));
                 }
                 //}
             }
+        }
+        else {
+            workers.put(workerId, workers.get(workerId).copyWithStatus(new Idle(workTimeout.fromNow())));
         }
     }
 
@@ -324,16 +333,16 @@ public class Master extends AbstractPersistentActor {
             workers.put(workerId, workers.get(workerId).copyWithRef(getSender()));
         } else {
             log.info("Worker registered: {}", workerId);
-            workers.put(workerId, new WorkerState(getSender(), Idle.instance));
+            workers.put(workerId, new WorkerState(getSender(), new Idle(workTimeout.fromNow())));
             if (jobDatabase.hasJob()) {
                 getSender().tell(MasterWorkerProtocol.WorkIsReady.getInstance(), getSelf());
             }
         }
     }
 
-    private void changeWorkerToIdle(String workerId, String workId) {
+    private void changeWorkerToIdle(String workerId) {
         if (workers.get(workerId).status.isBusy()) {
-            workers.put(workerId, workers.get(workerId).copyWithStatus(new Idle()));
+            workers.put(workerId, workers.get(workerId).copyWithStatus(new Idle(workTimeout.fromNow())));
         }
     }
 
@@ -350,10 +359,10 @@ public class Master extends AbstractPersistentActor {
     }
 
     private static final class Idle extends WorkerStatus {
-        private static final Idle instance = new Idle();
+        private final Deadline deadline;
 
-        public static Idle getInstance() {
-            return instance;
+        private Idle(Deadline deadline) {
+            this.deadline = deadline;
         }
 
         @Override
@@ -368,7 +377,7 @@ public class Master extends AbstractPersistentActor {
 
         @Override
         protected Deadline getDeadLine() {
-            throw new IllegalAccessError();
+            return deadline;
         }
 
         @Override
