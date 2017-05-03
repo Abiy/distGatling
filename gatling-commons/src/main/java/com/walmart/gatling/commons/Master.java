@@ -300,12 +300,18 @@ public class Master extends AbstractPersistentActor {
                         jobDatabase = jobDatabase.updated(event);
                         log.info("Postponing work: {}", workerId);
                     });
-                    workers.put(workerId, workers.get(workerId).copyWithStatus(new Idle(workTimeout.fromNow())));
+                    extendIdleExpiryTime(workerId);
                 }
                 //}
             }
         }
         else {
+            extendIdleExpiryTime(workerId);
+        }
+    }
+
+    private void extendIdleExpiryTime(String workerId) {
+        if(workers.get(workerId).status.isIdle()) {
             workers.put(workerId, workers.get(workerId).copyWithStatus(new Idle(workTimeout.fromNow())));
         }
     }
