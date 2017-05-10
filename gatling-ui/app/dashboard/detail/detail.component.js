@@ -16,6 +16,7 @@ var DetailComponent = (function () {
     function DetailComponent(workerService, route) {
         this.workerService = workerService;
         this.route = route;
+        this.cancelMsg = "Cancel Job >>";
     }
     DetailComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -33,7 +34,8 @@ var DetailComponent = (function () {
         var create = IntervalObservable_1.IntervalObservable.create(30000);
         create.subscribe(function (x) {
             //console.log(x)
-            return _this.fetchDetailData();
+            if (window.location.href.indexOf("detail") !== -1)
+                return _this.fetchDetailData();
         });
     };
     DetailComponent.prototype.ngOnDestroy = function () {
@@ -43,6 +45,30 @@ var DetailComponent = (function () {
         var _this = this;
         console.log("Fetching details for: " + this.trackingId);
         this.workerService.getJobDetail(this.trackingId).subscribe(function (data) { return _this.jobSummary = data; }, function (error) { return _this.errorMessage = error; });
+    };
+    DetailComponent.prototype.cancelReport = function () {
+        var _this = this;
+        console.log("Canceling job: " + this.trackingId);
+        this.cancelMsg = "Cancelling Job ...";
+        this.workerService.cancelJob(this.trackingId).subscribe(function (data) {
+            console.log(data);
+            _this.cancelled = data.cancelled;
+        }, function (error) {
+            _this.errorMessage = error;
+        });
+    };
+    DetailComponent.prototype.generateReport = function () {
+        var _this = this;
+        this.reportInProgress = true;
+        console.log("Generating job report: " + this.trackingId);
+        this.workerService.generateReport(this.trackingId).subscribe(function (data) {
+            _this.reportInProgress = false;
+            console.log(data);
+            _this.reportResult = data.report;
+        }, function (error) {
+            _this.reportInProgress = false;
+            _this.errorMessage = error;
+        });
     };
     DetailComponent.prototype.isSuccess = function (status) {
         if (status == "COMPLETED")

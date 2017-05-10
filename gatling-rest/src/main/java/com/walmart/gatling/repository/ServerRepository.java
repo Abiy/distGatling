@@ -111,14 +111,15 @@ public class ServerRepository {
     public Optional<String> submitSimulationJob(SimulationJobModel simulationJobModel) throws Exception {
         String trackingId = UUID.randomUUID().toString();
         List<Pair<String, String>> parameters = Arrays.asList(new Pair<>("0", "-nr"), new Pair<>("1", "-m"),
-                new Pair<>("2", "-s"), new Pair<>("3", simulationJobModel.getSimulation()));
+                new Pair<>("2", "-s"), new Pair<>("3", simulationJobModel.getFileFullName()));
         JobSummary.JobInfo jobinfo = JobSummary.JobInfo.newBuilder()
                 .withCount(simulationJobModel.getCount())
                 .withJobName("gatling")
                 .withPartitionAccessKey(simulationJobModel.getPartitionAccessKey())
                 .withPartitionName(simulationJobModel.getRoleId())
-                .withTrackingId(trackingId)
                 .withUser(simulationJobModel.getUser())
+                .withTrackingId(trackingId)
+                .withFileFullName(simulationJobModel.getFileFullName())
                 .build();
         //cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId,job.jobId));
         Timeout timeout = new Timeout(6, TimeUnit.SECONDS);
@@ -128,7 +129,10 @@ public class ServerRepository {
             taskEvent.setJobName("gatling"); //the gatling.sh script is the gateway for simulation files
             taskEvent.setJobInfo(jobinfo);
             taskEvent.setParameters(parameters);
-            Future<Object> future = ask(router, new Master.Job(simulationJobModel.getRoleId(), taskEvent, trackingId, agentConfig.getAbortUrl()), timeout);
+            Future<Object> future = ask(router, new Master.Job(simulationJobModel.getRoleId(), taskEvent, trackingId,
+                    agentConfig.getAbortUrl(),
+                    agentConfig.getJobFileUrl(simulationJobModel.getSimulation())),
+                    timeout);
             Object result = Await.result(future, timeout.duration());
             if (result instanceof MasterClientActor.Ok) {
                 success++;

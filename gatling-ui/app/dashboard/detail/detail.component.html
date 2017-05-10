@@ -35,6 +35,19 @@
                                         <span>{{jobSummary.jobInfo.user}}</span>
                                     </div>
                                 </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <label class="text-primary" *ngIf="(isNormalStatus(jobSummary.status) || reportInProgress) && !cancelled"> <img src="../../../assets/img/spinner.gif"></label>
+                                        <label class="text-warning" *ngIf="cancelled"> Job Successfully Cancelled.</label>
+                                    </div>
+                                    <div>
+                                        <a class="btn" *ngIf="reportResult" [href]="reportResult" target="_blank">View Report</a>
+                                    </div>
+                                    <div>
+                                         <button *ngIf="isSuccess(jobSummary.status) && !reportResult"   class="btn btn-success btn-fill left" (click)="generateReport();"> Run Report >> </button>
+                                         <div class="clearfix"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -47,19 +60,31 @@
                                     <th>END TIME</th>
                                     <th>WORKER ID</th>
                                     <th>STATUS</th>
+                                    <th>ERROR</th>
+                                    <th>STD</th>
                                 </tr>
                             <tbody *ngIf="jobSummary">
                                 <tr *ngFor="let taskEvent of jobSummary.taskInfoList" routerLinkActive="active"  >
                                     <td>{{taskEvent.jobName}}</td>
                                     <td>{{taskEvent.taskJobId}}</td>
                                     <td>{{taskEvent.startTimeStamp * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-                                    <td>{{taskEvent.endTimeStamp * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                    <td><span *ngIf="taskEvent.endTimeStamp - taskEvent.startTimeStamp >= 0">{{taskEvent.endTimeStamp * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
                                     <td>{{taskEvent.workerId}}</td>
                                     <td [ngClass]="{'text-success':isSuccess(taskEvent.status),'text-danger':isFailed(taskEvent.status),'text-primary':isNormalStatus(taskEvent.status) }">{{taskEvent.status}}</td>
+                                    <td>
+                                        <a class="btn btn-xs" *ngIf="taskEvent.errorLogPath" [href]="taskEvent.errorLogPath" target="_blank"> View</a>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-xs" *ngIf="taskEvent.stdLogPath" [href]="taskEvent.stdLogPath" target="_blank"> View</a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
-
+                        <div *ngIf="jobSummary">
+                            <div class="clearfix"></div>
+                            <button *ngIf="isNormalStatus(jobSummary.status) && !cancelled"   class="btn btn-warning btn-fill left" (click)="cancelReport();"> {{cancelMsg}} </button>
+                            <div class="clearfix"></div>
+                        </div>
                     </div>
                 </div>
             </div>

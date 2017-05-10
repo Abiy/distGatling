@@ -21,15 +21,18 @@ package com.walmart.gatling.endpoint.v1;
 import com.walmart.gatling.repository.ServerRepository;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.BufferedOutputStream;
@@ -38,6 +41,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -46,8 +50,9 @@ import java.util.stream.Collectors;
  * User could upload a lib files, conf files, simulation scripts and simulation data files
  * Files are staged to a temporary directory specified using file.repository configuration property
  */
-@Controller
+@org.springframework.web.bind.annotation.RestController
 public class FileUploadController {
+    private final Logger log = LoggerFactory.getLogger(FileUploadController.class);
     private ServerRepository serverRepository;
 
     @Value("${file.repository}")
@@ -77,37 +82,49 @@ public class FileUploadController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/upload")
-    public String handleFileUpload(@RequestParam("name") String name,
-                                   @RequestParam("role") String role,
-                                   @RequestParam("type") String type,
-                                   @RequestParam("file") MultipartFile file,
-                                   RedirectAttributes redirectAttributes) {
+    public SubmitResult handleFileUpload(MultipartHttpServletRequest request,  @RequestParam("file") MultipartFile file) {
 
+        Map<String, String[]> paramMap = request.getParameterMap();
+        String packageName = getValue(paramMap, "packageName"),  partitionName = getValue(paramMap, "partitionName");
+        String fileName = packageName.replace('.','/') + ".scala";
+        String trackingId = "";
+        SimulationJobModel job  = new SimulationJobModel();
         if (!file.isEmpty()) {
             try {
-                String path = tempFileDir + "/" + name;
-                System.out.println(path);
+                String path = tempFileDir + "/" + fileName;
                 FileUtils.touch(new File(path));
                 BufferedOutputStream stream = new BufferedOutputStream(
                         new FileOutputStream(new File(path)));
                 FileCopyUtils.copy(file.getInputStream(), stream);
                 stream.close();
-                Optional<String> trackingId = serverRepository.uploadFile(path, name, role, type);
-                redirectAttributes.addFlashAttribute("message",
-                        "You successfully uploaded " + name + "! ");
-
-                redirectAttributes.addFlashAttribute("link",
-                        "/#/file/" + trackingId.get());
+                job = new SimulationJobModel();
+                    job.setCount(getValue(paramMap,"parallelism").equals("") ? 0:Short.valueOf(getValue(paramMap,"parallelism")));
+                    job.setPartitionAccessKey(getValue(paramMap,"accessKey"));
+                    job.setRoleId(partitionName);
+                    job.setTag(getValue(paramMap, "tag"));
+                    job.setUser(getValue(paramMap, "userName"));
+                    job.setSimulation(path);
+                    job.setFileFullName(fileName);
+                log.info("Submitting job: {}", job);
+                Optional<String> tId = serverRepository.submitSimulationJob(job);
+                trackingId = tId.get();
             } catch (Exception e) {
-                redirectAttributes.addFlashAttribute("message",
-                        "You failed to upload " + name + " => " + e.getMessage());
+                log.error("Error uploading simulation {}", e);
+                return new SubmitResult(false,"",job);
             }
         } else {
-            redirectAttributes.addFlashAttribute("message",
-                    "You failed to upload " + name + " because the file was empty");
+            return new SubmitResult(false,"",job);
         }
 
-        return "redirect:upload";
+        return new SubmitResult(true,trackingId,job);
+    }
+
+    private String getValue(Map<String, String[]> paramMap, String key){
+        if (!paramMap.containsKey(key))
+            return "";
+        if (paramMap.get(key).length < 1)
+            return "";
+        return paramMap.get(key)[0];
     }
 
 }

@@ -27,7 +27,7 @@
                                     <td>{{summary.jobInfo.partitionName}}</td>
                                     <td>{{summary.jobInfo.count}}</td>
                                     <td>{{summary.startTime * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-                                    <td>{{summary.endTime * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                    <td> <span *ngIf="summary.endTime - summary.startTime >= 0">{{summary.endTime * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
                                     <td [ngClass]="{'text-success':isSuccess(summary.status),'text-danger':isFailed(summary.status),'text-primary':isNormalStatus(summary.status) }">{{summary.status}}</td>
                                 </tr>
                             </tbody>

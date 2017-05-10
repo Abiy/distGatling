@@ -19,6 +19,7 @@
 package com.walmart.gatling.endpoint.v1;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -26,7 +27,7 @@ import java.time.ZoneOffset;
  * Created by walmart
  */
 @XmlRootElement
-public class SimulationJobModel {
+public class SimulationJobModel implements Serializable {
 
     private String partitionAccessKey;
     private String user;
@@ -36,7 +37,17 @@ public class SimulationJobModel {
     private String roleId;
     private String simulation;
     private String jobId;
+    private String tag;
     private short count;
+    private String fileFullName;
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
     public short getCount() {
         return count;
@@ -50,12 +61,12 @@ public class SimulationJobModel {
         return roleId;
     }
 
-    public long getSubmittedTime() {
-        return LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
-    }
-
     public void setRoleId(String roleId) {
         this.roleId = roleId;
+    }
+
+    public long getSubmittedTime() {
+        return LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond();
     }
 
     public String getSimulation() {
@@ -88,5 +99,27 @@ public class SimulationJobModel {
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public String getFileFullName() {
+        return fileFullName;
+    }
+
+    public void setFileFullName(String fileName) {
+        this.fileFullName = fileName;
+    }
+
+    @Override
+    public String toString() {
+        return "SimulationJobModel{" +
+                "partitionAccessKey='" + partitionAccessKey + '\'' +
+                ", user='" + user + '\'' +
+                ", roleId='" + roleId + '\'' +
+                ", simulation='" + simulation + '\'' +
+                ", jobId='" + jobId + '\'' +
+                ", tag='" + tag + '\'' +
+                ", count=" + count +
+                ", fileName='" + fileFullName + '\'' +
+                '}';
     }
 }

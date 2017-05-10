@@ -109,6 +109,10 @@ public class AgentConfig {
         return result;
     }
 
+    public String getJobFileUrl(String simulationFilePath) {
+        return getGenericUrl("gatling/lib/file","filePath",simulationFilePath);
+    }
+
     @XmlRootElement
     public static class LogServer {
         private int port;
@@ -181,6 +185,19 @@ public class AgentConfig {
         private String mainClass;
         private String cpOrJar;
         private int[] exitValues;
+        private String jobDirectory;
+
+        public String getJobDirectory(String taskId, String filePath) {
+            return jobDirectory + taskId + "/" + filePath;
+        }
+
+        public String getJobDirectory(String taskId) {
+            return jobDirectory + taskId;
+        }
+
+        public void setJobDirectory(String jobDirectory) {
+            this.jobDirectory = jobDirectory;
+        }
 
         public String getLogDirectory() {
             return logDirectory;
@@ -256,6 +273,7 @@ public class AgentConfig {
         public void setExitValues(int[] exitValues) {
             this.exitValues = exitValues;
         }
+
 
     }
 }

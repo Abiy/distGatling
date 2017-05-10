@@ -131,17 +131,19 @@ public class JobSummary implements Serializable {
         public String jobName;
         public String trackingId;
         public short count;
+        public String fileFullName;
 
         public JobInfo() {
         }
 
-        public JobInfo(String partitionAccessKey, String user, String partitionName, String jobName, String trackingId, short count) {
+        public JobInfo(String partitionAccessKey, String user, String partitionName, String jobName, String trackingId, short count,String fileFullName) {
             this.partitionAccessKey = partitionAccessKey;
             this.user = user;
             this.partitionName = partitionName;
             this.jobName = jobName;
             this.trackingId = trackingId;
             this.count = count;
+            this.fileFullName = fileFullName;
         }
 
         private JobInfo(Builder builder) {
@@ -151,6 +153,7 @@ public class JobSummary implements Serializable {
             jobName = builder.jobName;
             trackingId = builder.trackingId;
             count = builder.count;
+            fileFullName = builder.fileFullName;
         }
 
         public static Builder newBuilder() {
@@ -164,12 +167,17 @@ public class JobSummary implements Serializable {
             private String jobName;
             private String trackingId;
             private short count;
+            public String fileFullName;
 
             private Builder() {
             }
 
             public Builder withPartitionAccessKey(String partitionAccessKey) {
                 this.partitionAccessKey = partitionAccessKey;
+                return this;
+            }
+            public Builder withFileFullName(String fileFullName) {
+                this.fileFullName = fileFullName;
                 return this;
             }
 

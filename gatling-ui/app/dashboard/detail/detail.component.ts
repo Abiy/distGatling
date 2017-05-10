@@ -18,6 +18,10 @@ export class DetailComponent implements OnInit, OnDestroy{
     public  jobSummary: JobSummary;
     private errorMessage: string;
     private trackingId: number;
+    private reportInProgress: boolean;
+    private reportResult: any;
+    private cancelled: any;
+    public cancelMsg: string = "Cancel Job >>"
 
     constructor(private workerService: WorkerService, private route: ActivatedRoute ){
 
@@ -39,6 +43,7 @@ export class DetailComponent implements OnInit, OnDestroy{
        var create =  IntervalObservable.create(30000);
        create.subscribe((x) => {
                 //console.log(x)
+           if(window.location.href.indexOf("detail") !== -1)
                 return this.fetchDetailData();
         });
 }
@@ -52,6 +57,36 @@ export class DetailComponent implements OnInit, OnDestroy{
         this.workerService.getJobDetail(this.trackingId).subscribe(
             data => this.jobSummary = data,
             error => this.errorMessage = <any>error
+        );
+    }
+
+    cancelReport():void{
+       console.log("Canceling job: " +  this.trackingId);
+        this.cancelMsg = "Cancelling Job ..."
+        this.workerService.cancelJob(this.trackingId).subscribe(
+            data => {
+                console.log(data);
+                this.cancelled = data.cancelled;
+            },
+            error => {
+                this.errorMessage = <any>error
+            }
+        );
+    }
+
+    generateReport():void {
+        this.reportInProgress = true;
+        console.log("Generating job report: " +  this.trackingId);
+        this.workerService.generateReport(this.trackingId).subscribe(
+            data => {
+                this.reportInProgress = false;
+                console.log(data);
+                this.reportResult = data.report;
+            },
+            error => {
+                this.reportInProgress = false;
+                this.errorMessage = <any>error
+            }
         );
     }
 

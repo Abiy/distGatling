@@ -21,12 +21,14 @@ package com.walmart.gatling.endpoint.v1;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.walmart.gatling.PageUtils;
+import com.walmart.gatling.commons.AgentConfig;
 import com.walmart.gatling.commons.JobSummary;
 import com.walmart.gatling.commons.Master;
 import com.walmart.gatling.commons.ReportExecutor;
 import com.walmart.gatling.commons.TrackingResult;
 import com.walmart.gatling.repository.ServerRepository;
 import com.walmart.gatling.repository.WorkerModel;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +61,9 @@ import java.util.stream.Collectors;
 public class RestController {
     private final Logger log = LoggerFactory.getLogger(RestController.class);
     private ServerRepository serverRepository;
+
+    @Autowired
+    private AgentConfig agentConfig;
 
     @Autowired
     public RestController(ServerRepository serverRepository) {
@@ -277,7 +282,7 @@ public class RestController {
         try {
             Optional<ReportExecutor.ReportResult> res =  serverRepository.generateReport(trackingId);
             log.info("report result: {}",res);
-            return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", res.get().result)).build();
+            return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", agentConfig.getGenericUrl(res.get().result.toString(), StringUtils.EMPTY,StringUtils.EMPTY) )).build();
         } catch (Exception e) {
             log.error("Error while submitting user report request for: {}, {}",trackingId,e);
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Error while submitting user report request.").build();

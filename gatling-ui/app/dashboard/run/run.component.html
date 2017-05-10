@@ -4,48 +4,76 @@
             <div class="col-md-8">
                 <div class="card" >
                     <div class="header">
-                        <h4 class="title">Edit Profile</h4>
+                        <h4 class="title">Please provide complete information for your performance test.</h4>
                     </div>
                     <div class="content">
-                        <form>
+                        <form #simulationForm="ngForm"  novalidate >
                             <div class="row">
                                 <div class="col-md-5">
                                     <div class="form-group">
                                         <label>Simulation File</label>
-                                        <input type="text" class="form-control"  placeholder="Simulation File Path.">
+                                        <input #fileInput type="file" name="file" required class="form-control" (change)="selectFile($event)" placeholder="Simulation File" accept=".scala"/>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="row">
                                 <div class="col-md-5">
                                     <div class="form-group">
                                         <label>Partition Name</label>
-                                        <input type="text" class="form-control"  placeholder="Partition Name">
+                                        <select type="text" name="partitionName" required  class="form-control" [(ngModel)]="model.partitionName"  placeholder="Partition Name">
+                                           <option *ngFor="let partition of partitions">
+                                               {{ partition}}
+                                           </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
+
 
                             <div class="row">
                                 <div class="col-md-5">
                                     <div class="form-group">
-                                        <label>Simulation File Name</label>
-                                        <input type="text" class="form-control" placeholder="Simulation File Name">
+                                        <label>Complete Simulation Class Name</label>
+                                        <input type="text" name="package" required class="form-control" [(ngModel)]="model.packageName" placeholder="Complete Simulation Class Name(com.walmart.store.BasicSimulation)">
                                     </div>
                                 </div>
-                            </div>
-
-
-                            <div class="row">
                                 <div class="col-md-5">
                                     <div class="form-group">
                                         <label>Simulation Parallelism</label>
-                                        <input type="number" class="form-control" placeholder="Simulation Parallelism">
+                                        <input type="number" name="parallelism"  required class="form-control"  [(ngModel)]="model.parallelism" placeholder="Simulation Parallelism">
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Access Key</label>
+                                        <input type="text" name="accessKey" class="form-control" [(ngModel)]="model.accessKey" placeholder="Access Key">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>User Name</label>
+                                        <input type="text" name="userName" class="form-control" [(ngModel)]="model.userName" placeholder="User Name">
                                     </div>
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-info btn-fill left">Uplaod & Run </button>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Optional Tag</label>
+                                        <input type="text" name="tag" class="form-control" [(ngModel)]="model.tag" placeholder="Optional Tag">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <span type="text"  *ngIf="!success" class="text-danger">The job is not submitted properly please correct your input and try again.</span>
+                            </div>
+
+                            <button type="submit"   class="btn btn-info btn-fill left" (click)="upload();">Uplaod & Run </button>
                             <div class="clearfix"></div>
                         </form>
                     </div>

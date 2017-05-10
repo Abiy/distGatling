@@ -43,6 +43,19 @@ export class WorkerService {
     }
 
 
+    cancelJob(trackingId: number): Observable<any>{
+        return this._http.post( this.baseUrl + "/gatling/server/abort/"+trackingId ,this.jsonHeaders())
+            .map(this.extractJobDetailResult)
+            .catch(this.handleError)
+    }
+
+
+    generateReport(trackingId: number): Observable<any>{
+        return this._http.post( this.baseUrl + "/gatling/server/report/"+trackingId ,this.jsonHeaders())
+            .map(this.extractJobDetailResult)
+            .catch(this.handleError)
+    }
+
     getMasterMetrics(): Observable<any>{
         return this._http.get( this.baseUrl + "/metrics" ,this.jsonHeaders())
             .map(this.extractPagedResult)

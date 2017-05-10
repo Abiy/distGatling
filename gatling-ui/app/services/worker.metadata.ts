@@ -55,3 +55,14 @@ export interface KeyVal {
     key:string,
     val:number
 }
+
+export class SimulationModel{
+    constructor(public packageName:string,
+                public partitionName:string,
+                public tag: string,
+                public userName: string,
+                public accessKey: string,
+                public parallelism: number
+    ){}
+
+}

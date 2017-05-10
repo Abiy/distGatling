@@ -13,12 +13,14 @@ var router_1 = require('@angular/router');
 var dashboard_routes_1 = require('./dashboard.routes');
 var common_1 = require('@angular/common');
 var http_1 = require('@angular/http');
+var forms_1 = require('@angular/forms');
 var DashboardModule = (function () {
     function DashboardModule() {
     }
     DashboardModule = __decorate([
         core_1.NgModule({
             imports: [
+                forms_1.FormsModule,
                 http_1.JsonpModule,
                 common_1.CommonModule,
                 router_1.RouterModule.forChild(dashboard_routes_1.MODULE_ROUTES)

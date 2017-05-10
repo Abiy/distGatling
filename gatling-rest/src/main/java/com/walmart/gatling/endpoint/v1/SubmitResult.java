@@ -1,0 +1,61 @@
+/*
+ *
+ *   Copyright 2016 Walmart Technology
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+
+package com.walmart.gatling.endpoint.v1;
+
+/**
+ * Created by walmart on 5/10/17.
+ */
+public class SubmitResult {
+    private boolean success;
+    private String trackingId;
+    private SimulationJobModel job;
+
+    public SubmitResult(){
+
+    }
+    public SubmitResult(boolean success, String trackingId, SimulationJobModel job) {
+        this.success = success;
+        this.trackingId = trackingId;
+        this.job = job;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getTrackingId() {
+        return trackingId;
+    }
+
+    public void setTrackingId(String trackingId) {
+        this.trackingId = trackingId;
+    }
+
+    public SimulationJobModel getJob() {
+        return job;
+    }
+
+    public void setJob(SimulationJobModel job) {
+        this.job = job;
+    }
+}

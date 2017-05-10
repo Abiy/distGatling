@@ -100,7 +100,7 @@ public class MasterTest {
         String id = UUID.randomUUID().toString();
         TaskEvent taskEvent = new TaskEvent();
         taskEvent.setJobName("gatling");
-        Master.Job job = new Master.Job("projectName", taskEvent, id, "");
+        Master.Job job = new Master.Job("projectName", taskEvent, id, "","");
         return job;
     }
 

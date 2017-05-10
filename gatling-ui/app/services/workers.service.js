@@ -42,6 +42,16 @@ var WorkerService = (function () {
             .map(this.extractJobDetailResult)
             .catch(this.handleError);
     };
+    WorkerService.prototype.cancelJob = function (trackingId) {
+        return this._http.post(this.baseUrl + "/gatling/server/abort/" + trackingId, this.jsonHeaders())
+            .map(this.extractJobDetailResult)
+            .catch(this.handleError);
+    };
+    WorkerService.prototype.generateReport = function (trackingId) {
+        return this._http.post(this.baseUrl + "/gatling/server/report/" + trackingId, this.jsonHeaders())
+            .map(this.extractJobDetailResult)
+            .catch(this.handleError);
+    };
     WorkerService.prototype.getMasterMetrics = function () {
         return this._http.get(this.baseUrl + "/metrics", this.jsonHeaders())
             .map(this.extractPagedResult)
