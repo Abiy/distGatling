@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -110,8 +111,10 @@ public class ServerRepository {
      */
     public Optional<String> submitSimulationJob(SimulationJobModel simulationJobModel) throws Exception {
         String trackingId = UUID.randomUUID().toString();
-        List<Pair<String, String>> parameters = Arrays.asList(new Pair<>("0", "-nr"), new Pair<>("1", "-m"),
-                new Pair<>("2", "-s"), new Pair<>("3", simulationJobModel.getFileFullName()));
+        //List<Pair<String, String>> parameters = Arrays.asList(new Pair<>("0", "-nr"), new Pair<>("1", "-m"),
+           //     new Pair<>("2", "-s"), new Pair<>("3", simulationJobModel.getFileFullName()));
+
+        List<String> parameters = Arrays.asList( "-nr",  "-m", "-s",  simulationJobModel.getFileFullName());
         JobSummary.JobInfo jobinfo = JobSummary.JobInfo.newBuilder()
                 .withCount(simulationJobModel.getCount())
                 .withJobName("gatling")
@@ -128,7 +131,7 @@ public class ServerRepository {
             TaskEvent taskEvent = new TaskEvent();
             taskEvent.setJobName("gatling"); //the gatling.sh script is the gateway for simulation files
             taskEvent.setJobInfo(jobinfo);
-            taskEvent.setParameters(parameters);
+            taskEvent.setParameters(new ArrayList<>(parameters));
             Future<Object> future = ask(router, new Master.Job(simulationJobModel.getRoleId(), taskEvent, trackingId,
                     agentConfig.getAbortUrl(),
                     agentConfig.getJobFileUrl(simulationJobModel.getSimulation())),
@@ -169,9 +172,7 @@ public class ServerRepository {
 
         TaskEvent taskEvent = new TaskEvent();
         taskEvent.setJobName("gatling");
-        taskEvent.setParameters(Arrays.asList(
-                new Pair<>("0", "-ro")
-        ));
+        taskEvent.setParameters(new ArrayList<>(Arrays.asList("-ro")));
         Object result = sendToMaster(new Master.Report(trackingId, taskEvent), 180);
 
         log.info("Report generated {}", result);

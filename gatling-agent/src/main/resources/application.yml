@@ -4,7 +4,7 @@ server:
 actor:
   numberOfActors: 5 # Number of worker actors , controls the number of parallel simulation jobs you can run per process
   port: 2555 # Port number for the actor system that host the worker actors
-  role: "script" # The name of the role each actor uses (role1,role2...role5 etc)
+  role: "soar" # The name of the role each actor uses (role1,role2...role5 etc)
   executerType: "script"
 job:
   path: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling simulation, data, and conf are stored
@@ -16,7 +16,7 @@ job:
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on
 akka:
-  contact-points: "127.0.0.1:2551"
+  contact-points: "10.165.150.120:2551"
 
 graphite:
     host: localhost

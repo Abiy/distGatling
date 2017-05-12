@@ -183,8 +183,8 @@ public class ScriptExecutor extends WorkExecutor {
             cmdLine.addArgument(agentConfig.getJob().getMainClass());
         }
         //parameters come from the task event
-        for (Pair<String, String> pair : taskEvent.getParameters()) {
-            cmdLine.addArgument(pair.getValue());
+        for (String pair : taskEvent.getParameters()) {
+            cmdLine.addArgument(pair);
         }
         //download the simulation or jar file
          DownloadFile.downloadFile(job.jobFileUrl,agentConfig.getJob().getJobDirectory(job.jobId, taskEvent.getJobInfo().fileFullName));

@@ -31,7 +31,7 @@ import javafx.util.Pair;
  */
 public class TaskEvent implements Serializable {
 
-    private List<Pair<String, String>> parameters;
+    private List<String> parameters;
     private String jobName;
     private long startTimeStamp;
     private long endTimeStamp;
@@ -43,6 +43,7 @@ public class TaskEvent implements Serializable {
     private JobSummary.JobInfo jobInfo;
 
     public TaskEvent() {
+        parameters = new ArrayList<>();
     }
 
     public String getTaskJobId() {
@@ -61,11 +62,11 @@ public class TaskEvent implements Serializable {
         this.jobInfo = jobInfo;
     }
 
-    public List<Pair<String, String>> getParameters() {
+    public List<String> getParameters() {
         return parameters;
     }
 
-    public void setParameters(List<Pair<String, String>> parameters) {
+    public void setParameters(List<String> parameters) {
         this.parameters = parameters;
     }
 

@@ -68,8 +68,8 @@ public class ReportExecutor extends WorkExecutor {
         cmdLine.addArgument("${path}");
 
         //parameters come from the task event
-        for (Pair<String, String> pair : taskEvent.getParameters()) {
-            cmdLine.addArgument(pair.getValue());
+        for (String pair : taskEvent.getParameters()) {
+            cmdLine.addArgument(pair);
         }
         String dir = agentConfig.getJob().getLogDirectory()+ "reports/" + job.reportJob.trackingId + "/";
         cmdLine.addArgument(dir);
