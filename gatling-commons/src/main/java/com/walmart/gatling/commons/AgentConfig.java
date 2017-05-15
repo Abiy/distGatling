@@ -187,12 +187,12 @@ public class AgentConfig {
         private int[] exitValues;
         private String jobDirectory;
 
-        public String getJobDirectory(String taskId, String filePath) {
-            return jobDirectory + taskId + "/" + filePath;
+        public String getJobDirectory(String taskId,String postFix, String filePath) {
+            return jobDirectory + taskId + "/" + postFix + "/" + filePath;
         }
 
-        public String getJobDirectory(String taskId) {
-            return jobDirectory + taskId;
+        public String getJobDirectory(String taskId,String postFix) {
+            return jobDirectory + taskId + "/" + postFix;
         }
 
         public void setJobDirectory(String jobDirectory) {

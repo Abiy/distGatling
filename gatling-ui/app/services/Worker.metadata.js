@@ -1,9 +1,9 @@
 "use strict";
 var SimulationModel = (function () {
-    function SimulationModel(packageName, partitionName, tag, userName, accessKey, parallelism) {
+    function SimulationModel(packageName, partitionName, parameter, userName, accessKey, parallelism) {
         this.packageName = packageName;
         this.partitionName = partitionName;
-        this.tag = tag;
+        this.parameter = parameter;
         this.userName = userName;
         this.accessKey = accessKey;
         this.parallelism = parallelism;

@@ -111,10 +111,8 @@ public class ServerRepository {
      */
     public Optional<String> submitSimulationJob(SimulationJobModel simulationJobModel) throws Exception {
         String trackingId = UUID.randomUUID().toString();
-        //List<Pair<String, String>> parameters = Arrays.asList(new Pair<>("0", "-nr"), new Pair<>("1", "-m"),
-           //     new Pair<>("2", "-s"), new Pair<>("3", simulationJobModel.getFileFullName()));
-
         List<String> parameters = Arrays.asList( "-nr",  "-m", "-s",  simulationJobModel.getFileFullName());
+        boolean hasDataFeed = !(simulationJobModel.getDataFile() == null || simulationJobModel.getDataFile().isEmpty());
         JobSummary.JobInfo jobinfo = JobSummary.JobInfo.newBuilder()
                 .withCount(simulationJobModel.getCount())
                 .withJobName("gatling")
@@ -122,7 +120,10 @@ public class ServerRepository {
                 .withPartitionName(simulationJobModel.getRoleId())
                 .withUser(simulationJobModel.getUser())
                 .withTrackingId(trackingId)
+                .withHasDataFeed(hasDataFeed)
+                .withParameterString(simulationJobModel.getParameterString())
                 .withFileFullName(simulationJobModel.getFileFullName())
+                .withDataFileName(getDataFileName(simulationJobModel,hasDataFeed))
                 .build();
         //cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId,job.jobId));
         Timeout timeout = new Timeout(6, TimeUnit.SECONDS);
@@ -134,7 +135,8 @@ public class ServerRepository {
             taskEvent.setParameters(new ArrayList<>(parameters));
             Future<Object> future = ask(router, new Master.Job(simulationJobModel.getRoleId(), taskEvent, trackingId,
                     agentConfig.getAbortUrl(),
-                    agentConfig.getJobFileUrl(simulationJobModel.getSimulation())),
+                    agentConfig.getJobFileUrl(simulationJobModel.getSimulation()),
+                            agentConfig.getJobFileUrl(simulationJobModel.getDataFile())),
                     timeout);
             Object result = Await.result(future, timeout.duration());
             if (result instanceof MasterClientActor.Ok) {
@@ -148,6 +150,15 @@ public class ServerRepository {
             return Optional.of(trackingId);
         }
         return Optional.empty();
+    }
+
+    private String getDataFileName(SimulationJobModel simulationJobModel, boolean hasDataFeed) {
+        if(!hasDataFeed)
+            return "";
+        String[] splits = simulationJobModel.getDataFile().split("/");
+        if (splits.length > 0) //return the last name
+            return splits[splits.length-1];
+        return "";
     }
 
     public TrackingResult getTrackingInfo(String trackingId) {

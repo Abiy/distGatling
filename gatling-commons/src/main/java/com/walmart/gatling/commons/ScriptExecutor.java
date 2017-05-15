@@ -58,6 +58,8 @@ import static akka.dispatch.Futures.*;
  */
 public class ScriptExecutor extends WorkExecutor {
 
+    public static final String SIMULATION = "simulation";
+    public static final String DATA = "data";
     IOFileFilter logFilter = new IOFileFilter() {
         @Override
         public boolean accept(File file) {
@@ -168,8 +170,8 @@ public class ScriptExecutor extends WorkExecutor {
     private Object runJob(Master.Job message) {
         Master.Job job = message;
         TaskEvent taskEvent = (TaskEvent) job.taskEvent;
-
         CommandLine cmdLine = new CommandLine(agentConfig.getJob().getCommand());
+
         log.info("Verified Script worker received task: {}", message);
         Map<String, Object> map = new HashMap<>();
 
@@ -187,9 +189,15 @@ public class ScriptExecutor extends WorkExecutor {
             cmdLine.addArgument(pair);
         }
         //download the simulation or jar file
-         DownloadFile.downloadFile(job.jobFileUrl,agentConfig.getJob().getJobDirectory(job.jobId, taskEvent.getJobInfo().fileFullName));
+        DownloadFile.downloadFile(job.jobFileUrl,agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION, taskEvent.getJobInfo().fileFullName));
         //job simulation artifact path
-        cmdLine.addArgument("-sf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId));
+        cmdLine.addArgument("-sf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,SIMULATION));
+        //download the data feed
+        if(taskEvent.getJobInfo().hasDataFeed) {
+            DownloadFile.downloadFile(job.dataFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, DATA,taskEvent.getJobInfo().dataFileName));
+            //job data feed  path
+            cmdLine.addArgument("-df").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,DATA));
+        }
         //report file path
         cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
 
@@ -211,8 +219,13 @@ public class ScriptExecutor extends WorkExecutor {
 
             PumpStreamHandler psh = new PumpStreamHandler(new ExecLogHandler(outFile), new ExecLogHandler(errorFile));
             executor.setStreamHandler(psh);
-            log.info("command: {}", cmdLine);
-            int exitResult = executor.execute(cmdLine);
+            Map<String,String> envOptions = new HashMap<>();
+            //additional user parameters
+            if (taskEvent.getJobInfo().parameterString != null && !taskEvent.getJobInfo().parameterString.isEmpty()){
+                envOptions.put("JAVA_OPTS" , taskEvent.getJobInfo().parameterString);
+            }
+            log.info("command: {} and env options {}", cmdLine,envOptions);
+            int exitResult = executor.execute(cmdLine,envOptions);
             //executor.getWatchdog().destroyProcess().
             Worker.Result result = new Worker.Result(exitResult, agentConfig.getUrl(errPath), agentConfig.getUrl(outPath), null, job);
             log.info("Exit code: {}", exitResult);

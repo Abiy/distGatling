@@ -3,7 +3,8 @@
 .classpath
 .project
 .settings/
-
+#vscode
+.vscode/
 # Intellij
 .idea/
 *.iml

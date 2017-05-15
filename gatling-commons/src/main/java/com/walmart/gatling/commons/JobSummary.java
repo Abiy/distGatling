@@ -132,11 +132,14 @@ public class JobSummary implements Serializable {
         public String trackingId;
         public short count;
         public String fileFullName;
+        public boolean hasDataFeed;
+        public String parameterString;
+        public String dataFileName;
 
         public JobInfo() {
         }
 
-        public JobInfo(String partitionAccessKey, String user, String partitionName, String jobName, String trackingId, short count,String fileFullName) {
+        public JobInfo(String partitionAccessKey, String user, String partitionName, String jobName, String trackingId, short count,String fileFullName,boolean hasDataFeed,String parameterString,String dataFileName) {
             this.partitionAccessKey = partitionAccessKey;
             this.user = user;
             this.partitionName = partitionName;
@@ -144,6 +147,9 @@ public class JobSummary implements Serializable {
             this.trackingId = trackingId;
             this.count = count;
             this.fileFullName = fileFullName;
+            this.hasDataFeed = hasDataFeed;
+            this.parameterString = parameterString;
+            this.dataFileName = dataFileName;
         }
 
         private JobInfo(Builder builder) {
@@ -154,6 +160,9 @@ public class JobSummary implements Serializable {
             trackingId = builder.trackingId;
             count = builder.count;
             fileFullName = builder.fileFullName;
+            this.hasDataFeed = builder.hasDataFeed;
+            this.parameterString = builder.parameterString;
+            this.dataFileName = builder.dataFileName;
         }
 
         public static Builder newBuilder() {
@@ -167,7 +176,10 @@ public class JobSummary implements Serializable {
             private String jobName;
             private String trackingId;
             private short count;
-            public String fileFullName;
+            private String fileFullName;
+            private boolean hasDataFeed;
+            private String parameterString;
+            public String dataFileName;
 
             private Builder() {
             }
@@ -201,11 +213,25 @@ public class JobSummary implements Serializable {
                 return this;
             }
 
+            public Builder withHasDataFeed(boolean hasDataFeed) {
+                this.hasDataFeed = hasDataFeed;
+                return this;
+            }
+
+            public Builder withParameterString(String parameterString) {
+                this.parameterString = parameterString;
+                return this;
+            }
             public Builder withCount(short count) {
                 this.count = count;
                 return this;
             }
 
+            public Builder withDataFileName(String dataFileName) {
+                this.dataFileName = dataFileName;
+                return this;
+            }
+            //
             public JobInfo build() {
                 return new JobInfo(this);
             }

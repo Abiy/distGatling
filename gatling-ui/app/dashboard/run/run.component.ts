@@ -17,7 +17,8 @@ import { Router } from '@angular/router';
     })
 
 export class RunComponent  implements OnDestroy,OnInit{
-    multipartItem:MultipartItem ;
+    errorMessage: any;
+    multipartItem: MultipartItem;
     private uploader:MultipartUploader;
     public model: SimulationModel;
     public  partitions: Array<string>;
@@ -25,7 +26,8 @@ export class RunComponent  implements OnDestroy,OnInit{
 
     upload : () => void;
     uploadCallback : (data) => void;
-    file: File;
+    simulationFile: File;
+    dataFile: File;
     private success: boolean;
 
 
@@ -50,10 +52,9 @@ export class RunComponent  implements OnDestroy,OnInit{
         this.uploadUrl  = "http://localhost:8080/upload";
         this.uploader = new MultipartUploader({url: this.uploadUrl});
         this.multipartItem =  new MultipartItem(this.uploader);
-        this.model = { parallelism:1, accessKey:"", packageName:"", partitionName:"", tag:"", userName:""};
-        this.partitions = ["aire","soar","ei"]
+        this.model = { parallelism:1, accessKey:"", packageName:"", partitionName:"", parameter:"", userName:""};
         this.upload = () => {
-            if (null == this.file || !this.isValid()){
+            if (null == this.simulationFile || !this.isValid()){
                 console.error("run.component.ts & upload() form invalid.");
                 return;
             }
@@ -65,11 +66,13 @@ export class RunComponent  implements OnDestroy,OnInit{
 
             // this.multipartItem.formData.append("name",  this.model.name);
             this.multipartItem.formData.append("partitionName",  this.model.partitionName);
-            this.multipartItem.formData.append("file",  this.file);
+            this.multipartItem.formData.append("simulationFile",  this.simulationFile);
             this.multipartItem.formData.append("parallelism",  this.model.parallelism);
             this.multipartItem.formData.append("packageName",  this.model.packageName);
             this.multipartItem.formData.append("userName",  this.model.userName);
             this.multipartItem.formData.append("accessKey",  this.model.accessKey);
+            this.multipartItem.formData.append("dataFile",  this.dataFile);
+            this.multipartItem.formData.append("parameter",  this.model.parameter);
 
             this.multipartItem.callback = this.uploadCallback;
             this.multipartItem.upload();
@@ -77,7 +80,8 @@ export class RunComponent  implements OnDestroy,OnInit{
 
         this.uploadCallback = (data) => {
             console.debug("uploadCallback() ==>");
-            this.file = null;
+            this.simulationFile = null;
+            this.dataFile = null;
             var result = JSON.parse(data)
             if (result.success){
                 this.success = true;
@@ -88,8 +92,7 @@ export class RunComponent  implements OnDestroy,OnInit{
                 console.log("uploadCallback() upload file false.");
             }
         }
-
-
+        this.fetchDashboardData();
     }
 
     selectFile($event): void {
@@ -98,38 +101,32 @@ export class RunComponent  implements OnDestroy,OnInit{
             console.debug("Input file error.");
             return;
         }else {
-            this.file = inputValue.files[0];
-            console.debug("Input File name: " + this.file.name + " type:" + this.file.size + " size:" + this.file.size);
+            this.simulationFile = inputValue.files[0];
+            console.debug("Input File name: " + this.simulationFile.name + " type:" + this.simulationFile.size + " size:" + this.simulationFile.size);
         }
     }
 
-  /*  submitSimulation(): boolean{
-        return true;
+   selectDataFile($event): void {
+        var inputValue = $event.target;
+        if( null == inputValue || null == inputValue.files[0]){
+            console.debug("Input file error.");
+            return;
+        }else {
+            this.dataFile = inputValue.files[0];
+            console.debug("Input File name: " + this.dataFile.name + " type:" + this.dataFile.size + " size:" + this.dataFile.size);
+        }
     }
 
-   fileChange() {
-
-        let fileList = this.fileInput.nativeElement.files;
-       // let fileList: FileList = event.target.files;
-        if(fileList.length > 0) {
-            let file: File = fileList[0];
-            let formData:FormData = new FormData();
-
-            formData.append('fileName', file, file.name);
-            //formData.append("partition",this.model.partitionName);
-            //formData.append("name",this.model.name);*!/
-            let headers = new Headers();
-            headers.append('Content-Type', 'multipart/form-data');
-            headers.append('Accept', 'application/json');
-            let options = new RequestOptions({ headers: headers });
-            this._http.post(this.uploadUrl, formData, options)
-                .map(res => res.json())
-                .catch(error => Observable.throw(error))
-                .subscribe(
-                    data => console.log('success'),
-                    error => console.log(error)
-                )
-        }
-    }*/
+    private fetchDashboardData():void {
+        this.workerService.getDashboardData().subscribe(
+            data => {
+               this.partitions = data.partition.keys;
+               if(this.partitions.length>0){
+                    this.model.partitionName = this.partitions[0];
+               }
+            },
+            error => this.errorMessage = <any>error
+        );
+    }
 
 }

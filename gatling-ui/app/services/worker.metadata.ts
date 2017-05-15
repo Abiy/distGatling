@@ -59,7 +59,7 @@ export interface KeyVal {
 export class SimulationModel{
     constructor(public packageName:string,
                 public partitionName:string,
-                public tag: string,
+                public parameter: string,
                 public userName: string,
                 public accessKey: string,
                 public parallelism: number

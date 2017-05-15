@@ -36,10 +36,20 @@ public class SimulationJobModel implements Serializable {
      */
     private String roleId;
     private String simulation;
+    private String dataFile;
     private String jobId;
     private String tag;
     private short count;
     private String fileFullName;
+    private String parameterString;
+
+    public String getDataFile() {
+        return dataFile;
+    }
+
+    public void setDataFile(String dataFile) {
+        this.dataFile = dataFile;
+    }
 
     public String getTag() {
         return tag;
@@ -109,6 +119,14 @@ public class SimulationJobModel implements Serializable {
         this.fileFullName = fileName;
     }
 
+    public String getParameterString() {
+        return parameterString;
+    }
+
+    public void setParameterString(String parameterString) {
+        this.parameterString = parameterString;
+    }
+
     @Override
     public String toString() {
         return "SimulationJobModel{" +
@@ -116,10 +134,12 @@ public class SimulationJobModel implements Serializable {
                 ", user='" + user + '\'' +
                 ", roleId='" + roleId + '\'' +
                 ", simulation='" + simulation + '\'' +
+                ", dataFile='" + dataFile + '\'' +
                 ", jobId='" + jobId + '\'' +
                 ", tag='" + tag + '\'' +
                 ", count=" + count +
-                ", fileName='" + fileFullName + '\'' +
+                ", fileFullName='" + fileFullName + '\'' +
+                ", parameterString='" + parameterString + '\'' +
                 '}';
     }
 }

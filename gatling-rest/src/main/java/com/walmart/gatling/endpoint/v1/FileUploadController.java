@@ -82,20 +82,29 @@ public class FileUploadController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/upload")
-    public SubmitResult handleFileUpload(MultipartHttpServletRequest request,  @RequestParam("file") MultipartFile file) {
-
+    public SubmitResult uploadAndRunSimulation(MultipartHttpServletRequest request,  @RequestParam("simulationFile") MultipartFile simulationFile) {
+        MultipartFile dataFile = request.getFile("dataFile");
         Map<String, String[]> paramMap = request.getParameterMap();
         String packageName = getValue(paramMap, "packageName"),  partitionName = getValue(paramMap, "partitionName");
         String fileName = packageName.replace('.','/') + ".scala";
         String trackingId = "";
         SimulationJobModel job  = new SimulationJobModel();
-        if (!file.isEmpty()) {
+        String dataFilePath = "";//should be empty by default
+        if (!simulationFile.isEmpty()) {
             try {
-                String path = tempFileDir + "/" + fileName;
-                FileUtils.touch(new File(path));
+                if(dataFile != null && !dataFile.isEmpty()){
+                    dataFilePath = tempFileDir + "/" + dataFile.getOriginalFilename();
+                    FileUtils.touch(new File(dataFilePath));
+                    BufferedOutputStream stream = new BufferedOutputStream(
+                            new FileOutputStream(new File(dataFilePath)));
+                    FileCopyUtils.copy(dataFile.getInputStream(), stream);
+                    stream.close();
+                }
+                String simulationFilePath = tempFileDir + "/" + fileName;
+                FileUtils.touch(new File(simulationFilePath));
                 BufferedOutputStream stream = new BufferedOutputStream(
-                        new FileOutputStream(new File(path)));
-                FileCopyUtils.copy(file.getInputStream(), stream);
+                        new FileOutputStream(new File(simulationFilePath)));
+                FileCopyUtils.copy(simulationFile.getInputStream(), stream);
                 stream.close();
                 job = new SimulationJobModel();
                     job.setCount(getValue(paramMap,"parallelism").equals("") ? 0:Short.valueOf(getValue(paramMap,"parallelism")));
@@ -103,8 +112,10 @@ public class FileUploadController {
                     job.setRoleId(partitionName);
                     job.setTag(getValue(paramMap, "tag"));
                     job.setUser(getValue(paramMap, "userName"));
-                    job.setSimulation(path);
+                    job.setSimulation(simulationFilePath);
+                    job.setDataFile(dataFilePath);
                     job.setFileFullName(fileName);
+                    job.setParameterString(getValue(paramMap,"parameter"));
                 log.info("Submitting job: {}", job);
                 Optional<String> tId = serverRepository.submitSimulationJob(job);
                 trackingId = tId.get();

@@ -472,14 +472,16 @@ public class Master extends AbstractPersistentActor {
         public final String trackingId;
         public String abortUrl;
         public String jobFileUrl;
+        public String dataFileUrl;
 
-        public Job(String roleId, Object job, String trackingId, String abortUrl,String jobFileUrl) {
+        public Job(String roleId, Object job, String trackingId, String abortUrl,String jobFileUrl, String dataFileUrl) {
             this.jobId = UUID.randomUUID().toString();
             this.roleId = roleId;
             this.taskEvent = job;
             this.trackingId = trackingId;
             this.abortUrl = abortUrl;
             this.jobFileUrl = jobFileUrl;
+            this.dataFileUrl = dataFileUrl;
         }
 
         @Override
@@ -491,6 +493,7 @@ public class Master extends AbstractPersistentActor {
                     ", trackingId='" + trackingId + '\'' +
                     ", abortUrl='" + abortUrl + '\'' +
                     ", jobFileUrl='" + jobFileUrl + '\'' +
+                    ", dataFileUrl='" + dataFileUrl + '\'' +
                     '}';
         }
     }

@@ -15,14 +15,10 @@
                                         <input #fileInput type="file" name="file" required class="form-control" (change)="selectFile($event)" placeholder="Simulation File" accept=".scala"/>
                                     </div>
                                 </div>
-                                <div class="col-md-5">
+                              <div class="col-md-5">
                                     <div class="form-group">
-                                        <label>Partition Name</label>
-                                        <select type="text" name="partitionName" required  class="form-control" [(ngModel)]="model.partitionName"  placeholder="Partition Name">
-                                           <option *ngFor="let partition of partitions">
-                                               {{ partition}}
-                                           </option>
-                                        </select>
+                                        <label>Optional Data File</label>
+                                        <input #dataFileInput type="file" name="datafile" required class="form-control" (change)="selectDataFile($event)" placeholder="Data File" accept=".csv"/>
                                     </div>
                                 </div>
                             </div>
@@ -63,8 +59,18 @@
                             <div class="row">
                                 <div class="col-md-5">
                                     <div class="form-group">
-                                        <label>Optional Tag</label>
-                                        <input type="text" name="tag" class="form-control" [(ngModel)]="model.tag" placeholder="Optional Tag">
+                                        <label>Optional Parameters</label>
+                                        <input type="text" name="parameter" class="form-control" [(ngModel)]="model.parameter" placeholder="Optional Parameters">
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Partition Name</label>
+                                        <select type="text" name="partitionName" required  class="form-control" [(ngModel)]="model.partitionName"  placeholder="Partition Name">
+                                           <option *ngFor="let partition of partitions">
+                                               {{ partition}}
+                                           </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>

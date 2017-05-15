@@ -35,10 +35,9 @@ var RunComponent = (function () {
         this.uploadUrl = "http://localhost:8080/upload";
         this.uploader = new multipart_uploader_1.MultipartUploader({ url: this.uploadUrl });
         this.multipartItem = new multipart_item_1.MultipartItem(this.uploader);
-        this.model = { parallelism: 1, accessKey: "", packageName: "", partitionName: "", tag: "", userName: "" };
-        this.partitions = ["aire", "soar", "ei"];
+        this.model = { parallelism: 1, accessKey: "", packageName: "", partitionName: "", parameter: "", userName: "" };
         this.upload = function () {
-            if (null == _this.file || !_this.isValid()) {
+            if (null == _this.simulationFile || !_this.isValid()) {
                 console.error("run.component.ts & upload() form invalid.");
                 return;
             }
@@ -49,17 +48,20 @@ var RunComponent = (function () {
                 _this.multipartItem.formData = new FormData();
             // this.multipartItem.formData.append("name",  this.model.name);
             _this.multipartItem.formData.append("partitionName", _this.model.partitionName);
-            _this.multipartItem.formData.append("file", _this.file);
+            _this.multipartItem.formData.append("simulationFile", _this.simulationFile);
             _this.multipartItem.formData.append("parallelism", _this.model.parallelism);
             _this.multipartItem.formData.append("packageName", _this.model.packageName);
             _this.multipartItem.formData.append("userName", _this.model.userName);
             _this.multipartItem.formData.append("accessKey", _this.model.accessKey);
+            _this.multipartItem.formData.append("dataFile", _this.dataFile);
+            _this.multipartItem.formData.append("parameter", _this.model.parameter);
             _this.multipartItem.callback = _this.uploadCallback;
             _this.multipartItem.upload();
         };
         this.uploadCallback = function (data) {
             console.debug("uploadCallback() ==>");
-            _this.file = null;
+            _this.simulationFile = null;
+            _this.dataFile = null;
             var result = JSON.parse(data);
             if (result.success) {
                 _this.success = true;
@@ -71,6 +73,7 @@ var RunComponent = (function () {
                 console.log("uploadCallback() upload file false.");
             }
         };
+        this.fetchDashboardData();
     };
     RunComponent.prototype.selectFile = function ($event) {
         var inputValue = $event.target;
@@ -79,9 +82,29 @@ var RunComponent = (function () {
             return;
         }
         else {
-            this.file = inputValue.files[0];
-            console.debug("Input File name: " + this.file.name + " type:" + this.file.size + " size:" + this.file.size);
+            this.simulationFile = inputValue.files[0];
+            console.debug("Input File name: " + this.simulationFile.name + " type:" + this.simulationFile.size + " size:" + this.simulationFile.size);
         }
+    };
+    RunComponent.prototype.selectDataFile = function ($event) {
+        var inputValue = $event.target;
+        if (null == inputValue || null == inputValue.files[0]) {
+            console.debug("Input file error.");
+            return;
+        }
+        else {
+            this.dataFile = inputValue.files[0];
+            console.debug("Input File name: " + this.dataFile.name + " type:" + this.dataFile.size + " size:" + this.dataFile.size);
+        }
+    };
+    RunComponent.prototype.fetchDashboardData = function () {
+        var _this = this;
+        this.workerService.getDashboardData().subscribe(function (data) {
+            _this.partitions = data.partition.keys;
+            if (_this.partitions.length > 0) {
+                _this.model.partitionName = _this.partitions[0];
+            }
+        }, function (error) { return _this.errorMessage = error; });
     };
     RunComponent = __decorate([
         core_1.Component({
