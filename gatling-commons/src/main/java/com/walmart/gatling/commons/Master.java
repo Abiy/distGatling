@@ -36,6 +36,8 @@ import scala.concurrent.duration.FiniteDuration;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -133,6 +135,7 @@ public class Master extends AbstractPersistentActor {
                 .match(Report.class, cmd -> onReport(cmd))
                 .match(UploadFile.class, cmd -> onUploadFile(cmd))
                 .match(Job.class, cmd -> onJob(cmd))
+                .match(MasterClientProtocol.CommandLineJob.class, cmd -> processCmdLineJob(cmd))
                 .match(JobSummaryInfo.class, cmd -> onJobSummary())
                 .matchEquals(CleanupTick, cmd -> onCleanupTick())
                 .matchAny(cmd -> unhandled(cmd))
@@ -172,6 +175,44 @@ public class Master extends AbstractPersistentActor {
             workers.remove(workerId);
         }
 
+    }
+
+    public Optional<String> processCmdLineJob(MasterClientProtocol.CommandLineJob cmdJob) {
+        ClientConfig clientConfig = cmdJob.clientConfig;
+        getSender().tell(new Ack(cmdJob.clientId), getSelf());
+        String trackingId = UUID.randomUUID().toString();
+        List<String> parameters = Arrays.asList(clientConfig.getParameterString().split(" "));
+        boolean hasDataFeed = !clientConfig.getDataFeedPath().isEmpty();
+        JobSummary.JobInfo jobinfo = JobSummary.JobInfo.newBuilder()
+                .withCount(clientConfig.getParallelism())
+                .withJobName("gatling")
+                .withPartitionAccessKey(clientConfig.getAccessKey())
+                .withPartitionName(clientConfig.getPartitionName())
+                .withUser(clientConfig.getUserName())
+                .withTrackingId(trackingId)
+                .withHasDataFeed(hasDataFeed)
+                .withParameterString(clientConfig.getParameterString())
+                .withFileFullName(clientConfig.getClassName())//class name is not fileName
+                .withDataFileName(clientConfig.getDataFeedFileName())
+                .build();
+        for (int i = 0; i < clientConfig.getParallelism(); i++) {
+            TaskEvent taskEvent = new TaskEvent();
+            taskEvent.setJobName("gatling"); //the gatling.sh script is the gateway for simulation files
+            taskEvent.setJobInfo(jobinfo);
+            taskEvent.setParameters(new ArrayList<>(parameters));
+            Job job = new Job(clientConfig.getRole(), taskEvent, trackingId,
+                    agentConfig.getAbortUrl(),
+                    agentConfig.getJobFileUrl(clientConfig.getJarPath()),
+                    agentConfig.getJobFileUrl(clientConfig.getDataFeedPath()), true);
+            persist(new JobState.JobAccepted(job), event -> {
+                // Ack back to original sender
+                getSender().tell(new MasterClientProtocol.CommandLineJobAccepted(job), getSelf());
+                jobDatabase = jobDatabase.updated(event);
+                notifyWorkers();
+            });
+
+        }
+        return Optional.of(trackingId);
     }
 
     private void onJob(Job cmd) {
@@ -470,11 +511,12 @@ public class Master extends AbstractPersistentActor {
         public final String jobId;
         public final String roleId;
         public final String trackingId;
+        public final boolean isJarSimulation;
         public String abortUrl;
         public String jobFileUrl;
         public String dataFileUrl;
 
-        public Job(String roleId, Object job, String trackingId, String abortUrl,String jobFileUrl, String dataFileUrl) {
+        public Job(String roleId, Object job, String trackingId, String abortUrl,String jobFileUrl, String dataFileUrl,boolean isJarSimulation) {
             this.jobId = UUID.randomUUID().toString();
             this.roleId = roleId;
             this.taskEvent = job;
@@ -482,6 +524,7 @@ public class Master extends AbstractPersistentActor {
             this.abortUrl = abortUrl;
             this.jobFileUrl = jobFileUrl;
             this.dataFileUrl = dataFileUrl;
+            this.isJarSimulation = isJarSimulation;
         }
 
         @Override
@@ -491,6 +534,7 @@ public class Master extends AbstractPersistentActor {
                     ", jobId='" + jobId + '\'' +
                     ", roleId='" + roleId + '\'' +
                     ", trackingId='" + trackingId + '\'' +
+                    ", isJarSimulation=" + isJarSimulation +
                     ", abortUrl='" + abortUrl + '\'' +
                     ", jobFileUrl='" + jobFileUrl + '\'' +
                     ", dataFileUrl='" + dataFileUrl + '\'' +

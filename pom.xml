@@ -28,6 +28,8 @@
         <module>gatling-rest</module>
         <module>gatling-agent</module>
         <module>gatling-commons</module>
+        <module>gatling-client</module>
+        <module>gatling-uber-example</module>
     </modules>
     <properties>
         <!--<akka.version>2.4.2</akka.version>-->

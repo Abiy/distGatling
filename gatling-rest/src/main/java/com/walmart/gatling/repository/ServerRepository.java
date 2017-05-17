@@ -111,7 +111,7 @@ public class ServerRepository {
      */
     public Optional<String> submitSimulationJob(SimulationJobModel simulationJobModel) throws Exception {
         String trackingId = UUID.randomUUID().toString();
-        List<String> parameters = Arrays.asList( "-nr",  "-m", "-s",  simulationJobModel.getFileFullName());
+        List<String> parameters = Arrays.asList( );//"-nr",  "-m", "-s",  simulationJobModel.getFileFullName());
         boolean hasDataFeed = !(simulationJobModel.getDataFile() == null || simulationJobModel.getDataFile().isEmpty());
         JobSummary.JobInfo jobinfo = JobSummary.JobInfo.newBuilder()
                 .withCount(simulationJobModel.getCount())
@@ -125,7 +125,6 @@ public class ServerRepository {
                 .withFileFullName(simulationJobModel.getFileFullName())
                 .withDataFileName(getDataFileName(simulationJobModel,hasDataFeed))
                 .build();
-        //cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId,job.jobId));
         Timeout timeout = new Timeout(6, TimeUnit.SECONDS);
         int success = 0;
         for (int i = 0; i < simulationJobModel.getCount(); i++) {
@@ -136,7 +135,7 @@ public class ServerRepository {
             Future<Object> future = ask(router, new Master.Job(simulationJobModel.getRoleId(), taskEvent, trackingId,
                     agentConfig.getAbortUrl(),
                     agentConfig.getJobFileUrl(simulationJobModel.getSimulation()),
-                            agentConfig.getJobFileUrl(simulationJobModel.getDataFile())),
+                            agentConfig.getJobFileUrl(simulationJobModel.getDataFile()),false),
                     timeout);
             Object result = Await.result(future, timeout.duration());
             if (result instanceof MasterClientActor.Ok) {

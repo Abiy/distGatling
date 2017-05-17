@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -59,7 +60,7 @@ public class FileUploadController {
     private String tempFileDir;
 
     @Autowired
-    public FileUploadController(ServerRepository serverRepository){
+    public FileUploadController(ServerRepository serverRepository) {
         this.serverRepository = serverRepository;
     }
 
@@ -81,18 +82,37 @@ public class FileUploadController {
         return "uploadForm";
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/uploadFile")
+    public String uploadFile(MultipartHttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        if (!file.isEmpty()) {
+            String filePath = tempFileDir + "/" + UUID.randomUUID().toString() + "/" + file.getOriginalFilename();
+            try {
+                FileUtils.touch(new File(filePath));
+
+                BufferedOutputStream stream = new BufferedOutputStream(
+                        new FileOutputStream(new File(filePath)));
+                FileCopyUtils.copy(file.getInputStream(), stream);
+                stream.close();
+                return filePath;
+            } catch (IOException e) {
+                log.error("Error uploading file {}", e);
+            }
+        }
+        return "";
+    }
+
     @RequestMapping(method = RequestMethod.POST, value = "/upload")
-    public SubmitResult uploadAndRunSimulation(MultipartHttpServletRequest request,  @RequestParam("simulationFile") MultipartFile simulationFile) {
+    public SubmitResult uploadAndRunSimulation(MultipartHttpServletRequest request, @RequestParam("simulationFile") MultipartFile simulationFile) {
         MultipartFile dataFile = request.getFile("dataFile");
         Map<String, String[]> paramMap = request.getParameterMap();
-        String packageName = getValue(paramMap, "packageName"),  partitionName = getValue(paramMap, "partitionName");
-        String fileName = packageName.replace('.','/') + ".scala";
+        String packageName = getValue(paramMap, "packageName"), partitionName = getValue(paramMap, "partitionName");
+        String fileName = packageName.replace('.', '/') + ".scala";
         String trackingId = "";
-        SimulationJobModel job  = new SimulationJobModel();
+        SimulationJobModel job = new SimulationJobModel();
         String dataFilePath = "";//should be empty by default
         if (!simulationFile.isEmpty()) {
             try {
-                if(dataFile != null && !dataFile.isEmpty()){
+                if (dataFile != null && !dataFile.isEmpty()) {
                     dataFilePath = tempFileDir + "/" + dataFile.getOriginalFilename();
                     FileUtils.touch(new File(dataFilePath));
                     BufferedOutputStream stream = new BufferedOutputStream(
@@ -107,30 +127,30 @@ public class FileUploadController {
                 FileCopyUtils.copy(simulationFile.getInputStream(), stream);
                 stream.close();
                 job = new SimulationJobModel();
-                    job.setCount(getValue(paramMap,"parallelism").equals("") ? 0:Short.valueOf(getValue(paramMap,"parallelism")));
-                    job.setPartitionAccessKey(getValue(paramMap,"accessKey"));
-                    job.setRoleId(partitionName);
-                    job.setTag(getValue(paramMap, "tag"));
-                    job.setUser(getValue(paramMap, "userName"));
-                    job.setSimulation(simulationFilePath);
-                    job.setDataFile(dataFilePath);
-                    job.setFileFullName(fileName);
-                    job.setParameterString(getValue(paramMap,"parameter"));
+                job.setCount(getValue(paramMap, "parallelism").equals("") ? 0 : Short.valueOf(getValue(paramMap, "parallelism")));
+                job.setPartitionAccessKey(getValue(paramMap, "accessKey"));
+                job.setRoleId(partitionName);
+                job.setTag(getValue(paramMap, "tag"));
+                job.setUser(getValue(paramMap, "userName"));
+                job.setSimulation(simulationFilePath);
+                job.setDataFile(dataFilePath);
+                job.setFileFullName(fileName);
+                job.setParameterString(getValue(paramMap, "parameter"));
                 log.info("Submitting job: {}", job);
                 Optional<String> tId = serverRepository.submitSimulationJob(job);
                 trackingId = tId.get();
             } catch (Exception e) {
                 log.error("Error uploading simulation {}", e);
-                return new SubmitResult(false,"",job);
+                return new SubmitResult(false, "", job);
             }
         } else {
-            return new SubmitResult(false,"",job);
+            return new SubmitResult(false, "", job);
         }
 
-        return new SubmitResult(true,trackingId,job);
+        return new SubmitResult(true, trackingId, job);
     }
 
-    private String getValue(Map<String, String[]> paramMap, String key){
+    private String getValue(Map<String, String[]> paramMap, String key) {
         if (!paramMap.containsKey(key))
             return "";
         if (paramMap.get(key).length < 1)

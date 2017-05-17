@@ -9,8 +9,11 @@ master:
 master.client.pool: 10 # The number of active actors that can talk to the master via master singleton proxy
 
 multipart:
-  max-file-size: 20Mb  # Max file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
-
+  maxFileSize: 100Mb  # Max file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
+multipart.max-file-size: 100MB
+multipart.max-request-size: 100MB
+spring.http.multipart.max-file-size: 100Mb
+spring.http.multipart.max-request-size: 100Mb
 #Actor configurations for the actors used during report generation
 actor:
   numberOfActors: 1
