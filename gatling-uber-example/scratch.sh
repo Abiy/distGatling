@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
- java -jar -Dusers=2 -D -DresultsFolder=target/results -DdataFolder=data -DsimulationClass=com.walmart.store.gatling.simulation.BasicSimulation target/gatling-uber-example-1.0-SNAPSHOT.jar
+ java -jar -Dusers=2  -DresultsFolder=target/results -DdataFolder=data -DsimulationClass=com.walmart.store.gatling.simulation.BasicSimulation target/gatling-uber-example-1.0-SNAPSHOT.jar

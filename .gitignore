@@ -20,6 +20,6 @@ target/
 shared-journal/
 gatling-rest/shared-journal/
 
-/gatling-ui/node_modules
-/gatling-ui/npm-debug.log
-/gatling-ui/assets/css/light-bootstrap-dashboard.css.map
+/src/node_modules
+/gatling-ui/src/main/frontend/npm-debug.log
+/gatling-ui/src/main/frontend/assets/css/light-bootstrap-dashboard.css.map

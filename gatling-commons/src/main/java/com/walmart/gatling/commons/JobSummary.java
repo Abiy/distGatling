@@ -135,11 +135,13 @@ public class JobSummary implements Serializable {
         public boolean hasDataFeed;
         public String parameterString;
         public String dataFileName;
+        public String jarFileName;
 
         public JobInfo() {
         }
 
-        public JobInfo(String partitionAccessKey, String user, String partitionName, String jobName, String trackingId, short count,String fileFullName,boolean hasDataFeed,String parameterString,String dataFileName) {
+        public JobInfo(String partitionAccessKey, String user, String partitionName, String jobName, String trackingId, short count,String fileFullName,boolean hasDataFeed,String parameterString,String dataFileName
+        ,  String jarFileName) {
             this.partitionAccessKey = partitionAccessKey;
             this.user = user;
             this.partitionName = partitionName;
@@ -150,6 +152,7 @@ public class JobSummary implements Serializable {
             this.hasDataFeed = hasDataFeed;
             this.parameterString = parameterString;
             this.dataFileName = dataFileName;
+            this.jarFileName =   jarFileName;
         }
 
         private JobInfo(Builder builder) {
@@ -163,6 +166,7 @@ public class JobSummary implements Serializable {
             this.hasDataFeed = builder.hasDataFeed;
             this.parameterString = builder.parameterString;
             this.dataFileName = builder.dataFileName;
+            this.jarFileName = builder.jarFileName;
         }
 
         public static Builder newBuilder() {
@@ -180,6 +184,7 @@ public class JobSummary implements Serializable {
             private boolean hasDataFeed;
             private String parameterString;
             public String dataFileName;
+            public String jarFileName;
 
             private Builder() {
             }
@@ -234,6 +239,11 @@ public class JobSummary implements Serializable {
             //
             public JobInfo build() {
                 return new JobInfo(this);
+            }
+
+            public Builder withJarFileName(String jarFileName) {
+                this.jarFileName = jarFileName;
+                return this;
             }
         }
     }

@@ -30,6 +30,7 @@
         <module>gatling-commons</module>
         <module>gatling-client</module>
         <module>gatling-uber-example</module>
+        <module>gatling-ui</module>
     </modules>
     <properties>
         <!--<akka.version>2.4.2</akka.version>-->

@@ -10,14 +10,15 @@ client:
 client.accessKey: accessSecretKey
 client.partitionName: public
 client.className:
-client.parameter: -Dusers=10 -Dramp=1
-client.dataFeedPath:
-client.quite: false
+client.parameter: -Dusers=10 -Dramps=1 -DsimulationClass=com.walmart.store.gatling.simulation.BasicSimulation
+client.dataFeedPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/data/search.csv
+client.quiet: false
 client.parallelism: 1
-client.jarPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-client/target/gatling-client-1.0-SNAPSHOT.jar
+client.jarPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/target/gatling-uber-example-1.0-SNAPSHOT.jar
 client.userName: default
 client.remoteArtifact: false
-client.dataFeedFileName:
+client.dataFeedFileName: search.csv
+client.jarFileName: gatling-uber-example-1.0-SNAPSHOT.jar
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on
 akka:

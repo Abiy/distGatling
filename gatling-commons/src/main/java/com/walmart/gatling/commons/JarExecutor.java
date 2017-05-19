@@ -169,47 +169,9 @@ public class JarExecutor extends WorkExecutor {
     private Object runJob(Master.Job message) {
         Master.Job job = message;
         TaskEvent taskEvent = (TaskEvent) job.taskEvent;
-        CommandLine cmdLine = new CommandLine(job.isJarSimulation ? "java" : agentConfig.getJob().getCommand());
-
+        CommandLine cmdLine =  job.isJarSimulation ? getJarCommand(job, taskEvent): getScriptCommand(job, taskEvent);
         log.info("Verified Script worker received task: {}", message);
-        Map<String, Object> map = new HashMap<>();
 
-        if (job.isJarSimulation) {
-            cmdLine.addArgument("-jar");
-            //parameters come from the task event
-            for (String pair : taskEvent.getParameters()) {
-                cmdLine.addArgument(pair);
-            }
-            cmdLine.addArgument(agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION, taskEvent.getJobInfo().fileFullName));
-            //class name
-        }
-        if (!job.isJarSimulation) {
-            map.put("path", new File(agentConfig.getJob().getJobArtifact(taskEvent.getJobName())));
-            cmdLine.addArgument("${path}");
-            //parameters come from the task event
-            for (String pair : taskEvent.getParameters()) {
-                cmdLine.addArgument(pair);
-            }
-        }
-
-        //download the simulation or jar file
-        DownloadFile.downloadFile(job.jobFileUrl,agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION, taskEvent.getJobInfo().fileFullName));
-        if(!job.isJarSimulation) {
-            //job simulation artifact path
-            cmdLine.addArgument("-sf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION));
-            cmdLine.addArgument("-s").addArgument(taskEvent.getJobInfo().fileFullName);
-        }
-        //download the data feed
-        if(taskEvent.getJobInfo().hasDataFeed) {
-            DownloadFile.downloadFile(job.dataFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, DATA,taskEvent.getJobInfo().dataFileName));
-            //job data feed  path
-            cmdLine.addArgument("-df").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,DATA));
-        }
-        //report file path
-        cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
-        cmdLine.addArgument("-nr").addArgument("-m");
-
-        cmdLine.setSubstitutionMap(map);
         DefaultExecutor executor = new DefaultExecutor();
         executor.setExitValues(agentConfig.getJob().getExitValues());
         ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
@@ -258,6 +220,62 @@ public class JarExecutor extends WorkExecutor {
             IOUtils.closeQuietly(outFile);
             IOUtils.closeQuietly(errorFile);
         }
+    }
+
+    private CommandLine getScriptCommand(Master.Job job,TaskEvent taskEvent) {
+        CommandLine cmdLine = new CommandLine(agentConfig.getJob().getCommand());
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("path", new File(agentConfig.getJob().getJobArtifact(taskEvent.getJobName())));
+        cmdLine.addArgument("${path}");
+        //parameters come from the task event
+        for (String pair : taskEvent.getParameters()) {
+            cmdLine.addArgument(pair);
+        }
+        //download the simulation or jar file
+        DownloadFile.downloadFile(job.jobFileUrl,agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION, taskEvent.getJobInfo().fileFullName));
+
+        //job simulation artifact path
+        cmdLine.addArgument("-sf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION));
+        cmdLine.addArgument("-s").addArgument(taskEvent.getJobInfo().fileFullName);
+
+        //download the data feed
+        if(taskEvent.getJobInfo().hasDataFeed) {
+            DownloadFile.downloadFile(job.dataFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, DATA,taskEvent.getJobInfo().dataFileName));
+            //job data feed  path
+            cmdLine.addArgument("-df").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,DATA));
+        }
+        //report file path
+        cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
+        cmdLine.addArgument("-nr").addArgument("-m");
+
+        cmdLine.setSubstitutionMap(map);
+        return cmdLine;
+    }
+
+    private CommandLine getJarCommand(Master.Job job, TaskEvent taskEvent) {
+        CommandLine cmdLine = new CommandLine("java");
+        cmdLine.addArgument("-jar");
+
+        //download the data feed
+        if(taskEvent.getJobInfo().hasDataFeed) {
+            log.info("Downloading from {}  to {}", job.dataFileUrl,agentConfig.getJob().getJobDirectory(job.jobId, DATA,taskEvent.getJobInfo().dataFileName));
+            DownloadFile.downloadFile(job.dataFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, DATA,taskEvent.getJobInfo().dataFileName));
+            //job data feed  path
+        }
+        cmdLine.addArgument("-DdataFolder=" + agentConfig.getJob().getJobDirectory(job.jobId,DATA));
+        cmdLine.addArgument("-DresultsFolder=" + agentConfig.getJob().getResultPath(job.roleId, job.jobId));
+        cmdLine.addArgument("-DnoReports=true");
+        //parameters come from the task event
+        for (String pair : taskEvent.getParameters()) {
+            cmdLine.addArgument(pair);
+        }
+        log.info("Downloading jar to {} ",agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION, taskEvent.getJobInfo().jarFileName));
+        //download the simulation or jar file
+        DownloadFile.downloadFile(job.jobFileUrl,agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION, taskEvent.getJobInfo().jarFileName));//.jar
+
+        cmdLine.addArgument(agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION, taskEvent.getJobInfo().jarFileName));//.jar
+        return cmdLine;
     }
 
     /**

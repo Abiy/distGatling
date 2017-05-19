@@ -41,8 +41,8 @@ public class CommandClientActor extends AbstractActor {
     private final Procedure<Object> working = new Procedure<Object>() {
         public void apply(Object message) {
             log.info("{}", message);
-            if (message instanceof MasterClientProtocol.CommandLineJobDone) {
-                log.info("Job Completed");
+            if (message instanceof MasterClientProtocol.CommandLineJobSubmitted) {
+                log.info("Job submitted. tracking info =>" + ((MasterClientProtocol.CommandLineJobSubmitted) message).getTrackingDetail());
                 System.exit(0);
             } else {
                 unhandled(message);

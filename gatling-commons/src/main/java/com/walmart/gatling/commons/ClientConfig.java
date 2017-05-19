@@ -33,7 +33,7 @@ public class ClientConfig implements Serializable {
     private String role;
     private String jarPath;
     private String dataFeedPath;
-    private boolean quite;
+    private boolean quiet;
     private String className;
     private short parallelism;
     private String accessKey;
@@ -44,6 +44,7 @@ public class ClientConfig implements Serializable {
     private String host;
     private boolean remoteArtifact;
     private String dataFeedFileName;
+    private String jarFileName;
 
     public String getDataFeedFileName() {
         return dataFeedFileName;
@@ -85,12 +86,12 @@ public class ClientConfig implements Serializable {
         this.dataFeedPath = dataFeedPath;
     }
 
-    public boolean isQuite() {
-        return quite;
+    public boolean isQuiet() {
+        return quiet;
     }
 
-    public void setQuite(boolean quite) {
-        this.quite = quite;
+    public void setQuiet(boolean quiet) {
+        this.quiet = quiet;
     }
 
     public String getClassName() {
@@ -173,5 +174,13 @@ public class ClientConfig implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public void setJarFileName(String jarFileName) {
+        this.jarFileName = jarFileName;
+    }
+
+    public String getJarFileName() {
+        return jarFileName;
     }
 }

@@ -46,6 +46,28 @@ public abstract class MasterClientProtocol {
 
     }
 
+    public static final class CommandLineJobSubmitted implements Serializable {
+        private String trackingId;
+
+        public CommandLineJobSubmitted() {
+
+        }
+
+        public CommandLineJobSubmitted(String trackingId) {
+            this.trackingId = trackingId;
+        }
+
+        @Override
+        public String toString() {
+            return "CommandLineJobSubmitted{" +
+                    "job=" + trackingId +
+                    '}';
+        }
+        public String getTrackingDetail(){
+            return "#detail/" + trackingId;
+        }
+    }
+
 
     public static final class CommandLineJobAccepted implements Serializable {
         private Master.Job job;

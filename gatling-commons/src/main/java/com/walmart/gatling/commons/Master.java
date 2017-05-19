@@ -26,6 +26,8 @@ import akka.cluster.client.ClusterClientReceptionist;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.persistence.AbstractPersistentActor;
+import akka.persistence.Recovery;
+import akka.persistence.SnapshotSelectionCriteria;
 import jersey.repackaged.com.google.common.collect.ImmutableList;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
@@ -104,6 +106,11 @@ public class Master extends AbstractPersistentActor {
         }
         return "master";
 
+    }
+
+    @Override
+    public Recovery recovery() {
+        return Recovery.create(100);
     }
 
     @Override
@@ -192,15 +199,16 @@ public class Master extends AbstractPersistentActor {
                 .withTrackingId(trackingId)
                 .withHasDataFeed(hasDataFeed)
                 .withParameterString(clientConfig.getParameterString())
-                .withFileFullName(clientConfig.getClassName())//class name is not fileName
+                .withFileFullName(clientConfig.getJarFileName())//class name is not fileName
                 .withDataFileName(clientConfig.getDataFeedFileName())
+                .withJarFileName(clientConfig.getJarFileName())
                 .build();
         for (int i = 0; i < clientConfig.getParallelism(); i++) {
             TaskEvent taskEvent = new TaskEvent();
             taskEvent.setJobName("gatling"); //the gatling.sh script is the gateway for simulation files
             taskEvent.setJobInfo(jobinfo);
             taskEvent.setParameters(new ArrayList<>(parameters));
-            Job job = new Job(clientConfig.getRole(), taskEvent, trackingId,
+            Job job = new Job(clientConfig.getPartitionName(), taskEvent, trackingId,
                     agentConfig.getAbortUrl(),
                     agentConfig.getJobFileUrl(clientConfig.getJarPath()),
                     agentConfig.getJobFileUrl(clientConfig.getDataFeedPath()), true);
@@ -212,6 +220,7 @@ public class Master extends AbstractPersistentActor {
             });
 
         }
+        getSender().tell(new MasterClientProtocol.CommandLineJobSubmitted(trackingId), getSelf());
         return Optional.of(trackingId);
     }
 
