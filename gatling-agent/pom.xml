@@ -23,7 +23,7 @@
     <parent>
         <artifactId>distributed-gatling</artifactId>
         <groupId>com.walmart.store</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${current.version}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>com.walmart.store</groupId>
             <artifactId>gatling-commons</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

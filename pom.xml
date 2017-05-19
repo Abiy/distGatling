@@ -23,16 +23,16 @@
     <groupId>com.walmart.store</groupId>
     <artifactId>distributed-gatling</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>${current.version}</version>
     <modules>
         <module>gatling-rest</module>
         <module>gatling-agent</module>
         <module>gatling-commons</module>
         <module>gatling-client</module>
         <module>gatling-uber-example</module>
-        <module>gatling-ui</module>
     </modules>
     <properties>
+        <current.version>1.0.0</current.version>
         <!--<akka.version>2.4.2</akka.version>-->
         <akka.version>2.5.0</akka.version>
     </properties>

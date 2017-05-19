@@ -16,7 +16,7 @@ job:
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on
 akka:
-  contact-points: "172.16.0.112:2551"
+  contact-points: "172.16.0.140:2551"
 
 graphite:
     host: localhost
