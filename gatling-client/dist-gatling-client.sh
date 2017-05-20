@@ -20,10 +20,10 @@ USER_ARGS="$@"
 JAVA_OPTS="-server -XX:+UseThreadPriorities  -XX:ThreadPriorityPolicy=42 -Xms512M -Xmx512M -Xmn100M -XX:+HeapDumpOnOutOfMemoryError -XX:+AggressiveOpts -XX:+OptimizeStringConcat -XX:+UseFastAccessorMethods -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv6Addresses=false ${USER_ARGS}"
 
 export SPRING_CONFIG_NAME=config.yml
-CLIENT_PATH="target/gatling-client-1.0-SNAPSHOT.jar"
+CLIENT_PATH="target/gatling-client-1.0.0.jar"
 # Run Gatling
 java $JAVA_OPTS -jar ${CLIENT_PATH} com.walmart.gatling.client.Client --spring.config.location=config.yml
 
 
-#Example /bin/bash dist-gatling-client.sh -Dclient.userName=ABIY -Dclient.parallelism=2
+#Example /bin/bash dist-gatling-client.sh -Dclient.userName=AbiyH -Dclient.parallelism=2
 

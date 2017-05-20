@@ -14,15 +14,15 @@ client.parameter: -Dusers=1000 -Dramps=1 -DsimulationClass=com.walmart.store.gat
 client.dataFeedPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/data/search.csv # path to the data feed file
 client.quiet: false
 client.parallelism: 2
-client.jarPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/target/gatling-uber-example-1.0-SNAPSHOT.jar #path to uber jar
+client.jarPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/target/gatling-uber-example-1.0.0.jar #path to uber jar
 client.userName: Abiy Hailemichael
 client.remoteArtifact: false
 client.dataFeedFileName: search.csv #data feed file name
-client.jarFileName: gatling-uber-example-1.0-SNAPSHOT.jar # jar file name
+client.jarFileName: gatling-uber-example-1.0.0.jar # jar file name
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on
 akka:
-  contact-points: "172.16.0.112:2551"
+  contact-points: "127.0.0.1:2551"
 
 application.title: distGatling
 

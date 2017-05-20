@@ -16,7 +16,7 @@ job:
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on
 akka:
-  contact-points: "172.16.0.140:2551"
+  contact-points: "127.0.0.1:2551"
 
 graphite:
     host: localhost
@@ -26,7 +26,7 @@ graphite:
 
 jersey:
     controller:
-        packages: com.walmart # Base package for jersey controllers for auto registration
+        packages: com.walmart.gatling.endpoint.v1 # Base package for jersey controllers for auto registration
 
 logging.level.root: INFO
 logging.level.com.walmart.gatling: DEBUG
