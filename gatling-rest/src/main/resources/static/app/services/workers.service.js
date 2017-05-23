@@ -20,7 +20,7 @@ var WorkerService = (function () {
     function WorkerService(_http, _jsonp) {
         this._http = _http;
         this._jsonp = _jsonp;
-        this.baseUrl = "http://localhost:8080";
+        this.baseUrl = "";
     }
     WorkerService.prototype.getWorkers = function () {
         return this._http.get(this.baseUrl + "/gatling/server/info", this.jsonHeaders())

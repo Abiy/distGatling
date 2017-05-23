@@ -33,11 +33,11 @@
 
 
     <properties>
-        <current.version>1.0.0</current.version>
+        <current.version>1.0.2-SNAPSHOT</current.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gatling.version>2.1.7</gatling.version>
+        <gatling.version>2.2.5</gatling.version>
         <gatling-plugin.version>2.2.4</gatling-plugin.version>
-        <scala.version>2.11.7</scala.version>
+        <scala.version>2.11.8</scala.version>
         <scala.maven-plugin.version>3.2.2</scala.maven-plugin.version>
     </properties>
 

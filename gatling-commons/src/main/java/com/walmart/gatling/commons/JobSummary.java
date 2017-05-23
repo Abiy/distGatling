@@ -137,6 +137,9 @@ public class JobSummary implements Serializable {
         public String dataFileName;
         public String jarFileName;
 
+        public String getFileNameFromPackageName(){
+            return fileFullName.replace('.', '/') + ".scala";
+        }
         public JobInfo() {
         }
 

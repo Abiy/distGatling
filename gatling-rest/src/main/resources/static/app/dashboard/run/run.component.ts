@@ -49,7 +49,7 @@ export class RunComponent  implements OnDestroy,OnInit{
     }
     ngOnInit(): void {
         this.success = true;
-        this.uploadUrl  = "http://localhost:8080/upload";
+        this.uploadUrl  = "/upload";
         this.uploader = new MultipartUploader({url: this.uploadUrl});
         this.multipartItem =  new MultipartItem(this.uploader);
         this.model = { parallelism:1, accessKey:"", packageName:"", partitionName:"", parameter:"", userName:""};

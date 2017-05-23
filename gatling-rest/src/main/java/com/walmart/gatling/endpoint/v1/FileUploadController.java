@@ -134,7 +134,7 @@ public class FileUploadController {
                 job.setUser(getValue(paramMap, "userName"));
                 job.setSimulation(simulationFilePath);
                 job.setDataFile(dataFilePath);
-                job.setFileFullName(fileName);
+                job.setFileFullName(packageName);
                 job.setParameterString(getValue(paramMap, "parameter"));
                 log.info("Submitting job: {}", job);
                 Optional<String> tId = serverRepository.submitSimulationJob(job);

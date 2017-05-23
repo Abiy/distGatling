@@ -21,64 +21,67 @@ package com.walmart.store.gatling.simulation
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
-import java.util.concurrent.ThreadLocalRandom
+
 
 class BasicSimulation extends Simulation {
-  val nbUsers = Integer.getInteger("users", 10)
-  val ramps = Integer.getInteger("ramps", 2)
 
+  val nbUsers = Integer.getInteger("users", 10)
+  val nbRamps = Integer.getInteger("ramps", 10)
   object Search {
 
 
-    val feeder = csv("search.csv").random
+    // We need dynamic data so that all users don't play the same and we end up with a behavior completely different from the live system (caching, JIT...)
+    // ==> Feeders!
+
+    val feeder = csv("search.csv").random // default is queue, so for this test, we use random to avoid feeder starvation
 
     val search = exec(http("Home")
       .get("/"))
       .pause(1)
-      .feed(feeder)
+      .feed(feeder) // every time a user passes here, a record is popped from the feeder and injected into the user's session
       .exec(http("Search")
-        .get("/computers?f=${searchCriterion}")
-        .check(css("a:contains('${searchComputerName}')", "href").saveAs("computerURL")))
+        .get("/computers?f=${searchCriterion}") // use session data thanks to Gatling's EL
+        .check(css("a:contains('${searchComputerName}')", "href").saveAs("computerURL"))) // use a CSS selector with an EL, save the result of the capture group
       .pause(1)
       .exec(http("Select")
-        .get("${computerURL}")
+        .get("${computerURL}") // use the link previously saved
         .check(status.is(200)))
       .pause(1)
   }
 
   object Browse {
 
-    // repeat is a loop resolved at RUNTIME
-    val browse = repeat(4, "i") {
-      // Note how we force the counter name so we can reuse it
-      exec(http("Page ${i}")
-        .get("/computers?p=${i}"))
-        .pause(1)
-    }
+    val browse = exec(http("Home")
+      .get("/"))
+      .pause(2)
+      .exec(http("Page 1")
+        .get("/computers?p=1"))
+      .pause(670 milliseconds)
+      .exec(http("Page 2")
+        .get("/computers?p=2"))
+      .pause(629 milliseconds)
+      .exec(http("Page 3")
+        .get("/computers?p=3"))
+      .pause(734 milliseconds)
+      .exec(http("Page 4")
+        .get("/computers?p=4"))
+      .pause(5)
   }
 
   object Edit {
 
-    // Note we should be using a feeder here
-
     val headers_10 = Map("Content-Type" -> "application/x-www-form-urlencoded")
 
-    // let's demonstrate how we can retry: let's make the request fail randomly and retry a given number of times
-
-    val edit = tryMax(2) {
-      // let's try at max 2 times
-      exec(http("Form")
-        .get("/computers/new"))
-        .pause(1)
-        .exec(http("Post")
-          .post("/computers")
-          .headers(headers_10)
-          .formParam("name", "Beautiful Computer")
-          .formParam("introduced", "2012-05-30")
-          .formParam("discontinued", "")
-          .formParam("company", "37").
-          check(status.is(session => 200 + ThreadLocalRandom.current.nextInt(2)))) // we do a check on a condition that's been customized with a lambda. It will be evaluated every time a user executes the request
-    }.exitHereIfFailed // if the chain didn't finally succeed, have the user exit the whole scenario
+    val edit = exec(http("Form")
+      .get("/computers/new"))
+      .pause(1)
+      .exec(http("Post")
+        .post("/computers")
+        .headers(headers_10)
+        .formParam("name", "Beautiful Computer")
+        .formParam("introduced", "2012-05-30")
+        .formParam("discontinued", "")
+        .formParam("company", "37"))
   }
 
   val httpConf = http
@@ -94,6 +97,6 @@ class BasicSimulation extends Simulation {
 
   setUp(
     users.inject(rampUsers(nbUsers) over (10 seconds)),
-    admins.inject(rampUsers(ramps) over (10 seconds))
+    admins.inject(rampUsers(nbRamps) over (10 seconds))
   ).protocols(httpConf)
 }

@@ -234,7 +234,7 @@ public class JarExecutor extends WorkExecutor {
             cmdLine.addArgument(pair);
         }
         //download the simulation or jar file
-        DownloadFile.downloadFile(job.jobFileUrl,agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION, taskEvent.getJobInfo().fileFullName));
+        DownloadFile.downloadFile(job.jobFileUrl,agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION, taskEvent.getJobInfo().getFileNameFromPackageName()));
 
         //job simulation artifact path
         cmdLine.addArgument("-sf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION));
