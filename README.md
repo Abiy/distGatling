@@ -141,3 +141,11 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 ### Cluster information - shows current state of all the workers in the cluster
 ![Alt text](images/cluster_info.png "Cluster info")
 <!-- <img src="/images/cluster_info.png" width="700" height="400" alt="Cluster info"/> -->
+
+### running a simulation that is packaged into an uber jar is now supported via gatling-client(https://github.com/Abiy/distGatlingClient)
+
+    Update config.yml with the necessary configuration
+
+    Use the following command to submit your uber jar to cluster
+    
+    /bin/bash dist-gatling-client.sh  -Dclient.userName=user -Dclient.parallelism=1
