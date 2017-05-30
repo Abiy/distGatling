@@ -119,12 +119,6 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 
 ---
 
-### Upload plugins, simulations files, data and conf files
-![Alt text](images/upload.png "Upload plugins, simulations files, data and conf files")
-<!-- <img src="/images/upload.png" width="700" height="400" alt="Upload plugins, simulations files, data and conf files"/> -->
-
----
-
 ### Start a distributed simulation task - users provide  the worker pool to use, the simulation file to run and number of parallel tasks
 ![Alt text](images/submit_simulation_job.png "Start a distributed simulation task")
 <!-- <img src="/images/submit_simulation_job.png" width="700" height="400" alt="Start a distributed simulation task"/> -->
