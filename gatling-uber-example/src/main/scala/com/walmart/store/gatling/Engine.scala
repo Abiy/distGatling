@@ -34,7 +34,7 @@ object Engine extends App {
 
   /** val usage =
     """
-      |Usage: java -jar gatling-1.0-SNAPSHOT.jar [similation name]
+      |Usage: java -jar gatling-1.2-SNAPSHOT.jar [similation name]
     """.stripMargin
   val props = new GatlingPropertiesBuilder
   props.dataDirectory("jar")

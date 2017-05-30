@@ -1,10 +1,10 @@
 server:
   port: 0 # Server information for embedded jetty
-  url: http://16.16.16.16:8080 #the
+  url: http://16.16.16.16:8080 #the master base url used by the client to upload uber jar and data feed files
 
 client:
   numberOfActors: 1 # Number of worker actors , controls the number of parallel simulation jobs you can run per process
-  port: 2655 # Port number for the actor system that host the worker actors
+  port: 0 # Port number for the actor system that host the worker actors
   role: "client" # The name of the role each actor uses (role1,role2...role5 etc)
 
 client.accessKey: optional #optional access key for the partition
