@@ -116,6 +116,7 @@
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-testkit_2.11</artifactId>
             <version>${akka.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -128,7 +129,8 @@
             <version>0.5.0</version>
         </dependency>
     </dependencies>
-    <distributionManagement>
+   <!-- Your internal nexus repo for publishing artifacts-->
+   <!-- <distributionManagement>
         <repository>
             <id>internal-repository</id>
             <name>devservices-nexus</name>
@@ -139,7 +141,7 @@
             <name>devservices-nexus</name>
             <url>http://repo.wal-mart.com/content/repositories/snapshots</url>
         </snapshotRepository>
-    </distributionManagement>
+    </distributionManagement>-->
     <build>
         <plugins>
             <plugin>

@@ -18,12 +18,11 @@
 
 package com.walmart.gatling.commons;
 
+import akka.testkit.javadsl.TestKit;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.UUID;
-
-import akka.testkit.JavaTestKit;
 
 /**
  * Created by walmart
@@ -32,9 +31,10 @@ public class WorkerMasterTest extends MasterTest {
 
     public static final String PROJECT_NAME = "projectName";
 
+
     @Test
     public void testSubmitJobAndRegisterWorker() {
-        new JavaTestKit(system) {
+        new TestKit(system) {
             {
                 Master.Job job = getJob();
                 master.tell(job, getRef());//send job
@@ -53,7 +53,7 @@ public class WorkerMasterTest extends MasterTest {
 
     @Test
     public void testWorkerRequestsFileBeforeAndAfterActiveFileExists() {
-        new JavaTestKit(system) {
+        new TestKit(system) {
             {
                 master.tell(new MasterWorkerProtocol.WorkerRequestsFile("worker-testWorkerRequestsFile","projectName","127.0.0.1"), getRef());//send request
                 expectNoMsg();
@@ -74,7 +74,7 @@ public class WorkerMasterTest extends MasterTest {
 
     @Test
     public void testWorkerRequestsWork() {
-        new JavaTestKit(system) {
+        new TestKit(system) {
             {
                 //submit job
                 Master.Job job = getJob();
@@ -113,7 +113,7 @@ public class WorkerMasterTest extends MasterTest {
 
     @Test
     public void testWorkCoordinationWhenJobFails() {
-        new JavaTestKit(system) {
+        new TestKit(system) {
             {
                 //submit job
                 Master.Job job = getJob();
@@ -151,7 +151,7 @@ public class WorkerMasterTest extends MasterTest {
 
     @Test
     public void testWorkerSendsFileUploadComplete() {
-        new JavaTestKit(system) {
+        new TestKit(system) {
             {
                 master.tell(new Worker.FileUploadComplete(new Master.UploadFile("trId","/path","file","role","lib"),"127.0.0.1"), getRef());//send request
                 expectNoMsg();
