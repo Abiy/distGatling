@@ -11,7 +11,7 @@ job:
   logDirectory: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.2.4/" # Base directory for logfiles(log/error and log/std)
   command: "/bin/bash" # Base command to run gatling.sh file
   artifact: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.2.4/bin/{0}.sh" # Path for the location of gatling.sh
-  jobDirectory: /Users/ahailem/workspace/gspace/
+  jobDirectory: /Users/ahailem/workspace/gspace/ # directory to store artifacts temporarily, only applicable for agents
 
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on
