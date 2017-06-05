@@ -250,7 +250,7 @@ public class Master extends AbstractPersistentActor {
     }
 
     private void onReport(Object cmd) {
-        log.info("Accepted tracking info request: {}", cmd);
+        log.info("Accepted report request: {}", cmd);
         List<Worker.Result> result = jobDatabase.getCompletedResults(((Report) cmd).trackingId);
         reportExecutor.forward(new GenerateReport((Report) cmd, result), getContext());
     }

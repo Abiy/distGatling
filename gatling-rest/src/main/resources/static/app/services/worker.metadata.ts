@@ -14,6 +14,7 @@ export interface JobInfo {
     jobName: string;
     trackingId: string;
     count: number;
+    parameterString: string;
 
 }
 

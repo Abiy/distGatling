@@ -29,7 +29,7 @@ jersey:
         packages: com.walmart.gatling.endpoint.v1 # Base package for jersey controllers for auto registration
 
 logging.level.root: INFO
-logging.level.com.walmart.gatling: DEBUG
+logging.level.com.walmart.gatling: ERROR
 
 ---
 
@@ -41,12 +41,12 @@ spring:
 spring:
     profiles: integration
 
-logging.level.com.walmart.gatling: INFO
+logging.level.com.walmart.gatling: ERROR
     
 ---
 
 spring:
     profiles: production
 
-logging.level.com.walmart: INFO
+logging.level.com.walmart: ERROR
 

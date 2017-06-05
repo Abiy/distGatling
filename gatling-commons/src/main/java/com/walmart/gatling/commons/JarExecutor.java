@@ -160,6 +160,11 @@ public class JarExecutor extends WorkExecutor {
             try {
                 log.info("Cancel command: {}", cmdLine);
                 killExecutor.execute(cmdLine);
+                TaskEvent taskEvent = (TaskEvent) message.taskEvent;
+                String outPath = agentConfig.getJob().getOutPath(taskEvent.getJobName(), message.jobId);
+                String errPath = agentConfig.getJob().getErrorPath(taskEvent.getJobName(), message.jobId);
+                Worker.Result result = new Worker.Result(-9, agentConfig.getUrl(errPath), agentConfig.getUrl(outPath), null, message);
+                getSender().tell(new Worker.WorkFailed(result), getSelf());
             } catch (IOException e) {
                 log.error(e, "Error cancelling job");
             }
