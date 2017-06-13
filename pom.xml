@@ -130,7 +130,7 @@
         </dependency>
     </dependencies>
    <!-- Your internal nexus repo for publishing artifacts-->
-   <!-- <distributionManagement>
+    <distributionManagement>
         <repository>
             <id>internal-repository</id>
             <name>devservices-nexus</name>
@@ -141,7 +141,7 @@
             <name>devservices-nexus</name>
             <url>http://repo.wal-mart.com/content/repositories/snapshots</url>
         </snapshotRepository>
-    </distributionManagement>-->
+    </distributionManagement>
     <build>
         <plugins>
             <plugin>

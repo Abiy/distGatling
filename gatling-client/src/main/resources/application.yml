@@ -1,30 +1,30 @@
 server:
-  port: 0 # Server information for embedded jetty
-  url: http://localhost:8080
+  port: 8090 # Server information for embedded jetty
+  url: http://gatling-master.dev-master.dev.cloud.wal-mart.com:8080 #the master base url used by the client to upload uber jar and data feed files
 
 client:
   numberOfActors: 1 # Number of worker actors , controls the number of parallel simulation jobs you can run per process
-  port: 2655 # Port number for the actor system that host the worker actors
-  role: "client" # The name of the role each actor uses (role1,role2...role5 etc)
+  port: 0 # Port number for the actor system that host the client actors
+  role: "client" # The name of the role each  client actor uses 
 
-client.accessKey: accessSecretKey
-client.partitionName: public
-client.className:
-client.parameter: -Dusers=10 -Dramps=1 -DsimulationClass=com.walmart.store.gatling.simulation.BasicSimulation
-client.dataFeedPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/data/search.csv
+client.accessKey: optional #optional access key for the partition
+client.partitionName: public #change depending on your need
+client.className: optional
+client.parameter: -Dusers=100 -Dramps=1 -DsimulationClass=com.walmart.store.gatling.simulation.BasicSimulation    #the simulation class is required
+client.dataFeedPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/data/search.csv # path to the data feed file
 client.quiet: false
 client.parallelism: 1
-client.jarPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/target/gatling-uber-example-1.0-SNAPSHOT.jar
-client.userName: default
+client.jarPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/target/gatling-uber-example-1.0.2-SNAPSHOT.jar #path to uber jar
+client.userName: Kalyan
 client.remoteArtifact: false
-client.dataFeedFileName: search.csv
-client.jarFileName: gatling-uber-example-1.0-SNAPSHOT.jar
+client.dataFeedFileName: search.csv #data feed file name
+client.jarFileName: gatling-uber-example-1.0.2-SNAPSHOT.jar # jar file name
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on
 akka:
-  contact-points: "172.16.0.112:2551"
+  contact-points: "10.226.68.2:2551"
 
-application.title: GATLING
+application.title: distGatling
 
 logging.level.root: ERROR
 logging.level.com.walmart.gatling: DEBUG
