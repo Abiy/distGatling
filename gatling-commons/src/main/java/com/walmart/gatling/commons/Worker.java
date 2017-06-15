@@ -18,12 +18,7 @@
 
 package com.walmart.gatling.commons;
 
-import com.walmart.gatling.commons.Master.Ack;
-import com.walmart.gatling.commons.Master.Job;
-
-import java.io.Serializable;
-import java.util.UUID;
-
+import akka.actor.AbstractActor;
 import akka.actor.ActorInitializationException;
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
@@ -33,19 +28,21 @@ import akka.actor.Props;
 import akka.actor.ReceiveTimeout;
 import akka.actor.SupervisorStrategy;
 import akka.actor.Terminated;
-import akka.actor.UntypedActor;
 import akka.cluster.client.ClusterClient;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Procedure;
+import com.walmart.gatling.commons.Master.Ack;
+import com.walmart.gatling.commons.Master.Job;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-import static akka.actor.SupervisorStrategy.escalate;
-import static akka.actor.SupervisorStrategy.restart;
-import static akka.actor.SupervisorStrategy.stop;
+import java.io.Serializable;
+import java.util.UUID;
 
-public class Worker extends UntypedActor {
+import static akka.actor.SupervisorStrategy.*;
+
+public class Worker extends AbstractActor {
 
     private final ActorRef clusterClient;
     private final String host;
@@ -66,17 +63,23 @@ public class Worker extends UntypedActor {
                 sendToMaster(new MasterWorkerProtocol.WorkIsDone(workerId, jobId(), result));
                 getContext().setReceiveTimeout(Duration.create(5, "seconds"));
                 Procedure<Object> waitForWorkIsDoneAck = waitForWorkIsDoneAck(result);
-                getContext().become(waitForWorkIsDoneAck);
+                getContext().become(receiveBuilder()
+                        .matchAny(p -> waitForWorkIsDoneAck.apply(p))
+                        .build());
             }
             else if (message instanceof  Worker.FileUploadComplete){
                 sendToMaster(message);
-                getContext().become(idle);
+                getContext().become(receiveBuilder()
+                        .matchAny(p->idle.apply(p))
+                        .build());
             }
             else if (message instanceof WorkFailed) {
                 Object result = ((WorkFailed) message).result;
                 log.info("Work is failed. Result {}.", result);
                 sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),result));
-                getContext().become(idle);
+                getContext().become(receiveBuilder()
+                        .matchAny(p->idle.apply(p))
+                        .build());
                 //getContext().setReceiveTimeout(Duration.create(5, "seconds"));
                 ///Procedure<Object> waitForWorkIsDoneAck = waitForWorkIsDoneAck(result);
                 //getContext().become(waitForWorkIsDoneAck);
@@ -106,14 +109,18 @@ public class Worker extends UntypedActor {
                 log.info("Got work: {}", job);
                 currentJobId = job.jobId;
                 workExecutor.tell(job, getSelf());
-                getContext().become(working);
+                getContext().become(receiveBuilder()
+                        .matchAny(p->working.apply(p))
+                        .build());
             }
             else if (message instanceof Master.FileJob) {
                 Master.FileJob fileJob = (Master.FileJob) message;
                 log.info("Got file upload work: {}", fileJob.uploadFileRequest);
                 currentJobId = fileJob.jobId;
                 workExecutor.tell(fileJob, getSelf());
-                getContext().become(working);
+                getContext().become(receiveBuilder()
+                        .matchAny(p->working.apply(p))
+                        .build());
             }
             else
              unhandled(message);
@@ -174,7 +181,9 @@ public class Worker extends UntypedActor {
                             log.info("RuntimeException, Work is failed for "+ currentJobId);
                             sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Result(-1,"","","",null)));
                         }
-                        getContext().become(idle);
+                        getContext().become(receiveBuilder()
+                                .matchAny(p->idle.apply(p))
+                                .build());
                         return restart();
                     }
                     else if (t instanceof Exception) {
@@ -182,7 +191,9 @@ public class Worker extends UntypedActor {
                             log.info("Exception, Work is failed for "+ currentJobId);
                             sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Result(-1,"","","",null)));
                         }
-                        getContext().become(idle);
+                        getContext().become(receiveBuilder()
+                                .matchAny(p->idle.apply(p))
+                                .build());
                         return restart();
                     }
                     else {
@@ -199,6 +210,12 @@ public class Worker extends UntypedActor {
         keepAliveTask.cancel();
     }
 
+    @Override
+    public Receive createReceive() {
+        return receiveBuilder()
+                .build();
+    }
+
     public void onReceive(Object message) {
         unhandled(message);
     }
@@ -208,7 +225,9 @@ public class Worker extends UntypedActor {
             if (message instanceof Ack && ((Ack) message).workId.equals(jobId())) {
                 sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
                 getContext().setReceiveTimeout(Duration.Undefined());
-                getContext().become(idle);
+                getContext().become(receiveBuilder()
+                        .matchAny(p->idle.apply(p))
+                        .build());
             } else if (message instanceof ReceiveTimeout) {
                 log.info("No ack from master, retrying (" + workerId + " -> " + jobId() + ")");
                 sendToMaster(new MasterWorkerProtocol.WorkIsDone(workerId, jobId(), result));
@@ -219,7 +238,9 @@ public class Worker extends UntypedActor {
     }
 
     {
-        getContext().become(idle);
+        getContext().become(receiveBuilder()
+                .matchAny(p->idle.apply(p))
+                .build());
     }
 
     @Override

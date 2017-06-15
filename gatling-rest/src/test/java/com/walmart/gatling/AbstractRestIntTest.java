@@ -20,23 +20,20 @@ package com.walmart.gatling;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.client.RestTemplateWithPutReturnSupport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Abstract helper class that defines necessary web integration testing annotations and common functions.
@@ -51,7 +48,7 @@ import static org.junit.Assert.fail;
 public abstract class AbstractRestIntTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractRestIntTest.class);
-	protected RestTemplateWithPutReturnSupport template = new RestTemplateWithPutReturnSupport();
+	protected TestRestTemplate template = new TestRestTemplate();
 	protected final String rootUrl = "http://localhost:8080/gatling";
 
 	@Autowired
@@ -98,18 +95,6 @@ public abstract class AbstractRestIntTest {
 		return entity.getBody();
 	}
 
-	protected <T> T putForObject(String url, Object input, Class<T> responseType,
-								 HttpStatus expectedStatus) {
-		ResponseEntity<T> entity = template.putForEntity(url, input, responseType);
-		if(expectedStatus != entity.getStatusCode()) {
-			if(entity.hasBody())
-				logger.debug("Error processings put:  {}", entity.getBody().toString());
-		}
-
-		assertEquals(expectedStatus, entity.getStatusCode());
-
-		return entity.getBody();
-	}
 
 	protected <T> T postForObject(String url, Object post, Class<T> responseType,
 								  HttpStatus expectedStatus) {

@@ -50,7 +50,7 @@ public class MonitoringConfiguration {
                 new InetSocketAddress(graphiteHost, graphitePort));
     }
 
-    @Bean
+    //@Bean
     public GraphiteReporter graphiteReporter(Graphite graphite,
                                              MetricRegistry registry,
                                              @Value("${graphite.prefix}")

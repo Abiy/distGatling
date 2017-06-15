@@ -31,54 +31,43 @@ import javafx.util.Pair;
  */
 public class TaskEvent implements Serializable {
 
-    private String roleName;
-    private List<Pair<String, String>> parameters;
-    private String instance;
-    private String status;
-    private String jobInstanceId;
+    private List<String> parameters;
     private String jobName;
-    private String outputPath;
-    private int retry;
-    private int retryDelayInSeconds;
+    private long startTimeStamp;
+    private long endTimeStamp;
+    private String workerId;
+    private String errorLogPath;
+    private String stdLogPath;
+    private String status;//Master.JobStatusString
+    private String taskJobId;
+    private JobSummary.JobInfo jobInfo;
 
-    public String getRoleName() {
-        return roleName;
+    public TaskEvent() {
+        parameters = new ArrayList<>();
     }
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
+    public String getTaskJobId() {
+        return taskJobId;
     }
 
-    public List<Pair<String, String>> getParameters() {
+    public void setTaskJobId(String taskJobId) {
+        this.taskJobId = taskJobId;
+    }
+
+    public JobSummary.JobInfo getJobInfo() {
+        return jobInfo;
+    }
+
+    public void setJobInfo(JobSummary.JobInfo jobInfo) {
+        this.jobInfo = jobInfo;
+    }
+
+    public List<String> getParameters() {
         return parameters;
     }
 
-    public void setParameters(List<Pair<String, String>> parameters) {
+    public void setParameters(List<String> parameters) {
         this.parameters = parameters;
-    }
-
-    public String getInstance() {
-        return instance;
-    }
-
-    public void setInstance(String instance) {
-        this.instance = instance;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getJobInstanceId() {
-        return jobInstanceId;
-    }
-
-    public void setJobInstanceId(String jobInstanceId) {
-        this.jobInstanceId = jobInstanceId;
     }
 
     public String getJobName() {
@@ -89,29 +78,51 @@ public class TaskEvent implements Serializable {
         this.jobName = jobName;
     }
 
-    public String getOutputPath() {
-        return outputPath;
+    public long getStartTimeStamp() {
+        return startTimeStamp;
     }
 
-    public void setOutputPath(String outputPath) {
-        this.outputPath = outputPath;
+    public void setStartTimeStamp(long startTimeStamp) {
+        this.startTimeStamp = startTimeStamp;
     }
 
-    public int getRetry() {
-        return retry;
+    public long getEndTimeStamp() {
+        return endTimeStamp;
     }
 
-    public void setRetry(int retry) {
-        this.retry = retry;
+    public void setEndTimeStamp(long endTimeStamp) {
+        this.endTimeStamp = endTimeStamp;
     }
 
-    public int getRetryDelayInSeconds() {
-        return retryDelayInSeconds;
+    public String getWorkerId() {
+        return workerId;
     }
 
-    public void setRetryDelayInSeconds(int retryDelayInSeconds) {
-        this.retryDelayInSeconds = retryDelayInSeconds;
+    public void setWorkerId(String workerId) {
+        this.workerId = workerId;
     }
 
+    public String getErrorLogPath() {
+        return errorLogPath;
+    }
 
+    public void setErrorLogPath(String errorLogPath) {
+        this.errorLogPath = errorLogPath;
+    }
+
+    public String getStdLogPath() {
+        return stdLogPath;
+    }
+
+    public void setStdLogPath(String stdLogPath) {
+        this.stdLogPath = stdLogPath;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

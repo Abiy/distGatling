@@ -18,6 +18,7 @@
 
 package com.walmart.gatling.commons;
 
+import akka.testkit.TestKit;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -25,10 +26,12 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -52,12 +55,36 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by walmart
  */
-public class MasterTest {
+public class MasterTest  {
 
     protected static AgentConfig agentConfig;
     protected static ActorSystem system;
     protected static ActorRef master;
 
+    short parallelism = 1;
+    JobSummary.JobInfo jobinfo;
+    TaskEvent taskEvent;
+    @Before
+    public void setUp(){
+        jobinfo = JobSummary.JobInfo.newBuilder()
+                .withCount(parallelism)
+                .withJobName("gatling")
+                .withPartitionAccessKey("noAccessKey")
+                .withPartitionName("public")
+                .withUser("testUser")
+                .withTrackingId(UUID.randomUUID().toString())
+                .withHasDataFeed(false)
+                .withParameterString("")
+                .withFileFullName("FileFullName")
+                .withDataFileName("DataFileName")
+                .build();
+        taskEvent = new TaskEvent();
+        {
+            taskEvent.setJobName("gatling"); //the gatling.sh script is the gateway for simulation files
+            taskEvent.setJobInfo(jobinfo);
+            taskEvent.setParameters(new ArrayList<>());
+        }
+    }
     @BeforeClass
     public static void setupActorSystem() throws Exception {
 
@@ -77,7 +104,7 @@ public class MasterTest {
 
     @AfterClass
     public static void teardownClass() {
-        JavaTestKit.shutdownActorSystem(system);
+        TestKit.shutdownActorSystem(system, Duration.create(10, TimeUnit.SECONDS), true);
         system = null;
     }
 
@@ -98,11 +125,8 @@ public class MasterTest {
 
     protected Master.Job getJob() {
         String id = UUID.randomUUID().toString();
-        TaskEvent taskEvent = new TaskEvent();
         taskEvent.setJobName("gatling");
-        taskEvent.setRoleName("role1");
-        taskEvent.setJobInstanceId(id);
-        Master.Job job = new Master.Job("projectName", taskEvent, id, "");
+        Master.Job job = new Master.Job("projectName", taskEvent, id, "","simulatioFilePath","dataFilePath",false);
         return job;
     }
 

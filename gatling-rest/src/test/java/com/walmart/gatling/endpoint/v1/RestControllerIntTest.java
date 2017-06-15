@@ -19,7 +19,7 @@
 package com.walmart.gatling.endpoint.v1;
 
 import com.walmart.gatling.AbstractRestIntTest;
-import com.walmart.gatling.repository.ValuePair;
+import com.walmart.gatling.repository.WorkerModel;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class RestControllerIntTest extends AbstractRestIntTest {
 
     @Test
     public void test(){
-        ValuePair[] info = template.getForObject(rootUrl+ "/server/info", ValuePair[].class);
+        WorkerModel[] info = template.getForObject(rootUrl+ "/server/info", WorkerModel[].class);
         log.debug(info.toString());
     }
 	

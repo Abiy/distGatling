@@ -18,23 +18,24 @@
 
 package com.walmart.gatling.endpoint.v1;
 
-import com.google.common.collect.ImmutableMap;
-
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableMap;
+import com.walmart.gatling.PageUtils;
+import com.walmart.gatling.commons.AgentConfig;
+import com.walmart.gatling.commons.JobSummary;
 import com.walmart.gatling.commons.Master;
 import com.walmart.gatling.commons.ReportExecutor;
 import com.walmart.gatling.commons.TrackingResult;
 import com.walmart.gatling.repository.ServerRepository;
-import com.walmart.gatling.repository.ValuePair;
-
+import com.walmart.gatling.repository.WorkerModel;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -45,6 +46,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 /**
@@ -55,6 +61,9 @@ import javax.ws.rs.core.UriInfo;
 public class RestController {
     private final Logger log = LoggerFactory.getLogger(RestController.class);
     private ServerRepository serverRepository;
+
+    @Autowired
+    private AgentConfig agentConfig;
 
     @Autowired
     public RestController(ServerRepository serverRepository) {
@@ -71,14 +80,135 @@ public class RestController {
     @Produces("application/json")
     @Timed
     public Response getServerInfo() {
+        List<WorkerModel> workers = getWorkersInfo();
+        return Response.status(Response.Status.OK).entity(workers).build();
+    }
+
+    @GET
+    @Path("/workers/host")
+    @Produces("application/json")
+    @Timed
+    public Response getWorkerHostInfo() {
+        List<WorkerModel> workers = getWorkersInfo();
+        Map<String, Long> result = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getHost, Collectors.counting()));
+        return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+    @GET
+    @Path("/workers/partition")
+    @Produces("application/json")
+    @Timed
+    public Response getWorkerPartitionInfo() {
+        List<WorkerModel> workers = getWorkersInfo();
+        Map<String, Long> result = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getRole, Collectors.counting()));
+        return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+    @GET
+    @Path("/workers/status")
+    @Produces("application/json")
+    @Timed
+    public Response getWorkerStatusInfo() {
+        List<WorkerModel> workers = getWorkersInfo();
+        Map<String, Long> result = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getStatus, Collectors.counting()));
+        return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+    @GET
+    @Path("/dashboard")
+    @Timed
+    public Response getDashboardInfo() {
+        DashboardModel dashboard = new DashboardModel();
+        List<WorkerModel> workers = getWorkersInfo();
+        Map<String, Long> status = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getStatus, Collectors.counting()));
+        dashboard.setStatus(status);
+        Map<String, Long> partition = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getRole, Collectors.counting()));
+        dashboard.setPartition(partition);
+        Map<String, Long> host = workers.stream()
+                .collect(Collectors.groupingBy(WorkerModel::getHost, Collectors.counting()));
+        dashboard.setHost(host);
+
+        Map<String, Long> partitionStatus = workers.stream()
+                .collect(Collectors.groupingBy(p->p.getRole() + ":" + p.getStatus(), Collectors.counting()));
+        dashboard.setPartitionStatus(partitionStatus);
+        return Response.status(Response.Status.OK).entity(dashboard).build();
+    }
+
+    @GET
+    @Path("/workers/partition/status")
+    @Produces("application/json")
+    @Timed
+    public Response getWorkerPartitionStatusInfo() {
+        List<WorkerModel> workers = getWorkersInfo();
+        Map<String, Long> result = workers.stream()
+                .collect(Collectors.groupingBy(p->p.getRole() + ":" + p.getStatus(), Collectors.counting()));
+        return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+    private List<WorkerModel> getWorkersInfo() {
         Master.ServerInfo info = serverRepository.getServerStatus(new Master.ServerInfo());
         log.info("Processing  get cluster status request: {}", info);
-
-        List<ValuePair> workers = info.getWorkers().entrySet().stream().map(stateEntry ->
-                new ValuePair(stateEntry.getValue().status.toString(),
+        return info.getWorkers().entrySet().stream().map(stateEntry ->
+                new WorkerModel(stateEntry.getValue().status.toString(),
                         stateEntry.getValue().ref.path().name().toString(),
                         stateEntry.getKey())).collect(Collectors.toList());
-        return Response.status(Response.Status.ACCEPTED).entity(workers).build();
+    }
+
+    @GET
+    @Path("/running/summary")
+    @Produces("application/json")
+    @Timed
+    public Response getRunningSummary(@QueryParam("size") int size,@QueryParam("page") int page) {
+        PageRequest  pageRequest = PageUtils.getPageRequest(size, page, null);
+        List<JobSummary> summaries = serverRepository.getJobSummary().stream().filter(s -> s.runningJob()).collect(Collectors.toList());
+        List<JobSummary> pagedResult = summaries.stream()
+                .filter(p->p.runningJob())
+                .sorted((o1, o2) -> Long.valueOf(o2.getStartTime()).compareTo(Long.valueOf(o1.getStartTime())))
+                .skip(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
+                .collect(Collectors.toList());
+
+        Page<JobSummary> result = new PageImpl<>(pagedResult, pageRequest, summaries.size());
+        log.info("Processing  get cluster job summary request.");
+        return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+
+    @GET
+    @Path("/completed/summary")
+    @Produces("application/json")
+    @Timed
+    public Response getCompletedJobSummary(@QueryParam("size") int size,@QueryParam("page") int page ) {
+        PageRequest  pageRequest = PageUtils.getPageRequest(size, page,null);
+        List<JobSummary> summaries = serverRepository.getJobSummary();
+        List<JobSummary> pagedResult = summaries.stream()
+                .filter(p->!p.runningJob())
+                .sorted((o1, o2) -> Long.valueOf(o2.getStartTime()).compareTo(Long.valueOf(o1.getStartTime())))
+                .skip(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
+                .collect(Collectors.toList());
+        Page<JobSummary> result = new PageImpl<>(pagedResult, pageRequest, summaries.size());
+        log.info("Processing  get cluster job summary request.");
+        return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+    @GET
+    @Path("/detail/{trackingId}")
+    @Produces("application/json")
+    @Timed
+    public Response getJobDetail(@PathParam("trackingId") String trackingId ) {
+        List<JobSummary> summaries = serverRepository.getJobSummary();
+        Optional<JobSummary> summary = summaries.stream().filter(p -> p.getJobInfo().trackingId.equalsIgnoreCase(trackingId)).findFirst();
+        log.info("Processing  get job detail.");
+        if(summary.isPresent())
+            return Response.status(Response.Status.OK).entity(summary.get()).build();
+        else
+            return Response.status(Response.Status.BAD_REQUEST).entity("The Specified tracking id is not available.").build();
     }
 
     @GET
@@ -94,21 +224,21 @@ public class RestController {
      * Requests the master to run gatling job on the workers, if the job is submitted properly
      * return the tracker page with the tracking id generated by the master.
      * The master actor generates a unique tracking id for each gatling job.
-     * @param jobModel
+     * @param simulationJobModel
      * @return
      */
     @POST
     @Path("/job")
     @Produces("application/json")
     @Timed
-    public Response runJob(JobModel jobModel) {
+    public Response runSimulationJob(SimulationJobModel simulationJobModel) {
         Optional<String> result;
         try {
-            result = serverRepository.submitJob(jobModel);
+            result = serverRepository.submitSimulationJob(simulationJobModel);
             String path = "#/tracker/" + result.get();
             return Response.status(Response.Status.ACCEPTED).entity( ImmutableMap.of("trackingPath",path)).build();
         } catch (Exception e) {
-            log.error("Error while submitting user job {}, {}",jobModel,e);
+            log.error("Error while submitting user job {}, {}", simulationJobModel,e);
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Could not submit the job to the cluster master.").build();
         }
 
@@ -152,7 +282,7 @@ public class RestController {
         try {
             Optional<ReportExecutor.ReportResult> res =  serverRepository.generateReport(trackingId);
             log.info("report result: {}",res);
-            return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", res.get().result)).build();
+            return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", agentConfig.getGenericUrl(res.get().result.toString(), StringUtils.EMPTY,StringUtils.EMPTY) )).build();
         } catch (Exception e) {
             log.error("Error while submitting user report request for: {}, {}",trackingId,e);
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Error while submitting user report request.").build();

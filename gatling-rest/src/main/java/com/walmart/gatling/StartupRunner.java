@@ -18,6 +18,7 @@
 
 package com.walmart.gatling;
 
+import com.romix.akka.serialization.kryo.KryoSerializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -28,6 +29,7 @@ public class StartupRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         logger.info("Application Initializing...");
+        //com.romix.akka.serialization.kryo.KryoSerializer serializer = new KryoSerializer()
         //run basic check to make sure the app is starting in a healthy state
 
     }

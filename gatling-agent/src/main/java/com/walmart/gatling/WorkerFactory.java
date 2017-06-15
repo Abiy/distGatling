@@ -23,6 +23,7 @@ import com.typesafe.config.ConfigFactory;
 import com.walmart.gatling.commons.AgentConfig;
 import com.walmart.gatling.commons.Constants;
 import com.walmart.gatling.commons.HostUtils;
+import com.walmart.gatling.commons.JarExecutor;
 import com.walmart.gatling.commons.ScriptExecutor;
 import com.walmart.gatling.commons.WorkExecutor;
 import com.walmart.gatling.commons.Worker;
@@ -71,7 +72,7 @@ public class WorkerFactory {
     }
 
     private static Props createWorkExecutor(AgentConfig agentConfig){
-       return Props.create(ScriptExecutor.class, agentConfig);
+       return Props.create(JarExecutor.class, agentConfig);
     }
 
 }

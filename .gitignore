@@ -3,7 +3,8 @@
 .classpath
 .project
 .settings/
-
+#vscode
+.vscode/
 # Intellij
 .idea/
 *.iml
@@ -18,3 +19,10 @@ target/
 /bin/
 shared-journal/
 gatling-rest/shared-journal/
+
+/gatling-rest/src/main/resources/static/node_modules/*.*
+/gatling-rest/src/main/resources/static/node_modules/
+/src/node_modules
+/gatling-ui/src/main/frontend/npm-debug.log
+/gatling-ui/src/main/frontend/assets/css/light-bootstrap-dashboard.css.map
+/gatling-rest/src/main/resources/static/*.map

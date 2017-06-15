@@ -1,0 +1,98 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title text-primary">JOB TASKS</h4>
+                        <p class="category">The partition access key is not displayed for security.</p>
+                    <div class="content table-responsive table-full-width">
+                        <div  *ngIf="jobSummary">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label class="text-primary">Job Name: </label>
+                                        <span>{{jobSummary.jobInfo.jobName}}</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="text-primary">Job Partition Name: </label>
+                                        <span >{{jobSummary.jobInfo.partitionName}}</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="text-primary">PARALLELISM:</label>
+                                        <span>{{jobSummary.jobInfo.count}}</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="text-primary">Job STATUS: </label>
+                                        <span [ngClass]="{'text-success':isSuccess(jobSummary.status),'text-danger':isFailed(jobSummary.status),'text-primary':isNormalStatus(jobSummary.status) }">{{jobSummary.status}}</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="text-primary">Job User: </label>
+                                        <span>{{jobSummary.jobInfo.user}}</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="text-primary">Job Parameters: </label>
+                                        <span>{{jobSummary.jobInfo.parameterString}}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <label class="text-primary" *ngIf="(isNormalStatus(jobSummary.status) || reportInProgress) && !cancelled"> <img src="../../../assets/img/spinner.gif"></label>
+                                        <label class="text-warning" *ngIf="cancelled"> Job Successfully Cancelled.</label>
+                                    </div>
+                                    <div>
+                                        <a class="btn" *ngIf="reportResult" [href]="reportResult" target="_blank">View Report</a>
+                                    </div>
+                                    <div>
+                                         <button *ngIf="isSuccess(jobSummary.status) && !reportResult"   class="btn btn-success btn-fill left" (click)="generateReport();"> Run Report >> </button>
+                                         <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>JOB NAME</th>
+                                    <th>TASK ID</th>
+                                    <th>START TIME</th>
+                                    <th>END TIME</th>
+                                    <th>WORKER ID</th>
+                                    <th>STATUS</th>
+                                    <th>ERROR</th>
+                                    <th>STD</th>
+                                </tr>
+                            <tbody *ngIf="jobSummary">
+                                <tr *ngFor="let taskEvent of jobSummary.taskInfoList" routerLinkActive="active"  >
+                                    <td>{{taskEvent.jobName}}</td>
+                                    <td>{{taskEvent.taskJobId}}</td>
+                                    <td>{{taskEvent.startTimeStamp * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                    <td><span *ngIf="taskEvent.endTimeStamp - taskEvent.startTimeStamp >= 0">{{taskEvent.endTimeStamp * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
+                                    <td>{{taskEvent.workerId}}</td>
+                                    <td [ngClass]="{'text-success':isSuccess(taskEvent.status),'text-danger':isFailed(taskEvent.status),'text-primary':isNormalStatus(taskEvent.status) }">{{taskEvent.status}}</td>
+                                    <td>
+                                        <a class="btn btn-xs" *ngIf="taskEvent.errorLogPath" [href]="taskEvent.errorLogPath" target="_blank"> View</a>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-xs" *ngIf="taskEvent.stdLogPath" [href]="taskEvent.stdLogPath" target="_blank"> View</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div *ngIf="jobSummary">
+                            <div class="clearfix"></div>
+                            <button *ngIf="isNormalStatus(jobSummary.status) && !cancelled"   class="btn btn-warning btn-fill left" (click)="cancelReport();"> {{cancelMsg}} </button>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title text-primary">RUNNING JOBS IN THE CLUSTER</h4>
+                        <p class="category">Includes jobs that are running.</p>
+                    </div>
+                    <div class="content table-responsive table-full-width">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>JOB NAME</th>
+                                    <th>USER</th>
+                                    <th>PARTITION NAME</th>
+                                    <th>PARALLELISM</th>
+                                    <th>START TIME</th>
+                                    <th>END TIME</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            <tbody *ngIf="pagedResult">
+                                <tr *ngFor="let summary of pagedResult.content" routerLinkActive="active" (click)="navigateToJobDetail(summary.jobInfo.trackingId)">
+
+                                    <td>{{summary.jobInfo.jobName}}</td>
+                                    <td>{{summary.jobInfo.user}}</td>
+                                    <td>{{summary.jobInfo.partitionName}}</td>
+                                    <td>{{summary.jobInfo.count}}</td>
+                                    <td>{{summary.startTime * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                    <td> <span *ngIf="summary.endTime - summary.startTime >= 0">{{summary.endTime * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</span></td>
+                                    <td [ngClass]="{'text-success':isSuccess(summary.status),'text-danger':isFailed(summary.status),'text-primary':isNormalStatus(summary.status) }">{{summary.status}}</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr *ngIf="pagedResult">
+                                <th> <a class="btn" (click)="onPrev()"> &lt;&lt;Prev</a></th>
+                                <th>  {{currentPage}} of {{pagedResult.totalPages}} </th>
+                                <th> <a class="btn" (click)="onNext()"> Next&gt;&gt;</a></th>
+                            </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

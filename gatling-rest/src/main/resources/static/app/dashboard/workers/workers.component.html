@@ -1,0 +1,34 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="header">
+                        <h4 class="title">Available Workers in the Cluster </h4>
+                        <p class="category">Include both Busy and Idle Workers </p>
+                    </div>
+                    <div class="content table-responsive table-full-width">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>STATUS</th>
+                                    <th>HOST</th>
+                                    <th>WORKER ID</th>
+                                    <th>PATH</th>
+                                </tr>
+                            <tbody>
+                                <tr *ngFor="let worker of workers" routerLinkActive="active" >
+                                    <td class="text-primary text-uppercase icon-azure">{{worker.status}}</td>
+                                    <td>{{worker.host}}</td>
+                                    <td>{{worker.workerId}}</td>
+                                    <td>{{worker.actor}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

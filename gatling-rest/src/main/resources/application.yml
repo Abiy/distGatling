@@ -9,8 +9,11 @@ master:
 master.client.pool: 10 # The number of active actors that can talk to the master via master singleton proxy
 
 multipart:
-  max-file-size: 10Mb  # Max file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
-
+  maxFileSize: 100Mb  # Max file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
+multipart.max-file-size: 100MB
+multipart.max-request-size: 100MB
+spring.http.multipart.max-file-size: 100Mb
+spring.http.multipart.max-request-size: 100Mb
 #Actor configurations for the actors used during report generation
 actor:
   numberOfActors: 1
@@ -18,13 +21,13 @@ actor:
   role: "report"
   executerType: "script"
 job:
-  path: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling lib, simulation, data, and conf are stored
-  logDirectory: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7/" # Base directory for logfiles(log/error and log/std)
+  path: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.2.4" # Path to the base directory where the gatling lib, simulation, data, and conf are stored
+  logDirectory: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.2.4/" # Base directory for logfiles(log/error and log/std)
   command: "/bin/bash" # Base command to run gatling.sh file
-  artifact: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.1.7/bin/{0}.sh" # Path for the location of gatling.sh
+  artifact: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.2.4/bin/{0}.sh" # Path for the location of gatling.sh
 
 file:
-  repository: "/Users/ahailem/uploadspace/upload/" # Base directory used as a temporary staging area for user file uploads(simulation files,conf,data files and lib files)
+  repository: "/Users/ahailem/workspace/uploads/" # Base directory used as a temporary staging area for user file uploads(simulation files,conf,data files and lib files)
 
 graphite: #Graphite configuration for master api metrics
     host: localhost
@@ -37,7 +40,7 @@ jersey:
         packages: com.walmart # Base package for jersey controllers for auto registration
 
 logging.level.root: INFO
-logging.level.com.walmart.gatling: DEBUG
+logging.level.com.walmart.gatling: ERROR
 
 ---
 
@@ -49,12 +52,12 @@ spring:
 spring:
     profiles: integration
 
-logging.level.com.walmart.gatling: INFO
+logging.level.com.walmart.gatling: ERROR
     
 ---
 
 spring:
     profiles: production
 
-logging.level.com.walmart.gatling: INFO
+logging.level.com.walmart.gatling: ERROR
 

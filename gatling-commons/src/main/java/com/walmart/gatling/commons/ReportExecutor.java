@@ -18,6 +18,7 @@
 
 package com.walmart.gatling.commons;
 
+import akka.japi.pf.FI;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -51,14 +52,11 @@ public class ReportExecutor extends WorkExecutor {
     }
 
     @Override
-    public void onReceive(Object message) {
-        if (message instanceof Master.GenerateReport) {
-            Master.GenerateReport job = (Master.GenerateReport) message;
-            runJob(job);
-        }
-        else {
-            unhandled(message);
-        }
+    public Receive createReceive() {
+        return receiveBuilder()
+                .match(Master.GenerateReport.class, cmd -> runJob(cmd))
+                .matchAny(cmd  -> unhandled(cmd))
+                .build();
     }
 
     private void runJob(Master.GenerateReport job) {
@@ -70,8 +68,8 @@ public class ReportExecutor extends WorkExecutor {
         cmdLine.addArgument("${path}");
 
         //parameters come from the task event
-        for (Pair<String, String> pair : taskEvent.getParameters()) {
-            cmdLine.addArgument(pair.getValue());
+        for (String pair : taskEvent.getParameters()) {
+            cmdLine.addArgument(pair);
         }
         String dir = agentConfig.getJob().getLogDirectory()+ "reports/" + job.reportJob.trackingId + "/";
         cmdLine.addArgument(dir);

@@ -71,6 +71,7 @@ public class SystemConfiguration {
        jobInfo.setCommand(env.getProperty("job.command"));
        jobInfo.setPath(env.getProperty("job.path"));
        jobInfo.setLogDirectory(env.getProperty("job.logDirectory"));
+       jobInfo.setJobDirectory(env.getProperty("job.jobDirectory"));
        jobInfo.setExitValues(new int[]{0,2,1});
        agentConfig.setJob(jobInfo);
 

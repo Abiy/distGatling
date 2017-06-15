@@ -1,0 +1,31 @@
+server:
+  port: 0 # Server information for embedded jetty
+  url: http://localhost:8080
+
+client:
+  numberOfActors: 1 # Number of worker actors , controls the number of parallel simulation jobs you can run per process
+  port: 2655 # Port number for the actor system that host the worker actors
+  role: "client" # The name of the role each actor uses (role1,role2...role5 etc)
+
+client.accessKey: accessSecretKey
+client.partitionName: public
+client.className:
+client.parameter: -Dusers=10 -Dramps=1 -DsimulationClass=com.walmart.store.gatling.simulation.BasicSimulation
+client.dataFeedPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/data/search.csv
+client.quiet: false
+client.parallelism: 1
+client.jarPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/target/gatling-uber-example-1.0-SNAPSHOT.jar
+client.userName: default
+client.remoteArtifact: false
+client.dataFeedFileName: search.csv
+client.jarFileName: gatling-uber-example-1.0-SNAPSHOT.jar
+# Actor identifier  that is used to join the master/cluster
+# update the host and port value to point to the cluster where the master is running on
+akka:
+  contact-points: "172.16.0.112:2551"
+
+application.title: GATLING
+
+logging.level.root: ERROR
+logging.level.com.walmart.gatling: DEBUG
+logging.level.com.walmart.gatling.Client: ERROR

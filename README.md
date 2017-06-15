@@ -26,7 +26,7 @@ Gatling doesn’t have a cluster mode yet, hence the need for this project.
 Distributed Gatling is a walmart Technology in house solution that was created to enable developers and QA engineers to run gatling simulation tests in a distributed/cluster environment.  
 The solution is cloud native and has two components, Cluster Master and Cluster Worker.
 
-     Thread metrics for the master
+     The overview section displays information about partition status across the cluster,worker task slots distribution by host and task slot distribution by partition
 ![Alt text](images/landing.png "Thread metrics for the master")
 <!-- <img src="/images/landing.png" width="700" height="400" alt="Thread metrics for the master"/> -->
 
@@ -61,13 +61,14 @@ Download Gatling bundle as a .zip file [here](http://gatling.io/#/resources/down
                         
 After cloning or downloading the repository of distGatling ,follow the following steps to start the cluster
     
-    1. Update the application.yml file settings 
+    1. Update the application.yml file settings (gatling-rest and gatling-agent)
     
     job:
       path: "/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling lib, simulation, data, and conf are stored
       logDirectory: "/workspace/gatling-charts-highcharts-bundle-2.1.7/" # Base directory for log files(log/error and log/std)
       command: "/bin/bash" # Base command to run gatling.sh file
       artifact: "/workspace/gatling-charts-highcharts-bundle-2.1.7/bin/{0}.sh" # Path for the location of gatling.sh
+      jobDirectory: /workspace/gspace/ # directory to store artifacts temporarily, only applicable for agents
 
     2. Open terminal window and run 
     
@@ -83,7 +84,7 @@ After starting the master using the above command, point your browser to GET htt
         
     4. Locate the agent shell script(under gatling-agent) and run agent.sh to start the Cluster worker on each node you intend to include in the cluster, each worker should be assigned the correct master contact point
         
-        /bin/bash agent.sh -Dakka.contact-points=<MASTER_HOST>:<MASTER_PORT>
+        /bin/bash agent.sh -Dakka.contact-points=<MASTER_HOST>:<MASTER_PORT> -Dactor.port=<0> -Dserver.port=<8090>
 
 
 
@@ -119,12 +120,6 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 
 ---
 
-### Upload plugins, simulations files, data and conf files
-![Alt text](images/upload.png "Upload plugins, simulations files, data and conf files")
-<!-- <img src="/images/upload.png" width="700" height="400" alt="Upload plugins, simulations files, data and conf files"/> -->
-
----
-
 ### Start a distributed simulation task - users provide  the worker pool to use, the simulation file to run and number of parallel tasks
 ![Alt text](images/submit_simulation_job.png "Start a distributed simulation task")
 <!-- <img src="/images/submit_simulation_job.png" width="700" height="400" alt="Start a distributed simulation task"/> -->
@@ -138,11 +133,19 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 ---
 
 ### Generate a report  - collects all simulation log and generates a gatling performance report
-![Alt text] (images/generate_report.png "Generate report")
-<!-- <img src="/images/cluster_info.png" width="700" height="400" alt="Cluster info"/> -->
+![Alt text](images/generate_report.png "Generate report")
+<!-- <img src="/images/generate_report.png" width="700" height="400" alt="Generate report"/> -->
 
 ---
 
 ### Cluster information - shows current state of all the workers in the cluster
 ![Alt text](images/cluster_info.png "Cluster info")
 <!-- <img src="/images/cluster_info.png" width="700" height="400" alt="Cluster info"/> -->
+
+### Running a simulation that is packaged into an uber jar is now supported via gatling-client(https://github.com/Abiy/distGatlingClient)
+
+    Update config.yml with the necessary configuration
+
+    Use the following command to submit your uber jar to cluster
+    
+    /bin/bash dist-gatling-client.sh  -Dclient.userName=user -Dclient.parallelism=1
