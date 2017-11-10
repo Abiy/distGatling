@@ -20,77 +20,59 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.walmart.store</groupId>
     <artifactId>distributed-gatling</artifactId>
-    <packaging>pom</packaging>
     <version>${current.version}</version>
-    <modules>
-        <module>gatling-rest</module>
-        <module>gatling-agent</module>
-        <module>gatling-commons</module>
-        <module>gatling-client</module>
-<!--        <module>gatling-uber-example</module>-->
-    </modules>
-    <properties>
-        <current.version>1.0.2-SNAPSHOT</current.version>
-        <!--<akka.version>2.4.2</akka.version>-->
-        <akka.version>2.5.0</akka.version>
-    </properties>
+    <packaging>pom</packaging>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.2.7.RELEASE</version>
     </parent>
+
+    <modules>
+        <module>gatling-rest</module>
+        <module>gatling-agent</module>
+        <module>gatling-commons</module>
+        <module>gatling-client</module>
+    </modules>
+
+    <properties>
+        <current.version>1.0.2-SNAPSHOT</current.version>
+        <java.version>1.8</java.version>
+        <maven.compiler.version>3.2</maven.compiler.version>
+
+        <akka.version>2.5.0</akka.version>
+        <dropwizard.version>3.1.2</dropwizard.version>
+        <fusesource.version>1.8</fusesource.version>
+
+        <junit.version>4.12</junit.version>
+        <hamcrest.version>1.3</hamcrest.version>
+        <jhades.version>1.0.4</jhades.version>
+        <logback.version>1.1.3</logback.version>
+    </properties>
+
+
     <dependencies>
+        <!-- Data Dependencies-->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource.leveldbjni</groupId>
+            <artifactId>leveldbjni-all</artifactId>
+            <version>${fusesource.version}</version>
+        </dependency>
+
+        <!-- Akka dependencies -->
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-slf4j_2.11</artifactId>
             <version>${akka.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-            <version>3.1.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-graphite</artifactId>
-            <version>3.1.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-jvm</artifactId>
-            <version>3.1.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-jersey2</artifactId>
-            <version>3.1.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-commons</artifactId>
-            <version>1.11.0.RELEASE</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jhades</groupId>
-            <artifactId>jhades</artifactId>
-            <version>1.0.4</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-
-
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_2.11</artifactId>
@@ -106,10 +88,55 @@
             <artifactId>akka-contrib_2.11</artifactId>
             <version>${akka.version}</version>
         </dependency>
+
+        <!-- Akka Serializer -->
         <dependency>
-            <groupId>org.fusesource.leveldbjni</groupId>
-            <artifactId>leveldbjni-all</artifactId>
-            <version>1.8</version>
+            <groupId>com.github.romix.akka</groupId>
+            <artifactId>akka-kryo-serialization_2.11</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+
+        <!-- Metrics and Logging-->
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-graphite</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jvm</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jersey2</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+
+        <!-- Testing Dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -118,17 +145,15 @@
             <version>${akka.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.romix.akka</groupId>
-            <artifactId>akka-kryo-serialization_2.11</artifactId>
-            <version>0.5.0</version>
+            <groupId>org.jhades</groupId>
+            <artifactId>jhades</artifactId>
+            <version>${jhades.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
    <!-- Your internal nexus repo for publishing artifacts-->
   <!--  <distributionManagement>
         <repository>
@@ -142,6 +167,7 @@
             <url>http://repo.wal-mart.com/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>-->
+
     <build>
         <plugins>
             <plugin>
@@ -178,10 +204,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
+                <version>${maven.compiler.version}</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
         </plugins>
