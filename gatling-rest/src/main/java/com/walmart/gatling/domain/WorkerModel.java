@@ -16,15 +16,17 @@
  *
  */
 
-package com.walmart.gatling.repository;
+package com.walmart.gatling.domain;
 
-import java.io.UnsupportedEncodingException;
+import lombok.Data;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by walmart on 3/4/16.
  */
+@Data
 @XmlRootElement
 public class WorkerModel {
     private String status;
@@ -43,45 +45,5 @@ public class WorkerModel {
         this.workerId = workerId;
         this.host = this.actor.split("@")[1].split(":")[0];
         this.role = this.actor.split("/")[4].split("#")[0].replaceAll("[0-9]","");
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getActor() {
-        return actor;
-    }
-
-    public void setActor(String actor) {
-        this.actor = actor;
-    }
-
-    public String getWorkerId() {
-        return workerId;
-    }
-
-    public void setWorkerId(String workerId) {
-        this.workerId = workerId;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
     }
 }

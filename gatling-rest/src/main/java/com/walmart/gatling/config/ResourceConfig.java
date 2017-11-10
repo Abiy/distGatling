@@ -16,7 +16,7 @@
  *
  */
 
-package com.walmart.gatling;
+package com.walmart.gatling.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

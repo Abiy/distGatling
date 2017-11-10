@@ -16,11 +16,10 @@
  *
  */
 
-package com.walmart.gatling;
+package com.walmart.gatling.config;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jersey2.InstrumentedResourceMethodApplicationListener;
-
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

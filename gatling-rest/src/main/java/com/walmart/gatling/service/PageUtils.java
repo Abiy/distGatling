@@ -16,7 +16,7 @@
  *
  */
 
-package com.walmart.gatling;
+package com.walmart.gatling.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;

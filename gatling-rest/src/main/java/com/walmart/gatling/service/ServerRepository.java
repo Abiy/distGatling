@@ -16,7 +16,7 @@
  *
  */
 
-package com.walmart.gatling.repository;
+package com.walmart.gatling.service;
 
 import akka.actor.ActorRef;
 import akka.util.Timeout;
@@ -27,8 +27,7 @@ import com.walmart.gatling.commons.MasterClientActor;
 import com.walmart.gatling.commons.ReportExecutor;
 import com.walmart.gatling.commons.TaskEvent;
 import com.walmart.gatling.commons.TrackingResult;
-import com.walmart.gatling.endpoint.v1.SimulationJobModel;
-import javafx.util.Pair;
+import com.walmart.gatling.domain.SimulationJobModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static akka.pattern.Patterns.*;
+import static akka.pattern.Patterns.ask;
 
 /**
  * Created by walmart

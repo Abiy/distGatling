@@ -16,13 +16,7 @@
  *
  */
 
-package com.walmart.gatling;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-
-
-import java.util.concurrent.TimeUnit;
+package com.walmart.gatling.init;
 
 import akka.actor.ActorIdentity;
 import akka.actor.ActorPath;
@@ -41,17 +35,19 @@ import akka.pattern.Patterns;
 import akka.persistence.journal.leveldb.SharedLeveldbJournal;
 import akka.persistence.journal.leveldb.SharedLeveldbStore;
 import akka.util.Timeout;
-import scala.concurrent.Future;
-import scala.concurrent.duration.Duration;
-import scala.concurrent.duration.FiniteDuration;
-
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import com.walmart.gatling.commons.AgentConfig;
 import com.walmart.gatling.commons.Constants;
 import com.walmart.gatling.commons.HostUtils;
 import com.walmart.gatling.commons.Master;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
+
+import java.util.concurrent.TimeUnit;
 
 public class ClusterFactory {
-
 
     /**
      * Creates the actor system with the master
