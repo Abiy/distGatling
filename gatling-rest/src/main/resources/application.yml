@@ -6,7 +6,8 @@ master:
   name: backend #Name of the master actor
   primary: true
 
-master.client.pool: 10 # The number of active actors that can talk to the master via master singleton proxy
+master.client.pool: 10
+  # The number of active actors that can talk to the master via master singleton proxy
 
 multipart:
   maxFileSize: 100Mb  # Max file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
@@ -40,7 +41,7 @@ jersey:
         packages: com.walmart # Base package for jersey controllers for auto registration
 
 logging.level.root: INFO
-logging.level.com.walmart.gatling: ERROR
+logging.level.com.walmart.gatling: DEBUG
 
 ---
 
@@ -52,12 +53,12 @@ spring:
 spring:
     profiles: integration
 
-logging.level.com.walmart.gatling: ERROR
+logging.level.com.walmart.gatling: DEBUG
     
 ---
 
 spring:
     profiles: production
 
-logging.level.com.walmart.gatling: ERROR
+logging.level.com.walmart.gatling: DEBUG
 

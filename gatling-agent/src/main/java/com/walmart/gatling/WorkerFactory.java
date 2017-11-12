@@ -18,31 +18,17 @@
 
 package com.walmart.gatling;
 
+import akka.actor.*;
+import akka.cluster.client.ClusterClient;
+import akka.cluster.client.ClusterClientSettings;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import com.walmart.gatling.commons.AgentConfig;
-import com.walmart.gatling.commons.Constants;
-import com.walmart.gatling.commons.HostUtils;
-import com.walmart.gatling.commons.JarExecutor;
-import com.walmart.gatling.commons.ScriptExecutor;
-import com.walmart.gatling.commons.WorkExecutor;
-import com.walmart.gatling.commons.Worker;
+import com.walmart.gatling.commons.*;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import akka.actor.ActorPath;
-import akka.actor.ActorPaths;
-import akka.actor.ActorRef;
-import akka.actor.ActorSelection;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
-import akka.cluster.client.ClusterClient;
-import akka.cluster.client.ClusterClientSettings;
 
 public class WorkerFactory {
 

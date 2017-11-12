@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.UntypedActor;
@@ -38,7 +39,7 @@ import scala.concurrent.Future;
 import static akka.pattern.Patterns.ask;
 import static akka.pattern.Patterns.pipe;
 
-public class MasterClientActor extends UntypedActor {
+public class MasterClientActor extends AbstractActor {
   private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private ActorRef masterProxy;
 
@@ -48,7 +49,7 @@ public class MasterClientActor extends UntypedActor {
     masterProxy = system.actorOf(ClusterSingletonProxy.props("/user/master", proxySettings), "masterProxy" + UUID.randomUUID());
   }
 
-  public void onReceive(Object message) {
+  public void receiveHandler(Object message) {
     log.debug("Master client received: {}",message);
     Timeout timeout = new Timeout(120, TimeUnit.SECONDS);
     Future<Object> future = ask(masterProxy, message, timeout);
@@ -67,6 +68,13 @@ public class MasterClientActor extends UntypedActor {
     }, ec);
 
     pipe(res, ec).to(getSender());
+  }
+
+  @Override
+  public Receive createReceive() {
+    return receiveBuilder()
+            .match(Object.class, cmd -> receiveHandler(cmd))
+            .build();
   }
 
   public  static class Ok implements Serializable {

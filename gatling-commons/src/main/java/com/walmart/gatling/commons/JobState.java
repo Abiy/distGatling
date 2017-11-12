@@ -159,6 +159,9 @@ public final class JobState {
         Optional<TaskEvent> task = summary.getByWork(result.job.jobId);
         if (task.isPresent()) {
             task.get().setStatus(JobStatusString.FAILED);
+            task.get().setEndTimeStamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+            task.get().setErrorLogPath(result.errPath);
+            task.get().setStdLogPath(result.stdPath);
         }
     }
 
