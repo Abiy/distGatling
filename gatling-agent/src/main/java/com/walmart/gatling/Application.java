@@ -18,7 +18,6 @@
 
 package com.walmart.gatling;
 
-import com.romix.akka.serialization.kryo.KryoSerializer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +27,6 @@ public class Application {
 
 
     public static void main(String[] args) throws Exception {
-        //new JHades().overlappingJarsReport();
         SpringApplication.run(Application.class, args);
     }
 

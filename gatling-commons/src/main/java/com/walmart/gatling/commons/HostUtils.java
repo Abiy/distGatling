@@ -18,8 +18,8 @@
 
 package com.walmart.gatling.commons;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.*;
+import java.util.Enumeration;
 
 /**
  * Created by walmart
@@ -40,11 +40,25 @@ public class HostUtils {
     }
 
     public static String lookupIp() {
-        InetAddress ip;
         String ipAddress;
+        ipAddress = System.getProperty("bind.ip.address",getLocalAddress());
+        return ipAddress;
+    }
+
+    private static String getLocalAddress(){
         try {
-            ipAddress = InetAddress.getLocalHost().getHostAddress();
-            return ipAddress;
+            Enumeration<NetworkInterface> b = NetworkInterface.getNetworkInterfaces();
+            while( b.hasMoreElements()){
+                for ( InterfaceAddress f : b.nextElement().getInterfaceAddresses())
+                    if ( f.getAddress().isSiteLocalAddress())
+                        return f.getAddress().getHostAddress();
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

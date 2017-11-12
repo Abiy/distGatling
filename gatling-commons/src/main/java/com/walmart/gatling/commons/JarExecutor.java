@@ -207,12 +207,10 @@ public class JarExecutor extends WorkExecutor {
             FileUtils.deleteQuietly(FileUtils.getFile(agentConfig.getJob().getJobDirectory(job.jobId, "")));
             if (executor.isFailure(exitResult) || exitResult == 1) {
                 log.info("Script Executor Failed, job: " + job.jobId);
-                //getSender().tell(new Worker.WorkFailed(result), getSelf());
                 return new Worker.WorkFailed(result);
             } else {
                 result = new Worker.Result(exitResult, agentConfig.getUrl(errPath), agentConfig.getUrl(outPath), agentConfig.getUrl(getMetricsPath(job)), job);
                 log.info("Script Executor Completed, job: " + result);
-                //getSender().tell(new Worker.WorkComplete(result), getSelf());
                 return new Worker.WorkComplete(result);
             }
 

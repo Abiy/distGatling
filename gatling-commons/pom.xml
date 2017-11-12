@@ -23,11 +23,12 @@
     <parent>
         <artifactId>distributed-gatling</artifactId>
         <groupId>com.walmart.store</groupId>
-        <version>${current.version}</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <version>1.0.2-SNAPSHOT</version>
     <artifactId>gatling-commons</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
