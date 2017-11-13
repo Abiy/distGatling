@@ -124,10 +124,10 @@ public class JarExecutor extends WorkExecutor {
             public void onFailure(Throwable throwable) throws Throwable {
                 log.error(throwable.toString());
                 abortLoop.cancel();
+                sender.tell(new Worker.WorkFailed(null), getSelf());
                 unhandled(job);
             }
         }, ctx);
-        //getSender().tell(runJob(message));
     }
 
     private boolean getAbortStatus(String abortUrl, String trackingId) {
@@ -201,25 +201,22 @@ public class JarExecutor extends WorkExecutor {
             }
             log.info("command: {} and env options {}", cmdLine,envOptions);
             int exitResult = executor.execute(cmdLine,envOptions);
-            //executor.getWatchdog().destroyProcess().
             Worker.Result result = new Worker.Result(exitResult, agentConfig.getUrl(errPath), agentConfig.getUrl(outPath), null, job);
             log.info("Exit code: {}", exitResult);
-            //FileUtils.deleteQuietly(FileUtils.getFile(agentConfig.getJob().getJobDirectory(job.jobId, "")));
+            FileUtils.deleteQuietly(FileUtils.getFile(agentConfig.getJob().getJobDirectory(job.jobId, "")));
             if (executor.isFailure(exitResult) || exitResult == 1) {
-                log.info("Script Executor Failed, job: " + job.jobId);
+                log.info("Jar Executor Failed, job: " + job.jobId);
                 return new Worker.WorkFailed(result);
             } else {
-                log.info("Jar Executor Completed, job: " + result);
                 result = new Worker.Result(exitResult, agentConfig.getUrl(errPath), agentConfig.getUrl(outPath), agentConfig.getUrl(getMetricsPath(job)), job);
                 log.info("Jar Executor Completed, job: " + result);
                 return new Worker.WorkComplete(result);
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.toString());
             Worker.Result result = new Worker.Result(-1, agentConfig.getUrl(errPath), agentConfig.getUrl(outPath), null, job);
             log.info("Executor Encountered run time exception, result: " + result.toString());
-            //getSender().tell(new Worker.WorkFailed(result), getSelf());
             return new Worker.WorkFailed(result);
         } finally {
             IOUtils.closeQuietly(outFile);
