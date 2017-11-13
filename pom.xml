@@ -137,18 +137,18 @@
         </dependency>
     </dependencies>
    <!-- Your internal nexus repo for publishing artifacts-->
-  <distributionManagement>
-        <repository>
-            <id>internal-repository</id>
-            <name>devservices-nexus</name>
-            <url>http://repo.wal-mart.com/content/repositories/walmart</url>
-        </repository>
-        <snapshotRepository>
-            <id>internal-repository</id>
-            <name>devservices-nexus</name>
-            <url>http://repo.wal-mart.com/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
+  <!--<distributionManagement>-->
+        <!--<repository>-->
+            <!--<id>internal-repository</id>-->
+            <!--<name>devservices-nexus</name>-->
+            <!--<url>http://repo.wal-mart.com/content/repositories/walmart</url>-->
+        <!--</repository>-->
+        <!--<snapshotRepository>-->
+            <!--<id>internal-repository</id>-->
+            <!--<name>devservices-nexus</name>-->
+            <!--<url>http://repo.wal-mart.com/content/repositories/snapshots</url>-->
+        <!--</snapshotRepository>-->
+    <!--</distributionManagement>-->
     <build>
         <plugins>
             <plugin>
