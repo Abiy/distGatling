@@ -1,7 +1,7 @@
 /*
  *
  *   Copyright 2016 Walmart Technology
- *
+ *  
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -16,24 +16,28 @@
  *
  */
 
-package com.walmart.gatling.repository;
+package com.walmart.gatling.domain;
 
-import com.walmart.gatling.domain.WorkerModel;
-import org.junit.Test;
+import lombok.Data;
 
-import static org.junit.Assert.*;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
- * Created by walmart on 5/3/17.
+ * A model of the desired job to be run on the cluster.
  */
-public class ValuePairTest {
-
-    @Test
-    public void testRoleExtractor(){
-        String path = "akka.tcp://PerformanceSystem@10.165.150.120:2555/user/script4#-1964952736";
-        WorkerModel pair = new WorkerModel("Idle",path,"workerId");
-        System.out.println(pair.getRole());
-        assertEquals("script", pair.getRole().replaceAll("[0-9]", ""));
-    }
+@Data
+@XmlRootElement
+public class SimulationJobModel implements Serializable {
+    private String partitionAccessKey;
+    private String user;
+    private String roleId; // The unique partition name/id
+    private String simulation;
+    private String dataFile;
+    private String jobId;
+    private String tag;
+    private short count;
+    private String fileFullName;
+    private String parameterString;
 
 }

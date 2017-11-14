@@ -16,46 +16,18 @@
  *
  */
 
-package com.walmart.gatling.endpoint.v1;
+package com.walmart.gatling.domain;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
- * Created by walmart on 5/10/17.
+ * A handle to track the results of a given job
  */
+@Data
+@AllArgsConstructor
 public class SubmitResult {
     private boolean success;
     private String trackingId;
     private SimulationJobModel job;
-
-    public SubmitResult(){
-
-    }
-    public SubmitResult(boolean success, String trackingId, SimulationJobModel job) {
-        this.success = success;
-        this.trackingId = trackingId;
-        this.job = job;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getTrackingId() {
-        return trackingId;
-    }
-
-    public void setTrackingId(String trackingId) {
-        this.trackingId = trackingId;
-    }
-
-    public SimulationJobModel getJob() {
-        return job;
-    }
-
-    public void setJob(SimulationJobModel job) {
-        this.job = job;
-    }
 }

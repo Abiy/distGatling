@@ -18,6 +18,7 @@
 
 package com.walmart.gatling;
 
+import com.walmart.gatling.init.StartupRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;

@@ -16,24 +16,20 @@
  *
  */
 
-package com.walmart.gatling.repository;
+package com.walmart.gatling.domain;
 
-import com.walmart.gatling.domain.WorkerModel;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
+import lombok.Data;
 
 /**
- * Created by walmart on 5/3/17.
+ * Created by walmart on 5/9/17.
  */
-public class ValuePairTest {
-
-    @Test
-    public void testRoleExtractor(){
-        String path = "akka.tcp://PerformanceSystem@10.165.150.120:2555/user/script4#-1964952736";
-        WorkerModel pair = new WorkerModel("Idle",path,"workerId");
-        System.out.println(pair.getRole());
-        assertEquals("script", pair.getRole().replaceAll("[0-9]", ""));
-    }
-
+@Data
+public class SubmitSimulationModel {
+    private String fileName;
+    private String partitionName;
+    private String name;
+    private String tag;
+    private String userName;
+    private String accessKey;
+    private int parallelism;
 }

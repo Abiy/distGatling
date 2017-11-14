@@ -16,7 +16,7 @@
  *
  */
 
-package com.walmart.gatling;
+package com.walmart.gatling.config;
 
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricFilter;
@@ -26,7 +26,6 @@ import com.codahale.metrics.graphite.GraphiteReporter;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 import com.walmart.gatling.commons.HostUtils;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,17 +34,14 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by walmart
+ * Configured the metrics for collection and for reporting
  */
-
 @Configuration
-public class MonitoringConfiguration {
+public class MonitoringConfig {
 
     @Bean
-    public Graphite graphite(@Value("${graphite.host}")
-                             String graphiteHost,
-                             @Value("${graphite.port}")
-                             int graphitePort) {
+    public Graphite graphite(@Value("${graphite.host}")  String graphiteHost,
+                             @Value("${graphite.port}")  int graphitePort) {
         return new Graphite(
                 new InetSocketAddress(graphiteHost, graphitePort));
     }

@@ -16,8 +16,9 @@
  *
  */
 
-package com.walmart.gatling;
+package com.walmart.gatling.config;
 
+import com.walmart.gatling.init.ClusterFactory;
 import com.walmart.gatling.commons.AgentConfig;
 import com.walmart.gatling.commons.HostUtils;
 import com.walmart.gatling.commons.MasterClientActor;
@@ -36,14 +37,17 @@ import akka.routing.RoundRobinPool;
  * Created by walmart. A spring configuration object to create beans
  */
 @Configuration
-public class SystemConfiguration {
+public class SystemConfig {
 
     @Value("${actor.numberOfActors}")
     private int numberOfActors;
+
     @Value("${actor.port}")
     private int port;
+
     @Value("${actor.role}")
     private String role;
+
     @Value("${actor.executerType}")
     private String executerType;
 
