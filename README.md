@@ -149,3 +149,7 @@ If the worker become alive after recovery it should re-join the cluster and re-r
     Use the following command to submit your uber jar to cluster
     
     /bin/bash dist-gatling-client.sh  -Dclient.userName=user -Dclient.parallelism=1
+    
+    
+    
+https://travis-ci.org/Abiy/distGatling.svg?branch=master 
