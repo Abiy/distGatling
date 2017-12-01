@@ -1,4 +1,4 @@
-## About Gatling
+## About Gatling  [![Build Status](https://travis-ci.org/Abiy/distGatling.svg?branch=master)]     
 
 [Gatling](https://gatling.io) is a highly capable load testing tool. It is designed for ease of use, maintainability and high performance.
 
@@ -150,6 +150,5 @@ If the worker become alive after recovery it should re-join the cluster and re-r
     
     /bin/bash dist-gatling-client.sh  -Dclient.userName=user -Dclient.parallelism=1
     
-    
-    
-https://travis-ci.org/Abiy/distGatling.svg?branch=master 
+  
+[![Build Status](https://travis-ci.org/Abiy/distGatling.svg?branch=master)]      
