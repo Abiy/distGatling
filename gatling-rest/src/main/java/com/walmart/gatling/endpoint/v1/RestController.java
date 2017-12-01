@@ -20,14 +20,16 @@ package com.walmart.gatling.endpoint.v1;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
-import com.walmart.gatling.PageUtils;
 import com.walmart.gatling.commons.AgentConfig;
 import com.walmart.gatling.commons.JobSummary;
 import com.walmart.gatling.commons.Master;
 import com.walmart.gatling.commons.ReportExecutor;
 import com.walmart.gatling.commons.TrackingResult;
-import com.walmart.gatling.repository.ServerRepository;
-import com.walmart.gatling.repository.WorkerModel;
+import com.walmart.gatling.domain.DashboardModel;
+import com.walmart.gatling.domain.SimulationJobModel;
+import com.walmart.gatling.domain.WorkerModel;
+import com.walmart.gatling.service.PageUtils;
+import com.walmart.gatling.service.ServerRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +48,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 /**
  * Created by walmart
@@ -123,12 +123,15 @@ public class RestController {
     public Response getDashboardInfo() {
         DashboardModel dashboard = new DashboardModel();
         List<WorkerModel> workers = getWorkersInfo();
+
         Map<String, Long> status = workers.stream()
                 .collect(Collectors.groupingBy(WorkerModel::getStatus, Collectors.counting()));
         dashboard.setStatus(status);
+
         Map<String, Long> partition = workers.stream()
                 .collect(Collectors.groupingBy(WorkerModel::getRole, Collectors.counting()));
         dashboard.setPartition(partition);
+
         Map<String, Long> host = workers.stream()
                 .collect(Collectors.groupingBy(WorkerModel::getHost, Collectors.counting()));
         dashboard.setHost(host);
@@ -136,6 +139,7 @@ public class RestController {
         Map<String, Long> partitionStatus = workers.stream()
                 .collect(Collectors.groupingBy(p->p.getRole() + ":" + p.getStatus(), Collectors.counting()));
         dashboard.setPartitionStatus(partitionStatus);
+
         return Response.status(Response.Status.OK).entity(dashboard).build();
     }
 

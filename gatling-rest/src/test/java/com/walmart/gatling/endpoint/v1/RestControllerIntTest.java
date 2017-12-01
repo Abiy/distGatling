@@ -19,7 +19,7 @@
 package com.walmart.gatling.endpoint.v1;
 
 import com.walmart.gatling.AbstractRestIntTest;
-import com.walmart.gatling.repository.WorkerModel;
+import com.walmart.gatling.domain.WorkerModel;
 
 import org.junit.Test;
 import org.slf4j.Logger;

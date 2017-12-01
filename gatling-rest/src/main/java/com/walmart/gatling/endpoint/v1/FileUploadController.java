@@ -18,22 +18,21 @@
 
 package com.walmart.gatling.endpoint.v1;
 
-import com.walmart.gatling.repository.ServerRepository;
-
+import com.walmart.gatling.domain.SimulationJobModel;
+import com.walmart.gatling.domain.SubmitResult;
+import com.walmart.gatling.service.ServerRepository;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
