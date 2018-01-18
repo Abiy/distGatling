@@ -22,6 +22,14 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Simulation bodies</label>
+                                        <input #fileInput type="file" name="file" required class="form-control" (change)="selectBodiesFile($event)" placeholder="Simulation File" accept=".zip"/>
+                                    </div>
+                                </div>
+                            </div>
 
 
                             <div class="row">

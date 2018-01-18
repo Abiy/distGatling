@@ -33,6 +33,7 @@ public class ClientConfig implements Serializable {
     private String role;
     private String jarPath;
     private String dataFeedPath;
+    private String bodiesFeedPath;
     private boolean quiet;
     private String className;
     private short parallelism;
@@ -44,6 +45,7 @@ public class ClientConfig implements Serializable {
     private String host;
     private boolean remoteArtifact;
     private String dataFeedFileName;
+    private String bodiesFeedFileName;
     private String jarFileName;
 
     public String getDataFeedFileName() {
@@ -54,7 +56,15 @@ public class ClientConfig implements Serializable {
         this.dataFeedFileName = dataFeedFileName;
     }
 
-    public boolean isRemoteArtifact() {
+    public String getBodiesFeedFileName() {
+		return bodiesFeedFileName;
+	}
+
+	public void setBodiesFeedFileName(String bodiesFeedFileName) {
+		this.bodiesFeedFileName = bodiesFeedFileName;
+	}
+
+	public boolean isRemoteArtifact() {
         return remoteArtifact;
     }
 
@@ -86,7 +96,15 @@ public class ClientConfig implements Serializable {
         this.dataFeedPath = dataFeedPath;
     }
 
-    public boolean isQuiet() {
+    public String getBodiesFeedPath() {
+		return bodiesFeedPath;
+	}
+
+	public void setBodiesFeedPath(String bodiesFeedPath) {
+		this.bodiesFeedPath = bodiesFeedPath;
+	}
+
+	public boolean isQuiet() {
         return quiet;
     }
 

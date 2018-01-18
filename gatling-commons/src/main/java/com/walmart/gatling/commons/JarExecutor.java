@@ -59,6 +59,8 @@ public class JarExecutor extends WorkExecutor {
 
     public static final String SIMULATION = "simulation";
     public static final String DATA = "data";
+    public static final String BODIES = "bodies";
+    
     IOFileFilter logFilter = new IOFileFilter() {
         @Override
         public boolean accept(File file) {
@@ -247,6 +249,14 @@ public class JarExecutor extends WorkExecutor {
             //job data feed  path
             cmdLine.addArgument("-df").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,DATA));
         }
+        
+        //download the bodies feed
+        if(taskEvent.getJobInfo().hasBodiesFeed) {
+            DownloadFile.downloadFileAndUnzip(job.bodiesFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, BODIES ,taskEvent.getJobInfo().bodiesFileName));
+            //job data feed  path
+            cmdLine.addArgument("-bdf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,BODIES));
+        }
+        
         //report file path
         cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
         cmdLine.addArgument("-nr").addArgument("-m");

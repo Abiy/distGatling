@@ -15,6 +15,7 @@ export class WorkerService {
     private baseUrl: string;
 
     constructor(private _http: Http,private _jsonp: Jsonp){
+       //this.baseUrl = "http://localhost:8080";
        this.baseUrl = "";
     }
 

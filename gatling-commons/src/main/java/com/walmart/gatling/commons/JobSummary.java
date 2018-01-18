@@ -133,8 +133,10 @@ public class JobSummary implements Serializable {
         public short count;
         public String fileFullName;
         public boolean hasDataFeed;
+        public boolean hasBodiesFeed;
         public String parameterString;
         public String dataFileName;
+        public String bodiesFileName;
         public String jarFileName;
 
         public String getFileNameFromPackageName(){
@@ -143,7 +145,7 @@ public class JobSummary implements Serializable {
         public JobInfo() {
         }
 
-        public JobInfo(String partitionAccessKey, String user, String partitionName, String jobName, String trackingId, short count,String fileFullName,boolean hasDataFeed,String parameterString,String dataFileName
+        public JobInfo(String partitionAccessKey, String user, String partitionName, String jobName, String trackingId, short count,String fileFullName,boolean hasDataFeed, boolean hasBodiesFeed, String parameterString,String dataFileName, String bodiesFilename
         ,  String jarFileName) {
             this.partitionAccessKey = partitionAccessKey;
             this.user = user;
@@ -153,8 +155,10 @@ public class JobSummary implements Serializable {
             this.count = count;
             this.fileFullName = fileFullName;
             this.hasDataFeed = hasDataFeed;
+            this.hasBodiesFeed = hasBodiesFeed;
             this.parameterString = parameterString;
             this.dataFileName = dataFileName;
+            this.bodiesFileName = bodiesFilename;
             this.jarFileName =   jarFileName;
         }
 
@@ -167,8 +171,10 @@ public class JobSummary implements Serializable {
             count = builder.count;
             fileFullName = builder.fileFullName;
             this.hasDataFeed = builder.hasDataFeed;
+            this.hasBodiesFeed = builder.hasBodiesFeed;
             this.parameterString = builder.parameterString;
             this.dataFileName = builder.dataFileName;
+            this.bodiesFileName = builder.bodiesFileName;
             this.jarFileName = builder.jarFileName;
         }
 
@@ -185,8 +191,10 @@ public class JobSummary implements Serializable {
             private short count;
             private String fileFullName;
             private boolean hasDataFeed;
+            private boolean hasBodiesFeed;
             private String parameterString;
             public String dataFileName;
+            public String bodiesFileName;
             public String jarFileName;
 
             private Builder() {
@@ -226,6 +234,11 @@ public class JobSummary implements Serializable {
                 return this;
             }
 
+            public Builder withHasBodiesFeed(boolean hasBodiesFeed) {
+            	this.hasBodiesFeed = hasBodiesFeed;
+                return this;
+            }
+
             public Builder withParameterString(String parameterString) {
                 this.parameterString = parameterString;
                 return this;
@@ -239,6 +252,11 @@ public class JobSummary implements Serializable {
                 this.dataFileName = dataFileName;
                 return this;
             }
+            public Builder withBodiesFileName(String bodiesFileName) {
+                this.bodiesFileName = bodiesFileName;
+                return this;
+            }
+
             //
             public JobInfo build() {
                 return new JobInfo(this);

@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import javafx.util.Pair;
+//import javafx.util.Pair;
 
 /**
  * Created by walmart on 8/17/15.

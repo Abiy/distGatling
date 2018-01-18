@@ -103,12 +103,14 @@ public class FileUploadController {
     @RequestMapping(method = RequestMethod.POST, value = "/upload")
     public SubmitResult uploadAndRunSimulation(MultipartHttpServletRequest request, @RequestParam("simulationFile") MultipartFile simulationFile) {
         MultipartFile dataFile = request.getFile("dataFile");
+        MultipartFile bodiesFile = request.getFile("bodiesFile");
         Map<String, String[]> paramMap = request.getParameterMap();
         String packageName = getValue(paramMap, "packageName"), partitionName = getValue(paramMap, "partitionName");
         String fileName = packageName.replace('.', '/') + ".scala";
         String trackingId = "";
         SimulationJobModel job = new SimulationJobModel();
         String dataFilePath = "";//should be empty by default
+        String bodiesFilePath = "";//should be empty by default
         if (!simulationFile.isEmpty()) {
             try {
                 if (dataFile != null && !dataFile.isEmpty()) {
@@ -119,6 +121,15 @@ public class FileUploadController {
                     FileCopyUtils.copy(dataFile.getInputStream(), stream);
                     stream.close();
                 }
+                if (bodiesFile != null && !bodiesFile.isEmpty()) {
+                    bodiesFilePath = tempFileDir + "/" + bodiesFile.getOriginalFilename();
+                    FileUtils.touch(new File(bodiesFilePath));
+                    BufferedOutputStream stream = new BufferedOutputStream(
+                            new FileOutputStream(new File(bodiesFilePath)));
+                    FileCopyUtils.copy(bodiesFile.getInputStream(), stream);
+                    stream.close();
+                }
+
                 String simulationFilePath = tempFileDir + "/" + fileName;
                 FileUtils.touch(new File(simulationFilePath));
                 BufferedOutputStream stream = new BufferedOutputStream(
@@ -133,6 +144,7 @@ public class FileUploadController {
                 job.setUser(getValue(paramMap, "userName"));
                 job.setSimulation(simulationFilePath);
                 job.setDataFile(dataFilePath);
+                job.setBodiesFile(bodiesFilePath);
                 job.setFileFullName(packageName);
                 job.setParameterString(getValue(paramMap, "parameter"));
                 log.info("Submitting job: {}", job);
