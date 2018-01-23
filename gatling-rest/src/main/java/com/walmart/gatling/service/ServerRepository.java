@@ -112,6 +112,7 @@ public class ServerRepository {
         String trackingId = UUID.randomUUID().toString();
         List<String> parameters = Arrays.asList( );//"-nr",  "-m", "-s",  simulationJobModel.getFileFullName());
         boolean hasDataFeed = !(simulationJobModel.getDataFile() == null || simulationJobModel.getDataFile().isEmpty());
+        boolean hasBodiesFeed = !(simulationJobModel.getBodiesFile() == null || simulationJobModel.getBodiesFile().isEmpty());
         JobSummary.JobInfo jobinfo = JobSummary.JobInfo.newBuilder()
                 .withCount(simulationJobModel.getCount())
                 .withJobName("gatling")
@@ -120,9 +121,11 @@ public class ServerRepository {
                 .withUser(simulationJobModel.getUser())
                 .withTrackingId(trackingId)
                 .withHasDataFeed(hasDataFeed)
+                .withHasBodiesFeed(hasBodiesFeed)
                 .withParameterString(simulationJobModel.getParameterString())
                 .withFileFullName(simulationJobModel.getFileFullName())
                 .withDataFileName(getDataFileName(simulationJobModel,hasDataFeed))
+                .withBodiesFileName(getBodiesFileName(simulationJobModel,hasBodiesFeed))
                 .build();
         Timeout timeout = new Timeout(6, TimeUnit.SECONDS);
         int success = 0;
@@ -134,7 +137,9 @@ public class ServerRepository {
             Future<Object> future = ask(router, new Master.Job(simulationJobModel.getRoleId(), taskEvent, trackingId,
                     agentConfig.getAbortUrl(),
                     agentConfig.getJobFileUrl(simulationJobModel.getSimulation()),
-                            agentConfig.getJobFileUrl(simulationJobModel.getDataFile()),false),
+                    agentConfig.getJobFileUrl(simulationJobModel.getDataFile()),
+                    agentConfig.getJobFileUrl(simulationJobModel.getBodiesFile()),
+                    false),
                     timeout);
             Object result = Await.result(future, timeout.duration());
             if (result instanceof MasterClientActor.Ok) {
@@ -154,6 +159,15 @@ public class ServerRepository {
         if(!hasDataFeed)
             return "";
         String[] splits = simulationJobModel.getDataFile().split("/");
+        if (splits.length > 0) //return the last name
+            return splits[splits.length-1];
+        return "";
+    }
+    
+    private String getBodiesFileName(SimulationJobModel simulationJobModel, boolean hasBodiesFeed) {
+        if(!hasBodiesFeed)
+            return "";
+        String[] splits = simulationJobModel.getBodiesFile().split("/");
         if (splits.length > 0) //return the last name
             return splits[splits.length-1];
         return "";

@@ -32,6 +32,7 @@ var RunComponent = (function () {
     RunComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.success = true;
+        //this.uploadUrl  = "http://localhost:8080/upload";
         this.uploadUrl = "/upload";
         this.uploader = new multipart_uploader_1.MultipartUploader({ url: this.uploadUrl });
         this.multipartItem = new multipart_item_1.MultipartItem(this.uploader);
@@ -54,6 +55,7 @@ var RunComponent = (function () {
             _this.multipartItem.formData.append("userName", _this.model.userName);
             _this.multipartItem.formData.append("accessKey", _this.model.accessKey);
             _this.multipartItem.formData.append("dataFile", _this.dataFile);
+            _this.multipartItem.formData.append("bodiesFile", _this.bodiesFile);
             _this.multipartItem.formData.append("parameter", _this.model.parameter);
             _this.multipartItem.callback = _this.uploadCallback;
             _this.multipartItem.upload();
@@ -62,6 +64,7 @@ var RunComponent = (function () {
             console.debug("uploadCallback() ==>");
             _this.simulationFile = null;
             _this.dataFile = null;
+            _this.bodiesFile = null;
             var result = JSON.parse(data);
             if (result.success) {
                 _this.success = true;
@@ -95,6 +98,17 @@ var RunComponent = (function () {
         else {
             this.dataFile = inputValue.files[0];
             console.debug("Input File name: " + this.dataFile.name + " type:" + this.dataFile.size + " size:" + this.dataFile.size);
+        }
+    };
+    RunComponent.prototype.selectBodiesFile = function ($event) {
+        var inputValue = $event.target;
+        if (null == inputValue || null == inputValue.files[0]) {
+            console.debug("Input file error.");
+            return;
+        }
+        else {
+            this.bodiesFile = inputValue.files[0];
+            console.debug("Input File name: " + this.bodiesFile.name + " type:" + this.bodiesFile.size + " size:" + this.bodiesFile.size);
         }
     };
     RunComponent.prototype.fetchDashboardData = function () {

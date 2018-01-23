@@ -211,7 +211,9 @@ public class Master extends AbstractPersistentActor {
             Job job = new Job(clientConfig.getPartitionName(), taskEvent, trackingId,
                     agentConfig.getAbortUrl(),
                     agentConfig.getJobFileUrl(clientConfig.getJarPath()),
-                    agentConfig.getJobFileUrl(clientConfig.getDataFeedPath()), true);
+                    agentConfig.getJobFileUrl(clientConfig.getDataFeedPath()),
+                    agentConfig.getJobFileUrl(clientConfig.getBodiesFeedPath()),
+                    true);
             persist(new JobState.JobAccepted(job), event -> {
                 // Ack back to original sender
                 getSender().tell(new MasterClientProtocol.CommandLineJobAccepted(job), getSelf());
@@ -524,8 +526,9 @@ public class Master extends AbstractPersistentActor {
         public String abortUrl;
         public String jobFileUrl;
         public String dataFileUrl;
+        public String bodiesFileUrl;
 
-        public Job(String roleId, Object job, String trackingId, String abortUrl,String jobFileUrl, String dataFileUrl,boolean isJarSimulation) {
+        public Job(String roleId, Object job, String trackingId, String abortUrl,String jobFileUrl, String dataFileUrl, String bodiesFileUrl, boolean isJarSimulation) {
             this.jobId = UUID.randomUUID().toString();
             this.roleId = roleId;
             this.taskEvent = job;
@@ -533,6 +536,7 @@ public class Master extends AbstractPersistentActor {
             this.abortUrl = abortUrl;
             this.jobFileUrl = jobFileUrl;
             this.dataFileUrl = dataFileUrl;
+            this.bodiesFileUrl = bodiesFileUrl;
             this.isJarSimulation = isJarSimulation;
         }
 
@@ -547,6 +551,7 @@ public class Master extends AbstractPersistentActor {
                     ", abortUrl='" + abortUrl + '\'' +
                     ", jobFileUrl='" + jobFileUrl + '\'' +
                     ", dataFileUrl='" + dataFileUrl + '\'' +
+                    ", bodiesFileUrl='" + bodiesFileUrl + '\'' +
                     '}';
         }
     }

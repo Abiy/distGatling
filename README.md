@@ -42,7 +42,7 @@ The Cluster Master  provides users interfaces and REST API's for basic operation
     - Tracking the progress of distributed tasks
     - Collecting and Aggregating performance reports
     - Providing a system of records for  multiple simulation history
-    - Maintaining repository for simulation and data files
+    - Maintaining repository for simulation, data and bodies files
    
 Different projects could share the same cluster and run side by side on the same cluster with  complete isolation
 
@@ -50,7 +50,7 @@ Different projects could share the same cluster and run side by side on the same
 
 After joining the cluster, CW workers are responsible for 
     - Running performance tests
-    - Pulling Simulation and data  files from the master
+    - Pulling Simulation, data and bodies files from the master
     - Proving a streaming REST end points for error logs , std logs and simulation logs
     
    
@@ -64,7 +64,7 @@ After cloning or downloading the repository of distGatling ,follow the following
     1. Update the application.yml file settings (gatling-rest and gatling-agent)
     
     job:
-      path: "/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling lib, simulation, data, and conf are stored
+      path: "/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling lib, simulation, data, bodies and conf are stored
       logDirectory: "/workspace/gatling-charts-highcharts-bundle-2.1.7/" # Base directory for log files(log/error and log/std)
       command: "/bin/bash" # Base command to run gatling.sh file
       artifact: "/workspace/gatling-charts-highcharts-bundle-2.1.7/bin/{0}.sh" # Path for the location of gatling.sh
@@ -122,8 +122,8 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 
 ### Start a distributed simulation task - users provide  the worker pool to use, the simulation file to run and number of parallel tasks
 ![Alt text](images/submit_simulation_job.png "Start a distributed simulation task")
+NB: The bodies input wait a zip containing directly bodies files used for your test
 <!-- <img src="/images/submit_simulation_job.png" width="700" height="400" alt="Start a distributed simulation task"/> -->
-
 ---
 
 ### Track the progress of a distributed simulation task on the cluster, after all the distributed tasks complete a button will appear on this page to allow you generate and view the gatling report

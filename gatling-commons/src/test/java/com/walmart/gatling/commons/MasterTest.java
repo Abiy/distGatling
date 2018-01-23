@@ -126,7 +126,7 @@ public class MasterTest  {
     protected Master.Job getJob() {
         String id = UUID.randomUUID().toString();
         taskEvent.setJobName("gatling");
-        Master.Job job = new Master.Job("projectName", taskEvent, id, "","simulatioFilePath","dataFilePath",false);
+        Master.Job job = new Master.Job("projectName", taskEvent, id, "","simulatioFilePath","dataFilePath", "bodiesFilePath", false);
         return job;
     }
 

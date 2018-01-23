@@ -19,11 +19,14 @@
 package com.walmart.gatling.commons;
 
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+
+import org.apache.commons.io.FileUtils;
+
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 
 
 /**
@@ -42,6 +45,30 @@ public class DownloadFile {
         }
         return false;
     }
+    
+
+    public static boolean downloadFileAndUnzip(String path,String destPath){
+    	try {
+            FileUtils.copyURLToFile(new URL(path),new File(destPath),CONNECTION_TIMEOUT,READ_TIMEOUT);
+            
+            int index = destPath.lastIndexOf("/");
+            String basePath = destPath.substring(0, index);
+            
+            try {
+                 ZipFile zipFile = new ZipFile(new File(destPath));
+                 zipFile.extractAll(basePath);
+            } catch (ZipException e) {
+                e.printStackTrace();
+            }
+            
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    
 
 
 }

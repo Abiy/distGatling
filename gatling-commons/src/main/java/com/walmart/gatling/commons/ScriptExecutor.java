@@ -23,7 +23,7 @@ import akka.actor.Cancellable;
 import akka.dispatch.ExecutionContexts;
 import akka.dispatch.OnFailure;
 import akka.dispatch.OnSuccess;
-import javafx.util.Pair;
+//import javafx.util.Pair;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -60,6 +60,7 @@ public class ScriptExecutor extends WorkExecutor {
 
     public static final String SIMULATION = "simulation";
     public static final String DATA = "data";
+    public static final String BODIES = "bodies";
     IOFileFilter logFilter = new IOFileFilter() {
         @Override
         public boolean accept(File file) {
@@ -198,6 +199,13 @@ public class ScriptExecutor extends WorkExecutor {
             //job data feed  path
             cmdLine.addArgument("-df").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,DATA));
         }
+        if(taskEvent.getJobInfo().hasBodiesFeed) {
+            DownloadFile.downloadFileAndUnzip(job.bodiesFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, BODIES,taskEvent.getJobInfo().bodiesFileName));
+            //job bodies feed  path
+            cmdLine.addArgument("-bdf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,BODIES));
+        }
+        
+        
         //report file path
         cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
 
