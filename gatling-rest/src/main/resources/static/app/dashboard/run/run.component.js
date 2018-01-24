@@ -34,7 +34,6 @@ var RunComponent = (function () {
         var _this = this;
         this.success = true;
         this.uploadUrl = environment_1.environment.apiUrl + "/upload";
-        //this.uploadUrl  = "/upload";
         this.uploader = new multipart_uploader_1.MultipartUploader({ url: this.uploadUrl, authToken: localStorage.getItem('currentUser') });
         this.multipartItem = new multipart_item_1.MultipartItem(this.uploader);
         this.model = { parallelism: 1, accessKey: "", packageName: "", partitionName: "", parameter: "", userName: "" };

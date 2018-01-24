@@ -12,6 +12,7 @@ export class LoginComponent implements OnInit {
     model: any = {};
     loading = false;
     returnUrl: string;
+    cause: string;
 
     constructor(
         private route: ActivatedRoute,
@@ -27,6 +28,7 @@ export class LoginComponent implements OnInit {
 
         // get return url from route parameters or default to '/'
         this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+        this.cause = this.route.snapshot.queryParams['cause'] || ''
     }
 
     login() {

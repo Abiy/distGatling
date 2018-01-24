@@ -24,6 +24,7 @@ var LoginComponent = (function () {
         localStorage.removeItem('currentUser');
         // get return url from route parameters or default to '/'
         this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+        this.cause = this.route.snapshot.queryParams['cause'] || '';
     };
     LoginComponent.prototype.login = function () {
         this.loading = true;
