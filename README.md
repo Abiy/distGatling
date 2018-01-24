@@ -63,6 +63,11 @@ After cloning or downloading the repository of distGatling ,follow the following
     
     1. Update the application.yml file settings (gatling-rest and gatling-agent)
     
+    # User account for connect to gatling-rest UI
+    security:
+        username: "gatling"
+        password: "gatling"
+
     job:
       path: "/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling lib, simulation, data, bodies and conf are stored
       logDirectory: "/workspace/gatling-charts-highcharts-bundle-2.1.7/" # Base directory for log files(log/error and log/std)
