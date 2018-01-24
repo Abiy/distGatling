@@ -8,15 +8,14 @@ import { Http, Response, Headers , Jsonp,} from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
-
+import { environment } from '../environments/environment';
 
 @Injectable()
 export class WorkerService {
     private baseUrl: string;
 
     constructor(private _http: Http,private _jsonp: Jsonp){
-       //this.baseUrl = "http://localhost:8080";
-       this.baseUrl = "";
+       this.baseUrl = environment.apiUrl;
     }
 
     getWorkers(): Observable<Worker[]>{

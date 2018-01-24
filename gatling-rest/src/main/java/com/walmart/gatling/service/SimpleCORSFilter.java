@@ -55,9 +55,15 @@ public class SimpleCORSFilter implements Filter {
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
         response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, X-Requested-With, remember-me");
 
-        chain.doFilter(req, res);
+    	// Just REPLY OK if request method is OPTIONS for CORS (pre-flight)
+		if ( request.getMethod().equals("OPTIONS") ) {
+	        response.setStatus(HttpServletResponse.SC_OK);
+	        return;
+	    }
+		
+		chain.doFilter(req, res);
     }
 
     @Override

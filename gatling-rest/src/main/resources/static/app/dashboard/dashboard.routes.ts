@@ -6,17 +6,20 @@ import { CompletedComponent } from './completed/completed.component';
 import { WorkersComponent } from './workers/workers.component';
 import { MasterComponent } from './master/master.component';
 import { DetailComponent } from './detail/detail.component';
+import { LoginComponent } from './login/login.component';
 
+import { AuthGuard } from '../guard/auth.guard';
 
 export const MODULE_ROUTES: Route[] =[
     { path: '', redirectTo: 'overview', pathMatch: 'full' },
-    { path: 'overview', component: HomeComponent },
-    { path: 'running', component: RunningComponent },
-    { path: 'completed', component: CompletedComponent },
-    { path: 'workers', component: WorkersComponent },
-    { path: 'master', component: MasterComponent },
-    { path: 'run', component: RunComponent },
-    { path: 'detail/:trackingId', component: DetailComponent }
+    { path: 'overview', component: HomeComponent, canActivate: [AuthGuard] },
+    { path: 'running', component: RunningComponent, canActivate: [AuthGuard] },
+    { path: 'completed', component: CompletedComponent, canActivate: [AuthGuard] },
+    { path: 'workers', component: WorkersComponent, canActivate: [AuthGuard] },
+    { path: 'master', component: MasterComponent, canActivate: [AuthGuard] },
+    { path: 'run', component: RunComponent, canActivate: [AuthGuard] },
+    { path: 'login', component: LoginComponent },
+    { path: 'detail/:trackingId', component: DetailComponent, canActivate: [AuthGuard] }
 
 ]
 
@@ -27,5 +30,6 @@ export const MODULE_COMPONENTS = [
     WorkersComponent,
     MasterComponent,
     RunComponent,
-    DetailComponent
+    DetailComponent,
+    LoginComponent
 ]

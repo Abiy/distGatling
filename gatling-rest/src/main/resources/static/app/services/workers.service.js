@@ -16,12 +16,12 @@ var http_1 = require('@angular/http');
 var Observable_1 = require('rxjs/Observable');
 require('rxjs/add/operator/catch');
 require('rxjs/add/operator/map');
+var environment_1 = require('../environments/environment');
 var WorkerService = (function () {
     function WorkerService(_http, _jsonp) {
         this._http = _http;
         this._jsonp = _jsonp;
-        //this.baseUrl = "http://localhost:8080";
-        this.baseUrl = "";
+        this.baseUrl = environment_1.environment.apiUrl;
     }
     WorkerService.prototype.getWorkers = function () {
         return this._http.get(this.baseUrl + "/gatling/server/info", this.jsonHeaders())

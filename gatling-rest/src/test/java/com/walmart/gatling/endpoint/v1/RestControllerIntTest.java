@@ -18,12 +18,15 @@
 
 package com.walmart.gatling.endpoint.v1;
 
-import com.walmart.gatling.AbstractRestIntTest;
-import com.walmart.gatling.domain.WorkerModel;
-
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.support.BasicAuthorizationInterceptor;
+
+import com.walmart.gatling.AbstractRestIntTest;
+import com.walmart.gatling.domain.WorkerModel;
 
 /**
  * Trivial integration test class that exercises the Junit spring runner and in container testing.
@@ -33,6 +36,15 @@ import org.slf4j.LoggerFactory;
  */
 public class RestControllerIntTest extends AbstractRestIntTest {
     private final Logger log = LoggerFactory.getLogger(RestControllerIntTest.class);
+
+    @Value("${security.username}") private String USERNAME;
+    @Value("${security.password}") private String PASSWORD;
+    
+    @Before
+    public void setup() {
+        BasicAuthorizationInterceptor bai = new BasicAuthorizationInterceptor(USERNAME, PASSWORD);
+        template.getRestTemplate().getInterceptors().add(bai);
+    }
 
     @Test
     public void test(){
