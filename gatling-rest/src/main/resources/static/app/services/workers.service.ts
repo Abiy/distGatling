@@ -15,10 +15,14 @@ import { Router } from '@angular/router';
 export class WorkerService {
     private baseUrl: string;
 
+    getBaseUrl(): string{
+        return this.baseUrl;
+    }
+
     constructor(private _http: Http,private _jsonp: Jsonp, private _router: Router){
        this.baseUrl = environment.apiUrl;
     }
-
+  
     getWorkers(): Observable<Worker[]>{
       return this._http.get( this.baseUrl + "/gatling/server/info",this.jsonHeaders())
             .map(this.extractData)
@@ -113,7 +117,7 @@ export class WorkerService {
         }
         console.error(errMsg);
 
-        if (error.status == 401 || error.status == 0 || error.status == 500 || error.status == 404) {
+        if (error.status == 401 || error.status == 0 || error.status == 404) {
             this._router.navigate(['/login'], { queryParams: { cause: errMsg }});
             return;
         } 

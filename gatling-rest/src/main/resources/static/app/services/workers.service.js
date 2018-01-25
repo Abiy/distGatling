@@ -25,6 +25,9 @@ var WorkerService = (function () {
         this._router = _router;
         this.baseUrl = environment_1.environment.apiUrl;
     }
+    WorkerService.prototype.getBaseUrl = function () {
+        return this.baseUrl;
+    };
     WorkerService.prototype.getWorkers = function () {
         return this._http.get(this.baseUrl + "/gatling/server/info", this.jsonHeaders())
             .map(this.extractData)
@@ -102,7 +105,7 @@ var WorkerService = (function () {
             errMsg = error.message ? error.message : error.toString();
         }
         console.error(errMsg);
-        if (error.status == 401 || error.status == 0 || error.status == 500 || error.status == 404) {
+        if (error.status == 401 || error.status == 0 || error.status == 404) {
             this._router.navigate(['/login'], { queryParams: { cause: errMsg } });
             return;
         }

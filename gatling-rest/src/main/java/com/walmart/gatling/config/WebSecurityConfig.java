@@ -46,7 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(new RestAuthenticationAccessDeniedHandler())
                 .and()
                 .authorizeRequests()
-                .antMatchers("/gatling/server/abort**").permitAll()
+                .antMatchers("/gatling/server/abort**", "/gatling/server/getlog/**").permitAll()
                 .anyRequest().hasRole("USER")
                 .and()
                 .addFilterBefore(new SimpleCORSFilter(), ChannelProcessingFilter.class)

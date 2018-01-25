@@ -1,6 +1,5 @@
 "use strict";
 exports.environment = {
-    //apiUrl: '',
-    apiUrl: 'http://localhost:8080',
+    apiUrl: '',
 };
 //# sourceMappingURL=environment.js.map
