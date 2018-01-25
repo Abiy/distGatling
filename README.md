@@ -143,6 +143,11 @@ NB: The bodies input wait a zip containing directly bodies files used for your t
 
 ---
 
+### Login screen
+![Alt text](images/login.png "Login")
+
+---
+
 ### Cluster information - shows current state of all the workers in the cluster
 ![Alt text](images/cluster_info.png "Cluster info")
 <!-- <img src="/images/cluster_info.png" width="700" height="400" alt="Cluster info"/> -->
