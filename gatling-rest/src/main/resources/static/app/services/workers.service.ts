@@ -101,7 +101,7 @@ export class WorkerService {
         // In a real world app, you might use a remote logging infrastructure
         let errMsg: string;
         if (error instanceof Response) {
-            const body = error.json() || '';
+            const body = error.status != 404 ? error.json() : '';
             const err = body.error || JSON.stringify(body);
             if (error.status == 0) {
                 errMsg = `${error.status} - No response from server`;    
@@ -113,7 +113,7 @@ export class WorkerService {
         }
         console.error(errMsg);
 
-        if (error.status == 401 || error.status == 0 || error.status == 500) {
+        if (error.status == 401 || error.status == 0 || error.status == 500 || error.status == 404) {
             this._router.navigate(['/login'], { queryParams: { cause: errMsg }});
             return;
         } 

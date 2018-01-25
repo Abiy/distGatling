@@ -89,7 +89,7 @@ var WorkerService = (function () {
         // In a real world app, you might use a remote logging infrastructure
         var errMsg;
         if (error instanceof http_1.Response) {
-            var body = error.json() || '';
+            var body = error.status != 404 ? error.json() : '';
             var err = body.error || JSON.stringify(body);
             if (error.status == 0) {
                 errMsg = error.status + " - No response from server";
@@ -102,7 +102,7 @@ var WorkerService = (function () {
             errMsg = error.message ? error.message : error.toString();
         }
         console.error(errMsg);
-        if (error.status == 401 || error.status == 0 || error.status == 500) {
+        if (error.status == 401 || error.status == 0 || error.status == 500 || error.status == 404) {
             this._router.navigate(['/login'], { queryParams: { cause: errMsg } });
             return;
         }
