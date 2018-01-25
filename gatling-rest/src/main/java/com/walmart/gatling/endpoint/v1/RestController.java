@@ -315,7 +315,7 @@ public class RestController {
         try {
             Optional<ReportExecutor.ReportResult> res =  serverRepository.generateReport(trackingId);
             log.info("report result: {}",res);
-            return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", agentConfig.getGenericUrl(res.get().result.toString(), StringUtils.EMPTY,StringUtils.EMPTY) )).build();
+            return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", res.get().result.toString() )).build();
         } catch (Exception e) {
             log.error("Error while submitting user report request for: {}, {}",trackingId,e);
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Error while submitting user report request.").build();

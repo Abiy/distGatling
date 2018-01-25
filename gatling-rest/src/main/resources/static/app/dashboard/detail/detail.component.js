@@ -67,7 +67,7 @@ var DetailComponent = (function () {
         this.workerService.generateReport(this.trackingId).subscribe(function (data) {
             _this.reportInProgress = false;
             console.log(data);
-            _this.reportResult = data.report;
+            _this.reportResult = _this.workerService.getBaseUrl() + data.report;
         }, function (error) {
             _this.reportInProgress = false;
             _this.errorMessage = error;

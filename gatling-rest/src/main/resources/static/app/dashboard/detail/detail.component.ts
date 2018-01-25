@@ -85,7 +85,7 @@ export class DetailComponent implements OnInit, OnDestroy{
             data => {
                 this.reportInProgress = false;
                 console.log(data);
-                this.reportResult = data.report;
+                this.reportResult = this.workerService.getBaseUrl() + data.report;
             },
             error => {
                 this.reportInProgress = false;
