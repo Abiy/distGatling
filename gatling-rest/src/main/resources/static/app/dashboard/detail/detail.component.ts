@@ -60,6 +60,10 @@ export class DetailComponent implements OnInit, OnDestroy{
         );
     }
 
+    getLog(taskJobId: number, logType:string):string{
+        return this.workerService.getBaseUrl() + "/gatling/server/getlog/" + this.trackingId + "/" + taskJobId + "/" + logType;
+    }
+
     cancelReport():void{
        console.log("Canceling job: " +  this.trackingId);
         this.cancelMsg = "Cancelling Job ..."
@@ -81,7 +85,7 @@ export class DetailComponent implements OnInit, OnDestroy{
             data => {
                 this.reportInProgress = false;
                 console.log(data);
-                this.reportResult = data.report;
+                this.reportResult = this.workerService.getBaseUrl() + data.report;
             },
             error => {
                 this.reportInProgress = false;

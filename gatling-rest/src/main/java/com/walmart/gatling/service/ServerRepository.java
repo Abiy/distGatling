@@ -28,6 +28,10 @@ import com.walmart.gatling.commons.ReportExecutor;
 import com.walmart.gatling.commons.TaskEvent;
 import com.walmart.gatling.commons.TrackingResult;
 import com.walmart.gatling.domain.SimulationJobModel;
+import com.walmart.gatling.service.exception.NotFoundException;
+import com.walmart.gatling.service.exception.UnknownResourceException;
+
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +39,20 @@ import org.springframework.stereotype.Component;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import static akka.pattern.Patterns.ask;
 
@@ -248,4 +260,51 @@ public class ServerRepository {
         return summaries;
 
     }
+
+	public String getLogResult(String trackingId, String taskJobId, String logType) throws NotFoundException, UnknownResourceException{
+    	List<JobSummary> summaries = getJobSummary();
+        Optional<JobSummary> summary = summaries.stream().filter(p -> p.getJobInfo().trackingId.equalsIgnoreCase(trackingId)).findFirst();
+        log.info("Processing  get job detail.");
+
+        if(summary.isPresent()) {
+    		Optional<TaskEvent> taskEvent = summary.get().getTaskInfoList().stream().filter(p -> p.getTaskJobId().equalsIgnoreCase(taskJobId)).findFirst();
+    		if (taskEvent.isPresent()) {
+    			
+    			String logPath = taskEvent.get().getErrorLogPath();
+    			if ("std".equalsIgnoreCase(logType)) {
+    				logPath = taskEvent.get().getStdLogPath();
+    			}
+    	        return loadLogFromPath(logPath);
+    		}
+    		else
+    			throw new UnknownResourceException("The Specified taskJobId id is not available.");
+        }
+        else
+			throw new UnknownResourceException("The Specified tracking id id is not available.");
+	}
+
+	private String loadLogFromPath(String logPath) throws NotFoundException {
+		URL url = null;
+		try {
+		    url = new URL(logPath);
+		} catch (MalformedURLException e) {
+		    log.error("Error on URL for receiving abort status: {}",e);
+		    e.printStackTrace();
+			throw new NotFoundException();
+		}
+		try (InputStream input = url.openStream()) {
+			
+			try {
+		        String resultString = IOUtils.toString(input, StandardCharsets.UTF_8.toString());
+		    	return resultString;
+		    } catch (Exception e) {
+		    	throw new NotFoundException();
+		    }
+			
+		} catch (IOException e) {
+		    log.error("Error receiving abort status: {}",e);
+		    e.printStackTrace();
+			throw new NotFoundException();
+		}
+	}
 }

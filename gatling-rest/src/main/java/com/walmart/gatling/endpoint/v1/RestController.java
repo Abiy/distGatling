@@ -24,12 +24,17 @@ import com.walmart.gatling.commons.AgentConfig;
 import com.walmart.gatling.commons.JobSummary;
 import com.walmart.gatling.commons.Master;
 import com.walmart.gatling.commons.ReportExecutor;
+import com.walmart.gatling.commons.TaskEvent;
 import com.walmart.gatling.commons.TrackingResult;
 import com.walmart.gatling.domain.DashboardModel;
 import com.walmart.gatling.domain.SimulationJobModel;
 import com.walmart.gatling.domain.WorkerModel;
 import com.walmart.gatling.service.PageUtils;
 import com.walmart.gatling.service.ServerRepository;
+import com.walmart.gatling.service.exception.NotFoundException;
+import com.walmart.gatling.service.exception.UnknownResourceException;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -46,8 +52,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -216,6 +230,21 @@ public class RestController {
     }
 
     @GET
+    @Path("/getlog/{trackingId}/{taskJobId}/{logType}")
+    @Produces("application/json")
+    @Timed
+    public Response getLog(@PathParam("trackingId") String trackingId, @PathParam("taskJobId") String taskJobId,  @PathParam("logType") String logType) {
+    	try {
+    		String resultString = serverRepository.getLogResult(trackingId, taskJobId, logType);
+    		return Response.ok(resultString, MediaType.TEXT_PLAIN).build();
+    	} catch(NotFoundException e) {
+    		return Response.status(Response.Status.NOT_FOUND).build();
+    	} catch(UnknownResourceException e) {
+    		return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+    	}
+    }
+        
+    @GET
     @Path("/upload/{id}")
     @Produces("application/json")
     @Timed
@@ -286,7 +315,7 @@ public class RestController {
         try {
             Optional<ReportExecutor.ReportResult> res =  serverRepository.generateReport(trackingId);
             log.info("report result: {}",res);
-            return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", agentConfig.getGenericUrl(res.get().result.toString(), StringUtils.EMPTY,StringUtils.EMPTY) )).build();
+            return Response.status(Response.Status.ACCEPTED).entity(ImmutableMap.of("report", res.get().result.toString() )).build();
         } catch (Exception e) {
             log.error("Error while submitting user report request for: {}, {}",trackingId,e);
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Error while submitting user report request.").build();
@@ -300,6 +329,7 @@ public class RestController {
      * @param trackingId
      * @return
      */
+    @PreAuthorize("hasRole('ROLE_USER')")
     @POST
     @Path("/abort/{id}")
     @Produces("application/json")

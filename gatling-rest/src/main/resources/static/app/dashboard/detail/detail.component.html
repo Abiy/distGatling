@@ -77,10 +77,10 @@
                                     <td>{{taskEvent.workerId}}</td>
                                     <td [ngClass]="{'text-success':isSuccess(taskEvent.status),'text-danger':isFailed(taskEvent.status),'text-primary':isNormalStatus(taskEvent.status) }">{{taskEvent.status}}</td>
                                     <td>
-                                        <a class="btn btn-xs" *ngIf="taskEvent.errorLogPath" [href]="taskEvent.errorLogPath" target="_blank"> View</a>
+                                        <a class="btn btn-xs" *ngIf="taskEvent.errorLogPath" [href]="getLog(taskEvent.taskJobId, 'error')" target="_blank"> View</a>
                                     </td>
                                     <td>
-                                        <a class="btn btn-xs" *ngIf="taskEvent.stdLogPath" [href]="taskEvent.stdLogPath" target="_blank"> View</a>
+                                        <a class="btn btn-xs" *ngIf="taskEvent.stdLogPath" [href]="getLog(taskEvent.taskJobId, 'std')" target="_blank"> View</a>
                                     </td>
                                 </tr>
                             </tbody>

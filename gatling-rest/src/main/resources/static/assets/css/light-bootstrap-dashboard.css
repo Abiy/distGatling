@@ -541,6 +541,15 @@ input:focus {
   background-size: 150% 150%;
 }
 
+
+.main-panel-login {
+  background: rgba(203, 203, 210, 0.15);
+  position: relative;
+  z-index: 2;
+  min-height: 100%;
+  overflow: auto;
+}
+
 .main-panel {
   background: rgba(203, 203, 210, 0.15);
   position: relative;

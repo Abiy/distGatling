@@ -46,6 +46,9 @@ var DetailComponent = (function () {
         console.log("Fetching details for: " + this.trackingId);
         this.workerService.getJobDetail(this.trackingId).subscribe(function (data) { return _this.jobSummary = data; }, function (error) { return _this.errorMessage = error; });
     };
+    DetailComponent.prototype.getLog = function (taskJobId, logType) {
+        return this.workerService.getBaseUrl() + "/gatling/server/getlog/" + this.trackingId + "/" + taskJobId + "/" + logType;
+    };
     DetailComponent.prototype.cancelReport = function () {
         var _this = this;
         console.log("Canceling job: " + this.trackingId);
@@ -64,7 +67,7 @@ var DetailComponent = (function () {
         this.workerService.generateReport(this.trackingId).subscribe(function (data) {
             _this.reportInProgress = false;
             console.log(data);
-            _this.reportResult = data.report;
+            _this.reportResult = _this.workerService.getBaseUrl() + data.report;
         }, function (error) {
             _this.reportInProgress = false;
             _this.errorMessage = error;

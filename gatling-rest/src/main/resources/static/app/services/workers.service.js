@@ -16,52 +16,57 @@ var http_1 = require('@angular/http');
 var Observable_1 = require('rxjs/Observable');
 require('rxjs/add/operator/catch');
 require('rxjs/add/operator/map');
+var environment_1 = require('../environments/environment');
+var router_1 = require('@angular/router');
 var WorkerService = (function () {
-    function WorkerService(_http, _jsonp) {
+    function WorkerService(_http, _jsonp, _router) {
         this._http = _http;
         this._jsonp = _jsonp;
-        //this.baseUrl = "http://localhost:8080";
-        this.baseUrl = "";
+        this._router = _router;
+        this.baseUrl = environment_1.environment.apiUrl;
     }
+    WorkerService.prototype.getBaseUrl = function () {
+        return this.baseUrl;
+    };
     WorkerService.prototype.getWorkers = function () {
         return this._http.get(this.baseUrl + "/gatling/server/info", this.jsonHeaders())
             .map(this.extractData)
-            .catch(this.handleError);
+            .catch(this.handleError.bind(this));
     };
     WorkerService.prototype.getRunning = function (pageNum) {
         return this._http.get(this.baseUrl + "/gatling/server/running/summary?size=15&page=" + pageNum, this.jsonHeaders())
             .map(this.extractPagedResult)
-            .catch(this.handleError);
+            .catch(this.handleError.bind(this));
     };
     WorkerService.prototype.getCompleted = function (pageNum) {
         return this._http.get(this.baseUrl + "/gatling/server/completed/summary?size=15&page=" + pageNum, this.jsonHeaders())
             .map(this.extractPagedResult)
-            .catch(this.handleError);
+            .catch(this.handleError.bind(this));
     };
     WorkerService.prototype.getJobDetail = function (trackingId) {
         return this._http.get(this.baseUrl + "/gatling/server/detail/" + trackingId, this.jsonHeaders())
             .map(this.extractJobDetailResult)
-            .catch(this.handleError);
+            .catch(this.handleError.bind(this));
     };
     WorkerService.prototype.cancelJob = function (trackingId) {
         return this._http.post(this.baseUrl + "/gatling/server/abort/" + trackingId, this.jsonHeaders())
             .map(this.extractJobDetailResult)
-            .catch(this.handleError);
+            .catch(this.handleError.bind(this));
     };
     WorkerService.prototype.generateReport = function (trackingId) {
         return this._http.post(this.baseUrl + "/gatling/server/report/" + trackingId, this.jsonHeaders())
             .map(this.extractJobDetailResult)
-            .catch(this.handleError);
+            .catch(this.handleError.bind(this));
     };
     WorkerService.prototype.getMasterMetrics = function () {
         return this._http.get(this.baseUrl + "/metrics", this.jsonHeaders())
             .map(this.extractPagedResult)
-            .catch(this.handleError);
+            .catch(this.handleError.bind(this));
     };
     WorkerService.prototype.getDashboardData = function () {
         return this._http.get(this.baseUrl + "/gatling/server/dashboard", this.jsonHeaders())
             .map(this.extractPagedResult)
-            .catch(this.handleError);
+            .catch(this.handleError.bind(this));
     };
     WorkerService.prototype.jsonHeaders = function () {
         var headers = new http_1.Headers();
@@ -87,19 +92,28 @@ var WorkerService = (function () {
         // In a real world app, you might use a remote logging infrastructure
         var errMsg;
         if (error instanceof http_1.Response) {
-            var body = error.json() || '';
+            var body = error.status != 404 ? error.json() : '';
             var err = body.error || JSON.stringify(body);
-            errMsg = error.status + " - " + (error.statusText || '') + " " + err;
+            if (error.status == 0) {
+                errMsg = error.status + " - No response from server";
+            }
+            else {
+                errMsg = error.status + " - " + err;
+            }
         }
         else {
             errMsg = error.message ? error.message : error.toString();
         }
         console.error(errMsg);
+        if (error.status == 401 || error.status == 0 || error.status == 404) {
+            this._router.navigate(['/login'], { queryParams: { cause: errMsg } });
+            return;
+        }
         return Observable_1.Observable.throw(errMsg);
     };
     WorkerService = __decorate([
         core_1.Injectable(), 
-        __metadata('design:paramtypes', [http_1.Http, http_1.Jsonp])
+        __metadata('design:paramtypes', [http_1.Http, http_1.Jsonp, router_1.Router])
     ], WorkerService);
     return WorkerService;
 }());

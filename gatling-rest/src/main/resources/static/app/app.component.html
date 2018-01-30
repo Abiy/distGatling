@@ -1,13 +1,13 @@
 <div class="wrapper">
-    <div class="sidebar" data-color="azure" data-image="">
+    <div *ngIf="isLoggedIn()" class="sidebar" data-color="azure" data-image="">
         <sidebar-cmp></sidebar-cmp>
         <div class="sidebar-background" style="background-image: url(/assets/img/sidebar-5.jpg)"></div>
     </div>
 
-    <div class="main-panel">
-        <navbar-cmp></navbar-cmp>
+    <div [ngClass]="(isLoggedIn())?'main-panel':'main-panel-login'">
+        <navbar-cmp *ngIf="isLoggedIn()"></navbar-cmp>
         <dashboard-cmp></dashboard-cmp>
-        <div>
+        <div *ngIf="isLoggedIn()">
             <footer-cmp></footer-cmp>
         </div>
     </div>

@@ -1,6 +1,10 @@
 server:
   port: 8080 # Server information for embedded jetty
 
+security:
+  username: "gatling"
+  password: "gatling"
+
 master:
   port: 2551 # Port of the master actor system
   name: backend #Name of the master actor

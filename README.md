@@ -63,6 +63,11 @@ After cloning or downloading the repository of distGatling ,follow the following
     
     1. Update the application.yml file settings (gatling-rest and gatling-agent)
     
+    # User account for connect to gatling-rest UI
+    security:
+        username: "gatling"
+        password: "gatling"
+
     job:
       path: "/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling lib, simulation, data, bodies and conf are stored
       logDirectory: "/workspace/gatling-charts-highcharts-bundle-2.1.7/" # Base directory for log files(log/error and log/std)
@@ -135,6 +140,11 @@ NB: The bodies input wait a zip containing directly bodies files used for your t
 ### Generate a report  - collects all simulation log and generates a gatling performance report
 ![Alt text](images/generate_report.png "Generate report")
 <!-- <img src="/images/generate_report.png" width="700" height="400" alt="Generate report"/> -->
+
+---
+
+### Login screen
+![Alt text](images/login.png "Login")
 
 ---
 

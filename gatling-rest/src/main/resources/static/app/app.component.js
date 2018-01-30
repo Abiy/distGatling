@@ -17,6 +17,9 @@ var AppComponent = (function () {
     AppComponent.prototype.ngOnInit = function () {
         $.getScript('../assets/js/gatling.js');
     };
+    AppComponent.prototype.isLoggedIn = function () {
+        return localStorage.getItem('currentUser') != null;
+    };
     AppComponent = __decorate([
         core_1.Component({
             selector: 'my-app',

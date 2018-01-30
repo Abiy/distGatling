@@ -4,6 +4,7 @@ import {JobSummary, SimulationModel} from '../../services/worker.metadata';
 import {WorkerService} from '../../services/workers.service';
 import {Http, Response, Headers, Jsonp, RequestOptions} from '@angular/http';
 import {Observable} from "rxjs";
+import { environment } from '../../environments/environment';
 
 import {MultipartItem} from "./multipart-item";
 import {MultipartUploader} from "./multipart-uploader";
@@ -50,9 +51,9 @@ export class RunComponent  implements OnDestroy,OnInit{
     }
     ngOnInit(): void {
         this.success = true;
-        //this.uploadUrl  = "http://localhost:8080/upload";
-        this.uploadUrl  = "/upload";
-        this.uploader = new MultipartUploader({url: this.uploadUrl});
+        this.uploadUrl  = environment.apiUrl + "/upload";
+        
+        this.uploader = new MultipartUploader({url: this.uploadUrl, authToken: localStorage.getItem('currentUser')});
         this.multipartItem =  new MultipartItem(this.uploader);
         this.model = { parallelism:1, accessKey:"", packageName:"", partitionName:"", parameter:"", userName:""};
         this.upload = () => {

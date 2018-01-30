@@ -13,12 +13,16 @@ var platform_browser_1 = require('@angular/platform-browser');
 var router_1 = require('@angular/router');
 var http_1 = require('@angular/http');
 var common_1 = require('@angular/common');
+//import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+//import { JwtInterceptor } from './services/jwt.interceptor';
+var http_factory_1 = require("./services/http.factory");
 var app_component_1 = require('./app.component');
 var dashboard_component_1 = require('./dashboard/dashboard.component');
 var dashboard_module_1 = require('./dashboard/dashboard.module');
 var sidebar_module_1 = require('./sidebar/sidebar.module');
 var footer_module_1 = require('./shared/footer/footer.module');
 var navbar_module_1 = require('./shared/navbar/navbar.module');
+var auth_guard_1 = require('./guard/auth.guard');
 var common_2 = require('@angular/common');
 var AppModule = (function () {
     function AppModule() {
@@ -36,7 +40,16 @@ var AppModule = (function () {
                 router_1.RouterModule.forRoot([])
             ],
             declarations: [app_component_1.AppComponent, dashboard_component_1.DashboardComponent],
-            providers: [{ provide: common_2.LocationStrategy, useClass: common_2.HashLocationStrategy }],
+            providers: [
+                auth_guard_1.AuthGuard,
+                { provide: common_2.LocationStrategy, useClass: common_2.HashLocationStrategy },
+                //{provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true}
+                {
+                    provide: http_1.Http,
+                    useFactory: http_factory_1.httpFactory,
+                    deps: [http_1.XHRBackend, http_1.RequestOptions]
+                }
+            ],
             bootstrap: [app_component_1.AppComponent]
         }), 
         __metadata('design:paramtypes', [])
