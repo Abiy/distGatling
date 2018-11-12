@@ -34,7 +34,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <akka.version>2.5.0</akka.version>
+        <akka.version>2.5.16</akka.version>
         <http.client.version>4.5.3</http.client.version>
         <commons-lang3.version>3.5</commons-lang3.version>
         <commons-codec.version>1.10</commons-codec.version>
@@ -104,17 +104,17 @@
 
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-actor_2.11</artifactId>
+            <artifactId>akka-actor_2.12</artifactId>
             <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-cluster_2.11</artifactId>
+            <artifactId>akka-cluster_2.12</artifactId>
             <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-contrib_2.11</artifactId>
+            <artifactId>akka-contrib_2.12</artifactId>
             <version>${akka.version}</version>
             <exclusions>
                 <exclusion>
@@ -132,7 +132,7 @@
 
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-testkit_2.11</artifactId>
+            <artifactId>akka-testkit_2.12</artifactId>
             <version>${akka.version}</version>
         </dependency>
     </dependencies>
