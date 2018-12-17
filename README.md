@@ -5,7 +5,7 @@
 Out of the box, Gatling comes with excellent support of the HTTP protocol that makes it a tool of choice for load testing any HTTP server. As the core engine is actually 
 protocol agnostic, it is perfectly possible to implement support for other protocols. For example, Gatling currently also ships JMS support.
 
-The [Quickstart](http://gatling.io/docs/2.2.2/quickstart.html#quickstart) has an overview of the most important concepts, walking you through the setup of a simple scenario for load testing an HTTP server.
+The [Quickstart](https://gatling.io/docs/current/quickstart/) has an overview of the most important concepts, walking you through the setup of a simple scenario for load testing an HTTP server.
 
 Having scenarios that are defined in code and are resource efficient are the two requirements that motivated the development of Gatling. Based on an expressive DSL, the scenarios
 are self explanatory. They are easy to maintain and can be kept in a version control system.
@@ -42,7 +42,7 @@ The Cluster Master  provides users interfaces and REST API's for basic operation
     - Tracking the progress of distributed tasks
     - Collecting and Aggregating performance reports
     - Providing a system of records for  multiple simulation history
-    - Maintaining repository for simulation, data and bodies files
+    - Maintaining repository for simulation and resource files
    
 Different projects could share the same cluster and run side by side on the same cluster with  complete isolation
 
@@ -50,14 +50,12 @@ Different projects could share the same cluster and run side by side on the same
 
 After joining the cluster, CW workers are responsible for 
     - Running performance tests
-    - Pulling Simulation, data and bodies files from the master
-    - Proving a streaming REST end points for error logs , std logs and simulation logs
-    
-   
+    - Pulling Simulation and resource files from the master
+    - Proving a streaming REST end points for error logs, std logs and simulation logs
     
 ## Usage
 
-Download Gatling bundle as a .zip file [here](http://gatling.io/#/resources/download). Unzip the file in a directory of your choosing. 
+Download Gatling bundle as a .zip file [here](http://gatling.io/#/resources/download). Unzip the file in a directory of your choosing. Add a cancel.sh command in the bin directory, suitable for your system, that stops the gatling processes on the workers (example:  `ps ax | grep "uploads$1" | grep -v grep | awk '{print $1}' | xargs kill -9` )
                         
 After cloning or downloading the repository of distGatling ,follow the following steps to start the cluster
     
@@ -69,7 +67,7 @@ After cloning or downloading the repository of distGatling ,follow the following
         password: "gatling"
 
     job:
-      path: "/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling lib, simulation, data, bodies and conf are stored
+      path: "/workspace/gatling-charts-highcharts-bundle-2.1.7" # Path to the base directory where the gatling lib, simulation, resource and conf are stored
       logDirectory: "/workspace/gatling-charts-highcharts-bundle-2.1.7/" # Base directory for log files(log/error and log/std)
       command: "/bin/bash" # Base command to run gatling.sh file
       artifact: "/workspace/gatling-charts-highcharts-bundle-2.1.7/bin/{0}.sh" # Path for the location of gatling.sh
@@ -90,7 +88,6 @@ After starting the master using the above command, point your browser to GET htt
     4. Locate the agent shell script(under gatling-agent) and run agent.sh to start the Cluster worker on each node you intend to include in the cluster, each worker should be assigned the correct master contact point
         
         /bin/bash agent.sh -Dakka.contact-points=<MASTER_HOST>:<MASTER_PORT> -Dactor.port=<0> -Dserver.port=<8090>
-
 
 
 ##  Goal
@@ -127,7 +124,7 @@ If the worker become alive after recovery it should re-join the cluster and re-r
 
 ### Start a distributed simulation task - users provide  the worker pool to use, the simulation file to run and number of parallel tasks
 ![Alt text](images/submit_simulation_job.png "Start a distributed simulation task")
-NB: The bodies input wait a zip containing directly bodies files used for your test
+NB: The bodies input wait a zip containing resource files used for your test
 <!-- <img src="/images/submit_simulation_job.png" width="700" height="400" alt="Start a distributed simulation task"/> -->
 ---
 
