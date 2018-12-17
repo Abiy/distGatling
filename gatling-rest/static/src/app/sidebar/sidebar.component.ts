@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ROUTES } from './sidebar-routes.config';
 
 @Component({
-    //moduleId: module.id,
     selector: 'sidebar-cmp',
     templateUrl: 'sidebar.component.html',
 })

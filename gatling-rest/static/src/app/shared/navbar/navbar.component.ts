@@ -4,7 +4,6 @@ import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common'
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
-    //moduleId: module.id,
     selector: 'navbar-cmp',
     templateUrl: 'navbar.component.html'
 })

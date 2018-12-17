@@ -15,23 +15,15 @@
                                         <input #fileInput type="file" name="file" required class="form-control" (change)="selectFile($event)" placeholder="Simulation File" accept=".scala"/>
                                     </div>
                                 </div>
-                              <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label>Optional Data File</label>
-                                        <input #dataFileInput type="file" name="datafile" required class="form-control" (change)="selectDataFile($event)" placeholder="Data File" accept=".csv"/>
-                                    </div>
-                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-5">
                                     <div class="form-group">
-                                        <label>Simulation bodies</label>
-                                        <input #fileInput type="file" name="file" required class="form-control" (change)="selectBodiesFile($event)" placeholder="Simulation File" accept=".zip"/>
+                                        <label>Simulation resources</label>
+                                        <input #fileInput type="file" name="file" required class="form-control" (change)="selectResourcesFile($event)" placeholder="Resources File" accept=".zip"/>
                                     </div>
                                 </div>
                             </div>
-
-
                             <div class="row">
                                 <div class="col-md-5">
                                     <div class="form-group">
@@ -76,7 +68,7 @@
                                         <label>Partition Name</label>
                                         <select type="text" name="partitionName" required  class="form-control" [(ngModel)]="model.partitionName"  placeholder="Partition Name">
                                            <option *ngFor="let partition of partitions">
-                                               {{ partition}}
+                                               {{ partition }}
                                            </option>
                                         </select>
                                     </div>

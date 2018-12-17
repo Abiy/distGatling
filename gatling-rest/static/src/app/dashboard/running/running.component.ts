@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 
 
 @Component({
-    //moduleId: module.id,
     selector: 'table-running',
     templateUrl: 'running.component.html',
     providers: [WorkerService]

@@ -10,7 +10,6 @@ import {MultipartUploader} from "./multipart-uploader";
 import { Router } from '@angular/router';
 
 @Component({
-    //moduleId: module.id,
     selector: 'run-cmp',
     templateUrl: 'run.component.html',
     providers:[WorkerService]
@@ -28,7 +27,7 @@ export class RunComponent  implements OnDestroy, OnInit{
     uploadCallback : (data) => void;
     simulationFile: File;
     dataFile: File;
-    bodiesFile: File;
+    resourcesFile: File;
     success: boolean;
 
     constructor(private workerService:WorkerService, private router: Router){
@@ -72,8 +71,7 @@ export class RunComponent  implements OnDestroy, OnInit{
             this.multipartItem.formData.append("packageName",  this.model.packageName);
             this.multipartItem.formData.append("userName",  this.model.userName);
             this.multipartItem.formData.append("accessKey",  this.model.accessKey);
-            this.multipartItem.formData.append("dataFile",  this.dataFile);
-            this.multipartItem.formData.append("bodiesFile",  this.bodiesFile);
+            this.multipartItem.formData.append("resourcesFile",  this.resourcesFile);
             this.multipartItem.formData.append("parameter",  this.model.parameter);
 
             this.multipartItem.callback = this.uploadCallback;
@@ -84,7 +82,7 @@ export class RunComponent  implements OnDestroy, OnInit{
             console.debug("uploadCallback() ==>");
             this.simulationFile = null;
             this.dataFile = null;
-            this.bodiesFile = null;
+            this.resourcesFile = null;
             var result = JSON.parse(data);
             if (result.success){
                 this.success = true;
@@ -109,25 +107,14 @@ export class RunComponent  implements OnDestroy, OnInit{
         }
     }
 
-   selectDataFile($event): void {
-        var inputValue = $event.target;
-        if( null == inputValue || null == inputValue.files[0]){
-            console.debug("Input file error.");
-            return;
-        } else {
-            this.dataFile = inputValue.files[0];
-            console.debug("Input File name: " + this.dataFile.name + " type:" + this.dataFile.size + " size:" + this.dataFile.size);
-        }
-    }
-
-    selectBodiesFile($event): void {
+    selectResourcesFile($event): void {
         var inputValue = $event.target;
         if( null == inputValue || null == inputValue.files[0]){
             console.debug("Input file error.");
             return;
         }else {
-            this.bodiesFile = inputValue.files[0];
-            console.debug("Input File name: " + this.bodiesFile.name + " type:" + this.bodiesFile.size + " size:" + this.bodiesFile.size);
+            this.resourcesFile = inputValue.files[0];
+            console.debug("Input File name: " + this.resourcesFile.name + " type:" + this.resourcesFile.size + " size:" + this.resourcesFile.size);
         }
     }
 

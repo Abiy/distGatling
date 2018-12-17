@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 
 
 @Component({
-    //moduleId: module.id,
     selector: 'table-completed',
     templateUrl: 'completed.component.html',
     providers: [WorkerService]

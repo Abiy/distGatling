@@ -7,7 +7,6 @@ import { ActivatedRoute } from '@angular/router';
 import { IntervalObservable } from 'rxjs/observable/IntervalObservable';
 
 @Component({
-    //moduleId: module.id,
     selector: 'detail-cmp',
     templateUrl: 'detail.component.html',
     providers:[WorkerService]

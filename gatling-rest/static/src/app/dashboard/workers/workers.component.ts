@@ -3,7 +3,6 @@ import {WorkerService} from '../../services/workers.service';
 import {Worker} from '../../services/worker.metadata';
 
 @Component({
-    //moduleId: module.id,
     selector: 'table-cmp',
     templateUrl: 'workers.component.html',
     providers:[WorkerService]

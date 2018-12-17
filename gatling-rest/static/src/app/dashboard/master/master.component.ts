@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { KeyVal } from '../../services/worker.metadata';
 
 @Component({
-    //moduleId: module.id,
     selector: 'home-cmp',
     templateUrl: 'master.component.html',
     providers: [WorkerService]

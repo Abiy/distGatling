@@ -5,13 +5,10 @@ import * as Chartist from "chartist";
 import {IBarChartOptions, IResponsiveOptionTuple} from "chartist";
 
 @Component({
-    //moduleId: module.id,
     selector: 'home-cmp',
     templateUrl: 'home.component.html',
     providers:[WorkerService]
 })
-
-
 
 export class HomeComponent implements OnInit{
     private dashboardData: any;
@@ -39,9 +36,7 @@ export class HomeComponent implements OnInit{
 
         var dataHost = {
             labels: dashboardData.host.keys,
-            series: [
-                dashboardData.host.values
-            ]
+            series: [ dashboardData.host.values ]
         };
 
         var optionsHost = {
@@ -59,9 +54,7 @@ export class HomeComponent implements OnInit{
 
         var dataPartition = {
             labels: dashboardData.partition.keys,
-            series: [
-                dashboardData.partition.values
-            ]
+            series: [ dashboardData.partition.values ]
         };
 
         var optionsPartition = {
@@ -77,9 +70,7 @@ export class HomeComponent implements OnInit{
 
         var dataPartitionStatus = {
             labels: dashboardData.partitionStatus.keys,
-            series: [
-                dashboardData.partitionStatus.values
-            ]
+            series: dashboardData.partitionStatus.values
         };
 
         var optionsPartitionStatus = {
@@ -91,6 +82,21 @@ export class HomeComponent implements OnInit{
         };
 
         new Chartist.Pie('#partitionStatus', dataPartitionStatus, optionsPartitionStatus);
+
+        var dataStatus = {
+            labels: dashboardData.status.keys,
+            series: dashboardData.status.values
+        };
+
+        var optionsStatus = {
+            donut: true,
+            donutWidth: 40,
+            startAngle: 0,
+            // total: 100,
+            showLabel: true
+        };
+
+        new Chartist.Pie('#status', dataStatus, optionsStatus);
 
     }
 
