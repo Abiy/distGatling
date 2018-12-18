@@ -32,7 +32,7 @@
     </modules>
     <properties>
         <current.version>1.0.2-SNAPSHOT</current.version>
-        <akka.version>2.5.16</akka.version>
+        <akka.version>2.5.19</akka.version>
         <hamcrest.version>1.3</hamcrest.version>
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
         <jhades.version>1.0.4</jhades.version>
@@ -42,16 +42,16 @@
         <java.version>1.8</java.version>
     </properties>
     <dependencyManagement>
-    <dependencies>
-        <dependency>
-            <!-- Import dependency management from Spring Boot -->
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-dependencies</artifactId>
-            <version>1.5.8.RELEASE</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-    </dependencies>
+        <dependencies>
+            <dependency>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>1.5.8.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
     </dependencyManagement>
     <dependencies>
         <dependency>
@@ -152,18 +152,18 @@
             <version>0.5.2</version>
         </dependency>
     </dependencies>
-   <!-- Your internal nexus repo for publishing artifacts-->
-  <!--<distributionManagement>-->
-        <!--<repository>-->
-            <!--<id>internal-repository</id>-->
-            <!--<name>devservices-nexus</name>-->
-            <!--<url>http://repo.wal-mart.com/content/repositories/walmart</url>-->
-        <!--</repository>-->
-        <!--<snapshotRepository>-->
-            <!--<id>internal-repository</id>-->
-            <!--<name>devservices-nexus</name>-->
-            <!--<url>http://repo.wal-mart.com/content/repositories/snapshots</url>-->
-        <!--</snapshotRepository>-->
+    <!-- Your internal nexus repo for publishing artifacts-->
+    <!--<distributionManagement>-->
+    <!--<repository>-->
+    <!--<id>internal-repository</id>-->
+    <!--<name>devservices-nexus</name>-->
+    <!--<url>http://repo.wal-mart.com/content/repositories/walmart</url>-->
+    <!--</repository>-->
+    <!--<snapshotRepository>-->
+    <!--<id>internal-repository</id>-->
+    <!--<name>devservices-nexus</name>-->
+    <!--<url>http://repo.wal-mart.com/content/repositories/snapshots</url>-->
+    <!--</snapshotRepository>-->
     <!--</distributionManagement>-->
     <build>
         <plugins>
@@ -185,6 +185,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>aggregate</id>
