@@ -27,7 +27,6 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.persistence.AbstractPersistentActor;
 import akka.persistence.Recovery;
-import akka.persistence.SnapshotSelectionCriteria;
 import jersey.repackaged.com.google.common.collect.ImmutableList;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
@@ -189,7 +188,7 @@ public class Master extends AbstractPersistentActor {
         getSender().tell(new Ack(cmdJob.clientId), getSelf());
         String trackingId = UUID.randomUUID().toString();
         List<String> parameters = Arrays.asList(clientConfig.getParameterString().split(" "));
-        boolean hasDataFeed = !clientConfig.getDataFeedPath().isEmpty();
+        boolean hasResourcesFeed = !clientConfig.getResourcesFeedPath().isEmpty();
         JobSummary.JobInfo jobinfo = JobSummary.JobInfo.newBuilder()
                 .withCount(clientConfig.getParallelism())
                 .withJobName("gatling")
@@ -197,10 +196,10 @@ public class Master extends AbstractPersistentActor {
                 .withPartitionName(clientConfig.getPartitionName())
                 .withUser(clientConfig.getUserName())
                 .withTrackingId(trackingId)
-                .withHasDataFeed(hasDataFeed)
+                .withHasResourcesFeed(hasResourcesFeed)
                 .withParameterString(clientConfig.getParameterString())
                 .withFileFullName(clientConfig.getJarFileName())//class name is not fileName
-                .withDataFileName(clientConfig.getDataFeedFileName())
+                .withResourcesFileName((clientConfig.getResourcesFeedFileName()))
                 .withJarFileName(clientConfig.getJarFileName())
                 .build();
         for (int i = 0; i < clientConfig.getParallelism(); i++) {
@@ -211,8 +210,7 @@ public class Master extends AbstractPersistentActor {
             Job job = new Job(clientConfig.getPartitionName(), taskEvent, trackingId,
                     agentConfig.getAbortUrl(),
                     agentConfig.getJobFileUrl(clientConfig.getJarPath()),
-                    agentConfig.getJobFileUrl(clientConfig.getDataFeedPath()),
-                    agentConfig.getJobFileUrl(clientConfig.getBodiesFeedPath()),
+                    agentConfig.getJobFileUrl(clientConfig.getResourcesFeedPath()),
                     true);
             persist(new JobState.JobAccepted(job), event -> {
                 // Ack back to original sender
@@ -525,18 +523,16 @@ public class Master extends AbstractPersistentActor {
         public final boolean isJarSimulation;
         public String abortUrl;
         public String jobFileUrl;
-        public String dataFileUrl;
-        public String bodiesFileUrl;
+        public String resourcesFileUrl;
 
-        public Job(String roleId, Object job, String trackingId, String abortUrl,String jobFileUrl, String dataFileUrl, String bodiesFileUrl, boolean isJarSimulation) {
+        public Job(String roleId, Object job, String trackingId, String abortUrl, String jobFileUrl, String resourcesFileUrl, boolean isJarSimulation) {
             this.jobId = UUID.randomUUID().toString();
             this.roleId = roleId;
             this.taskEvent = job;
             this.trackingId = trackingId;
             this.abortUrl = abortUrl;
             this.jobFileUrl = jobFileUrl;
-            this.dataFileUrl = dataFileUrl;
-            this.bodiesFileUrl = bodiesFileUrl;
+            this.resourcesFileUrl = resourcesFileUrl;
             this.isJarSimulation = isJarSimulation;
         }
 
@@ -550,8 +546,7 @@ public class Master extends AbstractPersistentActor {
                     ", isJarSimulation=" + isJarSimulation +
                     ", abortUrl='" + abortUrl + '\'' +
                     ", jobFileUrl='" + jobFileUrl + '\'' +
-                    ", dataFileUrl='" + dataFileUrl + '\'' +
-                    ", bodiesFileUrl='" + bodiesFileUrl + '\'' +
+                    ", resourcesFileUrl='" + resourcesFileUrl + '\'' +
                     '}';
         }
     }

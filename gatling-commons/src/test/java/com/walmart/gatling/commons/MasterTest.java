@@ -18,39 +18,24 @@
 
 package com.walmart.gatling.commons;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
+import akka.persistence.journal.leveldb.SharedLeveldbStore;
 import akka.testkit.TestKit;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
-import akka.persistence.SnapshotOffer;
-import akka.persistence.journal.leveldb.LeveldbJournal;
-import akka.persistence.journal.leveldb.LeveldbStore;
-import akka.persistence.journal.leveldb.SharedLeveldbJournal;
-import akka.persistence.journal.leveldb.SharedLeveldbStore;
-import akka.testkit.JavaTestKit;
-import scala.concurrent.Await;
-import scala.concurrent.Future;
-import scala.concurrent.duration.Duration;
-import scala.concurrent.duration.FiniteDuration;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by walmart
@@ -73,10 +58,8 @@ public class MasterTest  {
                 .withPartitionName("public")
                 .withUser("testUser")
                 .withTrackingId(UUID.randomUUID().toString())
-                .withHasDataFeed(false)
                 .withParameterString("")
                 .withFileFullName("FileFullName")
-                .withDataFileName("DataFileName")
                 .build();
         taskEvent = new TaskEvent();
         {
@@ -126,7 +109,7 @@ public class MasterTest  {
     protected Master.Job getJob() {
         String id = UUID.randomUUID().toString();
         taskEvent.setJobName("gatling");
-        Master.Job job = new Master.Job("projectName", taskEvent, id, "","simulatioFilePath","dataFilePath", "bodiesFilePath", false);
+        Master.Job job = new Master.Job("projectName", taskEvent, id, "","simulationFilePath", "resourcesFilePath", false);
         return job;
     }
 

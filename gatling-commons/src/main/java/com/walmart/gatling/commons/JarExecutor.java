@@ -31,7 +31,6 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.lang3.StringUtils;
 import scala.concurrent.ExecutionContextExecutorService;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -58,8 +57,7 @@ import static akka.dispatch.Futures.*;
 public class JarExecutor extends WorkExecutor {
 
     public static final String SIMULATION = "simulation";
-    public static final String DATA = "data";
-    public static final String BODIES = "bodies";
+    public static final String RESOURCES = "resources";
     
     IOFileFilter logFilter = new IOFileFilter() {
         @Override
@@ -232,7 +230,7 @@ public class JarExecutor extends WorkExecutor {
 
         map.put("path", new File(agentConfig.getJob().getJobArtifact(taskEvent.getJobName())));
         cmdLine.addArgument("${path}");
-        //parameters come from the task event
+        //parameters come from the task eventjob.jobFileUrl,
         for (String pair : taskEvent.getParameters()) {
             cmdLine.addArgument(pair);
         }
@@ -242,24 +240,17 @@ public class JarExecutor extends WorkExecutor {
         //job simulation artifact path
         cmdLine.addArgument("-sf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION));
         cmdLine.addArgument("-s").addArgument(taskEvent.getJobInfo().fileFullName);
-
-        //download the data feed
-        if(taskEvent.getJobInfo().hasDataFeed) {
-            DownloadFile.downloadFile(job.dataFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, DATA,taskEvent.getJobInfo().dataFileName));
-            //job data feed  path
-            cmdLine.addArgument("-df").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,DATA));
-        }
         
-        //download the bodies feed
-        if(taskEvent.getJobInfo().hasBodiesFeed) {
-            DownloadFile.downloadFileAndUnzip(job.bodiesFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, BODIES ,taskEvent.getJobInfo().bodiesFileName));
-            //job data feed  path
-            cmdLine.addArgument("-bdf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,BODIES));
+        //download the resources feed
+        if(taskEvent.getJobInfo().hasResourcesFeed) {
+            DownloadFile.downloadFileAndUnzip(job.resourcesFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, RESOURCES ,taskEvent.getJobInfo().resourcesFileName));
+            //job resources feed  path
+            cmdLine.addArgument("-rsf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId, RESOURCES));
         }
         
         //report file path
         cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
-        cmdLine.addArgument("-nr").addArgument("-m");
+        cmdLine.addArgument("-nr");
 
         cmdLine.setSubstitutionMap(map);
         return cmdLine;
@@ -269,13 +260,14 @@ public class JarExecutor extends WorkExecutor {
         CommandLine cmdLine = new CommandLine("java");
         cmdLine.addArgument("-jar");
 
-        //download the data feed
-        if(taskEvent.getJobInfo().hasDataFeed) {
-            log.info("Downloading from {}  to {}", job.dataFileUrl,agentConfig.getJob().getJobDirectory(job.jobId, DATA,taskEvent.getJobInfo().dataFileName));
-            DownloadFile.downloadFile(job.dataFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, DATA,taskEvent.getJobInfo().dataFileName));
-            //job data feed  path
+        //download the resources feed
+        if(taskEvent.getJobInfo().hasResourcesFeed) {
+            DownloadFile.downloadFileAndUnzip(job.resourcesFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, RESOURCES ,taskEvent.getJobInfo().resourcesFileName));
+            //job resources feed  path
+            cmdLine.addArgument("-rsf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId, RESOURCES));
         }
-        cmdLine.addArgument("-DdataFolder=" + agentConfig.getJob().getJobDirectory(job.jobId,DATA));
+
+        cmdLine.addArgument("-DresourcesFolder=" + agentConfig.getJob().getJobDirectory(job.jobId, RESOURCES));
         cmdLine.addArgument("-DresultsFolder=" + agentConfig.getJob().getResultPath(job.roleId, job.jobId));
         cmdLine.addArgument("-DnoReports=true");
         //parameters come from the task event

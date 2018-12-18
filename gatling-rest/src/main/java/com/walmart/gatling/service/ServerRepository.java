@@ -123,8 +123,7 @@ public class ServerRepository {
     public Optional<String> submitSimulationJob(SimulationJobModel simulationJobModel) throws Exception {
         String trackingId = UUID.randomUUID().toString();
         List<String> parameters = Arrays.asList( );//"-nr",  "-m", "-s",  simulationJobModel.getFileFullName());
-        boolean hasDataFeed = !(simulationJobModel.getDataFile() == null || simulationJobModel.getDataFile().isEmpty());
-        boolean hasBodiesFeed = !(simulationJobModel.getBodiesFile() == null || simulationJobModel.getBodiesFile().isEmpty());
+        boolean hasResourcesFeed = !(simulationJobModel.getResourcesFile() == null || simulationJobModel.getResourcesFile().isEmpty());
         JobSummary.JobInfo jobinfo = JobSummary.JobInfo.newBuilder()
                 .withCount(simulationJobModel.getCount())
                 .withJobName("gatling")
@@ -132,12 +131,10 @@ public class ServerRepository {
                 .withPartitionName(simulationJobModel.getRoleId())
                 .withUser(simulationJobModel.getUser())
                 .withTrackingId(trackingId)
-                .withHasDataFeed(hasDataFeed)
-                .withHasBodiesFeed(hasBodiesFeed)
+                .withHasResourcesFeed(hasResourcesFeed)
                 .withParameterString(simulationJobModel.getParameterString())
                 .withFileFullName(simulationJobModel.getFileFullName())
-                .withDataFileName(getDataFileName(simulationJobModel,hasDataFeed))
-                .withBodiesFileName(getBodiesFileName(simulationJobModel,hasBodiesFeed))
+                .withResourcesFileName(getResourcesFileName(simulationJobModel, hasResourcesFeed))
                 .build();
         Timeout timeout = new Timeout(6, TimeUnit.SECONDS);
         int success = 0;
@@ -149,8 +146,7 @@ public class ServerRepository {
             Future<Object> future = ask(router, new Master.Job(simulationJobModel.getRoleId(), taskEvent, trackingId,
                     agentConfig.getAbortUrl(),
                     agentConfig.getJobFileUrl(simulationJobModel.getSimulation()),
-                    agentConfig.getJobFileUrl(simulationJobModel.getDataFile()),
-                    agentConfig.getJobFileUrl(simulationJobModel.getBodiesFile()),
+                    agentConfig.getJobFileUrl(simulationJobModel.getResourcesFile()),
                     false),
                     timeout);
             Object result = Await.result(future, timeout.duration());
@@ -167,19 +163,10 @@ public class ServerRepository {
         return Optional.empty();
     }
 
-    private String getDataFileName(SimulationJobModel simulationJobModel, boolean hasDataFeed) {
-        if(!hasDataFeed)
-            return "";
-        String[] splits = simulationJobModel.getDataFile().split("/");
-        if (splits.length > 0) //return the last name
-            return splits[splits.length-1];
-        return "";
-    }
-    
-    private String getBodiesFileName(SimulationJobModel simulationJobModel, boolean hasBodiesFeed) {
+    private String getResourcesFileName(SimulationJobModel simulationJobModel, boolean hasBodiesFeed) {
         if(!hasBodiesFeed)
             return "";
-        String[] splits = simulationJobModel.getBodiesFile().split("/");
+        String[] splits = simulationJobModel.getResourcesFile().split("/");
         if (splits.length > 0) //return the last name
             return splits[splits.length-1];
         return "";

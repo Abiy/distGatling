@@ -102,31 +102,22 @@ public class FileUploadController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/upload")
     public SubmitResult uploadAndRunSimulation(MultipartHttpServletRequest request, @RequestParam("simulationFile") MultipartFile simulationFile) {
-        MultipartFile dataFile = request.getFile("dataFile");
-        MultipartFile bodiesFile = request.getFile("bodiesFile");
+        MultipartFile resourcesFile = request.getFile("resourcesFile");
         Map<String, String[]> paramMap = request.getParameterMap();
         String packageName = getValue(paramMap, "packageName"), partitionName = getValue(paramMap, "partitionName");
         String fileName = packageName.replace('.', '/') + ".scala";
         String trackingId = "";
         SimulationJobModel job = new SimulationJobModel();
         String dataFilePath = "";//should be empty by default
-        String bodiesFilePath = "";//should be empty by default
+        String resourcesFilePath = "";//should be empty by default
         if (!simulationFile.isEmpty()) {
             try {
-                if (dataFile != null && !dataFile.isEmpty()) {
-                    dataFilePath = tempFileDir + "/" + dataFile.getOriginalFilename();
-                    FileUtils.touch(new File(dataFilePath));
+                if (resourcesFile != null && !resourcesFile.isEmpty()) {
+                    resourcesFilePath = tempFileDir + "/" + resourcesFile.getOriginalFilename();
+                    FileUtils.touch(new File(resourcesFilePath));
                     BufferedOutputStream stream = new BufferedOutputStream(
-                            new FileOutputStream(new File(dataFilePath)));
-                    FileCopyUtils.copy(dataFile.getInputStream(), stream);
-                    stream.close();
-                }
-                if (bodiesFile != null && !bodiesFile.isEmpty()) {
-                    bodiesFilePath = tempFileDir + "/" + bodiesFile.getOriginalFilename();
-                    FileUtils.touch(new File(bodiesFilePath));
-                    BufferedOutputStream stream = new BufferedOutputStream(
-                            new FileOutputStream(new File(bodiesFilePath)));
-                    FileCopyUtils.copy(bodiesFile.getInputStream(), stream);
+                            new FileOutputStream(new File(resourcesFilePath)));
+                    FileCopyUtils.copy(resourcesFile.getInputStream(), stream);
                     stream.close();
                 }
 
@@ -143,8 +134,7 @@ public class FileUploadController {
                 job.setTag(getValue(paramMap, "tag"));
                 job.setUser(getValue(paramMap, "userName"));
                 job.setSimulation(simulationFilePath);
-                job.setDataFile(dataFilePath);
-                job.setBodiesFile(bodiesFilePath);
+                job.setResourcesFile(resourcesFilePath);
                 job.setFileFullName(packageName);
                 job.setParameterString(getValue(paramMap, "parameter"));
                 log.info("Submitting job: {}", job);

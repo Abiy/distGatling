@@ -32,8 +32,7 @@ public class ClientConfig implements Serializable {
     private int port;
     private String role;
     private String jarPath;
-    private String dataFeedPath;
-    private String bodiesFeedPath;
+    private String resourcesFeedPath;
     private boolean quiet;
     private String className;
     private short parallelism;
@@ -44,24 +43,15 @@ public class ClientConfig implements Serializable {
     private String userName;
     private String host;
     private boolean remoteArtifact;
-    private String dataFeedFileName;
-    private String bodiesFeedFileName;
+    private String resourcesFeedFileName;
     private String jarFileName;
 
-    public String getDataFeedFileName() {
-        return dataFeedFileName;
-    }
-
-    public void setDataFeedFileName(String dataFeedFileName) {
-        this.dataFeedFileName = dataFeedFileName;
-    }
-
-    public String getBodiesFeedFileName() {
-		return bodiesFeedFileName;
+    public String getResourcesFeedFileName() {
+		return resourcesFeedFileName;
 	}
 
-	public void setBodiesFeedFileName(String bodiesFeedFileName) {
-		this.bodiesFeedFileName = bodiesFeedFileName;
+	public void setResourcesFeedFileName(String resourcesFeedFileName) {
+		this.resourcesFeedFileName = resourcesFeedFileName;
 	}
 
 	public boolean isRemoteArtifact() {
@@ -88,20 +78,12 @@ public class ClientConfig implements Serializable {
         this.jarPath = jarPath;
     }
 
-    public String getDataFeedPath() {
-        return dataFeedPath;
-    }
-
-    public void setDataFeedPath(String dataFeedPath) {
-        this.dataFeedPath = dataFeedPath;
-    }
-
-    public String getBodiesFeedPath() {
-		return bodiesFeedPath;
+    public String getResourcesFeedPath() {
+		return resourcesFeedPath;
 	}
 
-	public void setBodiesFeedPath(String bodiesFeedPath) {
-		this.bodiesFeedPath = bodiesFeedPath;
+	public void setResourcesFeedPath(String resourcesFeedPath) {
+		this.resourcesFeedPath = resourcesFeedPath;
 	}
 
 	public boolean isQuiet() {

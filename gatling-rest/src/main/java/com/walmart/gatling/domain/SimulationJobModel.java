@@ -33,8 +33,7 @@ public class SimulationJobModel implements Serializable {
     private String user;
     private String roleId; // The unique partition name/id
     private String simulation;
-    private String dataFile;
-    private String bodiesFile;
+    private String resourcesFile;
     private String jobId;
     private String tag;
     private short count;

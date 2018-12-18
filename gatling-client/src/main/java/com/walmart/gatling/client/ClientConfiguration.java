@@ -60,12 +60,12 @@ public class ClientConfiguration {
        clientConfig.setPartitionName(env.getProperty("client.partitionName"));
        clientConfig.setClassName(env.getProperty("client.className"));
        clientConfig.setParameterString(env.getProperty("client.parameter"));
-       clientConfig.setDataFeedPath(env.getProperty("client.dataFeedPath"));
-        clientConfig.setDataFeedFileName(env.getProperty("client.dataFeedFileName"));
+       clientConfig.setResourcesFeedPath(env.getProperty("client.resourcesFeedPath"));
+       clientConfig.setResourcesFeedFileName(env.getProperty("client.resourcesFeedFileName"));
        clientConfig.setQuiet(Boolean.parseBoolean(env.getProperty("client.quiet")));
        clientConfig.setParallelism(Short.parseShort(env.getProperty("client.parallelism")));
        clientConfig.setJarPath(env.getProperty("client.jarPath"));
-        clientConfig.setJarFileName(env.getProperty("client.jarFileName"));
+       clientConfig.setJarFileName(env.getProperty("client.jarFileName"));
        clientConfig.setUserName(env.getProperty("client.userName"));
        clientConfig.setHost(HostUtils.lookupHost());
        clientConfig.setRemoteArtifact(Boolean.parseBoolean(env.getProperty("client.remoteArtifact")));
@@ -85,9 +85,9 @@ public class ClientConfiguration {
             //upload files here
             String jarFileFullPath = UploadUtils.uploadFile(serverUrl, clientConfig.getJarPath());
             clientConfig.setJarPath(jarFileFullPath);
-            if (!clientConfig.getDataFeedPath().isEmpty()) {
-                String dataFileFullPath = UploadUtils.uploadFile(serverUrl, clientConfig.getDataFeedPath());
-                clientConfig.setDataFeedPath(dataFileFullPath);
+            if (!clientConfig.getResourcesFeedPath().isEmpty()) {
+                String resourcesFileFullPath = UploadUtils.uploadFile(serverUrl, clientConfig.getResourcesFeedPath());
+                clientConfig.setResourcesFeedPath(resourcesFileFullPath);
             }
         }
         return ClientFactory.startCommandClient(clientConfig);
