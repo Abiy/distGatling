@@ -20,6 +20,8 @@ package com.walmart.gatling.client;
 
 import com.walmart.gatling.commons.HostUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -36,8 +38,10 @@ import java.io.IOException;
  * Created by walmart on 5/16/17.
  */
 public class UploadUtils {
+    protected static final Log logger = LogFactory.getLog(UploadUtils.class);
 
-    public static String uploadFile(String server, String path,String basicToken){
+    public static String uploadFile(String server, String path,String basicToken)
+        throws IOException {
         CloseableHttpClient client = HttpClientBuilder.create()
                 .build();
 
@@ -60,17 +64,21 @@ public class UploadUtils {
             HttpResponse response = client.execute(post);
             final int statusCode = response.getStatusLine()
                     .getStatusCode();
-            return IOUtils.toString(response.getEntity().getContent());
+            String result = IOUtils.toString(response.getEntity().getContent());
+            logger.info(result);
+            if (statusCode != 200){
+                throw new RuntimeException("Upload Failed");
+            }
+            return result;
         } catch (IOException e) {
-            e.printStackTrace();
+            throw e;
         }
         finally {
             try {
                 client.close();
             } catch (IOException e) {
-                e.printStackTrace();
+               throw e;
             }
         }
-        return "";
     }
 }

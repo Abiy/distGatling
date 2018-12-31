@@ -1,6 +1,6 @@
 server:
   port: 0 # Server information for embedded jetty
-  url: http://192.168.1.196:8080 #the master base url used by the client to upload uber jar and data feed files
+  url: http://10.165.150.225:8080 #the master base url used by the client to upload uber jar and data feed files
 
 client:
   numberOfActors: 1 # Number of worker actors , controls the number of parallel simulation jobs you can run per process
@@ -24,7 +24,7 @@ client.jarFileName: gatling-uber-example-1.0.2-SNAPSHOT.jar # jar file name
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on
 akka:
-  contact-points: "192.168.1.196:2551"
+  contact-points: "10.165.150.225:2551"
 
 application.title: distGatling
 

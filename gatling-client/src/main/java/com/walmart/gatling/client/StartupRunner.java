@@ -27,7 +27,7 @@ public class StartupRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        logger.info("CommandClientActor Initializing...");
+        //logger.info("CommandClientActor Initializing...");
         //run basic check to make sure the app is starting in a healthy state
     }
 }
