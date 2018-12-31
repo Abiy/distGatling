@@ -262,12 +262,12 @@ public class JarExecutor extends WorkExecutor {
 
         //download the resources feed
         if(taskEvent.getJobInfo().hasResourcesFeed) {
-            DownloadFile.downloadFileAndUnzip(job.resourcesFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, RESOURCES ,taskEvent.getJobInfo().resourcesFileName));
+            DownloadFile.downloadFileAndUnzip(job.resourcesFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, RESOURCES));
             //job resources feed  path
-            cmdLine.addArgument("-rsf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId, RESOURCES));
+            //cmdLine.addArgument("-rsf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId, RESOURCES,taskEvent.getJobInfo().resourcesFileName));
         }
 
-        cmdLine.addArgument("-DresourcesFolder=" + agentConfig.getJob().getJobDirectory(job.jobId, RESOURCES));
+        cmdLine.addArgument("-DresourcesFolder=" + agentConfig.getJob().getJobDirectory(job.jobId,""));
         cmdLine.addArgument("-DresultsFolder=" + agentConfig.getJob().getResultPath(job.roleId, job.jobId));
         cmdLine.addArgument("-DnoReports=true");
         //parameters come from the task event

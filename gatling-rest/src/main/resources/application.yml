@@ -26,10 +26,10 @@ actor:
   role: "report"
   executerType: "script"
 job:
-  path: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.2.4" # Path to the base directory where the gatling lib, simulation, data, and conf are stored
-  logDirectory: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.2.4/" # Base directory for logfiles(log/error and log/std)
+  path: "/Users/ahailem/workspace/gatling/gatling-charts-highcharts-bundle-3.0.2" # Path to the base directory where the gatling lib, simulation, data, and conf are stored
+  logDirectory: "/Users/ahailem/workspace/gatling/gatling-charts-highcharts-bundle-3.0.2/" # Base directory for logfiles(log/error and log/std)
   command: "/bin/bash" # Base command to run gatling.sh file
-  artifact: "/Users/ahailem/workspace/gatling-charts-highcharts-bundle-2.2.4/bin/{0}.sh" # Path for the location of gatling.sh
+  artifact: "/Users/ahailem/workspace/gatling/gatling-charts-highcharts-bundle-3.0.2/bin/{0}.sh" # Path for the location of gatling.sh
 
 file:
   repository: "/Users/ahailem/workspace/uploads/" # Base directory used as a temporary staging area for user file uploads(simulation files,conf,data files and lib files)

@@ -33,7 +33,8 @@ class BasicSimulation extends Simulation {
     // We need dynamic data so that all users don't play the same and we end up with a behavior completely different from the live system (caching, JIT...)
     // ==> Feeders!
 
-    val feeder = csv("search.csv").random // default is queue, so for this test, we use random to avoid feeder starvation
+    //<BASE_DIR>/<FILENAME>.csv
+    val feeder = csv("toupload/search.csv").random // default is queue, so for this test, we use random to avoid feeder starvation
 
     val search = exec(http("Home")
       .get("/"))
@@ -85,7 +86,7 @@ class BasicSimulation extends Simulation {
   }
 
   val httpConf = http
-    .baseURL("http://computer-database.gatling.io")
+    .baseUrl("http://computer-database.gatling.io")
     .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
     .doNotTrackHeader("1")
     .acceptLanguageHeader("en-US,en;q=0.5")
@@ -95,8 +96,11 @@ class BasicSimulation extends Simulation {
   val users = scenario("Users").exec(Search.search, Browse.browse)
   val admins = scenario("Admins").exec(Search.search, Browse.browse, Edit.edit)
 
-  setUp(
-    users.inject(rampUsers(nbUsers) over (10 seconds)),
-    admins.inject(rampUsers(nbRamps) over (10 seconds))
-  ).protocols(httpConf)
+//  setUp(
+//    users.inject(rampUsers(nbUsers) over (10 seconds)),
+//    admins.inject(rampUsers(nbRamps) over (10 seconds))
+//  ).protocols(httpConf)
+// Now, we can write the scenario as a composition
+  val scn = scenario("Scenario Name").exec(Search.search, Browse.browse, Edit.edit)
+  setUp(scn.inject(atOnceUsers(nbUsers)).protocols(httpConf))
 }

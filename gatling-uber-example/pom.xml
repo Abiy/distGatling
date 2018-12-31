@@ -26,7 +26,7 @@
         <version>${current.version}</version>
     </parent>-->
     <groupId>com.walmart.store</groupId>
-    <version>${current.version}</version>
+    <version>1.0.2-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>gatling-uber-example</artifactId>
@@ -35,9 +35,9 @@
     <properties>
         <current.version>1.0.2-SNAPSHOT</current.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gatling.version>2.2.5</gatling.version>
+        <gatling.version>3.0.2</gatling.version>
         <gatling-plugin.version>2.2.4</gatling-plugin.version>
-        <scala.version>2.11.8</scala.version>
+        <scala.version>2.12.8</scala.version>
         <scala.maven-plugin.version>3.2.2</scala.maven-plugin.version>
     </properties>
 

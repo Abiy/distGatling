@@ -25,10 +25,9 @@ object Engine extends App {
 
   val props = new GatlingPropertiesBuilder
   props.resultsDirectory(System.getProperty("resultsFolder"))
-  props.dataDirectory(System.getProperty("dataFolder"))
+  props.resourcesDirectory(System.getProperty("resourcesFolder"))
   props.simulationClass(System.getProperty("simulationClass"))
   props.noReports()
-  props.mute()
   Gatling.fromMap(props.build)
   sys.exit()
 

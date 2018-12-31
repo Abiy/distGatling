@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.util.Base64Utils;
 
 /**
  * Created by walmart
@@ -80,13 +81,16 @@ public class ClientConfiguration {
      * @return
      */
     @Bean
-    public ActorSystem createActorSystemWithAgent(ClientConfig clientConfig){
+    public ActorSystem createActorSystemWithAgent(ClientConfig clientConfig, Environment env){
+
         if(!clientConfig.isRemoteArtifact()) {
+           String usPwd =  env.getProperty("gatling.user") + ":" + env.getProperty("gatling.password");
+            String basicToken = "Basic " + Base64Utils.encodeToString(usPwd.getBytes());
             //upload files here
-            String jarFileFullPath = UploadUtils.uploadFile(serverUrl, clientConfig.getJarPath());
+            String jarFileFullPath = UploadUtils.uploadFile(serverUrl, clientConfig.getJarPath(),basicToken);
             clientConfig.setJarPath(jarFileFullPath);
             if (!clientConfig.getResourcesFeedPath().isEmpty()) {
-                String resourcesFileFullPath = UploadUtils.uploadFile(serverUrl, clientConfig.getResourcesFeedPath());
+                String resourcesFileFullPath = UploadUtils.uploadFile(serverUrl, clientConfig.getResourcesFeedPath(),basicToken);
                 clientConfig.setResourcesFeedPath(resourcesFileFullPath);
             }
         }

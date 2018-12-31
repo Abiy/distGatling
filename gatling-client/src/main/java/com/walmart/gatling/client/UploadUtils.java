@@ -37,15 +37,16 @@ import java.io.IOException;
  */
 public class UploadUtils {
 
-    public static String uploadFile(String server, String path){
+    public static String uploadFile(String server, String path,String basicToken){
         CloseableHttpClient client = HttpClientBuilder.create()
                 .build();
 
 
         HttpPost post = new HttpPost( server + "/uploadFile");
+        post.setHeader("Authorization",basicToken);
         //File jarFile = new File(jarFilePath);
         File dataFeedFile = new File(path);
-        String message = HostUtils.lookupHost();
+        String message = HostUtils.lookupIp();
 
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
