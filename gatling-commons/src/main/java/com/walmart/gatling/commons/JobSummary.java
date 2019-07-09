@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Created by walmart on 4/28/17.
+ *  on 4/28/17.
  */
 public class JobSummary implements Serializable {
 

@@ -35,7 +35,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by walmart on 5/16/17.
+ *  on 5/16/17.
  */
 public class UploadUtils {
     protected static final Log logger = LogFactory.getLog(UploadUtils.class);

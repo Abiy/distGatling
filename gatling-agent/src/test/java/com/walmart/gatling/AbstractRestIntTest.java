@@ -33,7 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * Abstract helper class that defines necessary web integration testing annotations and common functions.
  * 
- * @author walmart
+ * @author
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)

@@ -21,7 +21,7 @@ package com.walmart.gatling.commons;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Created by walmart.
+ * .
  */
 @XmlRootElement
 public class TaskTrackingInfo {

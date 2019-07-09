@@ -24,7 +24,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Created by walmart on 5/3/17.
+ *  on 5/3/17.
  */
 public class ValuePairTest {
 

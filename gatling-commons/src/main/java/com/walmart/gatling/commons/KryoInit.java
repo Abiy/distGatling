@@ -21,7 +21,7 @@ package com.walmart.gatling.commons;
 import com.esotericsoftware.kryo.Kryo;
 
 /**
- * Created by walmart on 5/12/17.
+ *  on 5/12/17.
  */
 public class KryoInit {
     public void customize(Kryo kryo){

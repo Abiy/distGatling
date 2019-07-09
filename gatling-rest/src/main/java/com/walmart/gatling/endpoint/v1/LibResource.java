@@ -41,7 +41,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Created by walmart
+ *
  * This jersey controller exposes http end points for workers ,
  * workers pull new artifacts and other resources using either the streaming end point or the file end point
  */

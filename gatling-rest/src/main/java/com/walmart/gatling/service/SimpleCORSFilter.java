@@ -19,7 +19,7 @@
 package com.walmart.gatling.service;
 
 /**
- * Created by walmart on 4/28/17.
+ *  on 4/28/17.
  */
 
 import org.slf4j.Logger;

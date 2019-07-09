@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
 /**
  * Abstract helper class that defines necessary web integration testing annotations and common functions.
  * 
- * @author walmart
+ * @author
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)

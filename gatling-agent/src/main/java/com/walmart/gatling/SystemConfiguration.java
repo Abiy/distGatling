@@ -35,7 +35,7 @@ import akka.actor.Props;
 import akka.routing.RoundRobinPool;
 
 /**
- * Created by walmart
+ *
  */
 @Configuration
 public class SystemConfiguration {

@@ -21,7 +21,7 @@ package com.walmart.gatling.domain;
 import lombok.Data;
 
 /**
- * Created by walmart on 5/9/17.
+ *  on 5/9/17.
  */
 @Data
 public class SubmitSimulationModel {

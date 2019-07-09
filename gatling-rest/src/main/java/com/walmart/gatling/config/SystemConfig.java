@@ -34,7 +34,7 @@ import akka.actor.Props;
 import akka.routing.RoundRobinPool;
 
 /**
- * Created by walmart. A spring configuration object to create beans
+ * . A spring configuration object to create beans
  */
 @Configuration
 public class SystemConfig {

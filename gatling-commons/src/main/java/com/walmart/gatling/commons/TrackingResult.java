@@ -23,7 +23,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Created by walmart
+ *
  */
 @XmlRootElement
 public class TrackingResult {

@@ -31,7 +31,7 @@ import com.walmart.gatling.domain.WorkerModel;
 /**
  * Trivial integration test class that exercises the Junit spring runner and in container testing.
  * 
- * @author walmart
+ * @author
  *
  */
 public class RestControllerIntTest extends AbstractRestIntTest {

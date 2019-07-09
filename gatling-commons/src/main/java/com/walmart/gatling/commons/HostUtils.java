@@ -22,7 +22,7 @@ import java.net.*;
 import java.util.Enumeration;
 
 /**
- * Created by walmart
+ *
  */
 public class HostUtils {
 

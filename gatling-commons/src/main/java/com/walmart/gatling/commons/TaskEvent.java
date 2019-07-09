@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 //import javafx.util.Pair;
 
 /**
- * Created by walmart
+ *
  */
 public class TaskEvent implements Serializable {
 

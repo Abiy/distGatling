@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Base64Utils;
 
-/** Created by walmart */
+/**  */
 @Configuration
 public class ClientConfiguration {
   protected final Log logger = LogFactory.getLog(getClass());

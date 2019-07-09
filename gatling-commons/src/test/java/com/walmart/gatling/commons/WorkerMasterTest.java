@@ -25,7 +25,7 @@ import org.junit.Test;
 import java.util.UUID;
 
 /**
- * Created by walmart
+ *
  */
 public class WorkerMasterTest extends MasterTest {
 

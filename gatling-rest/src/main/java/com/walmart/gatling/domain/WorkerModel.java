@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Created by walmart on 3/4/16.
+ *  on 3/4/16.
  */
 @Data
 @XmlRootElement

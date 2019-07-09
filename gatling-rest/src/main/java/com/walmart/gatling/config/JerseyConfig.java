@@ -36,7 +36,7 @@ import javax.ws.rs.ApplicationPath;
 /**
  * This class configures Jersey in Spring and registers annotated Jersey endpoints.
  * 
- * @author walmart
+ * @author
  *
  */
 @Component

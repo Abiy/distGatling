@@ -24,7 +24,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
- * Created by walmart
+ *
  */
 @Configuration
 public class ResourceConfig extends WebMvcConfigurerAdapter {

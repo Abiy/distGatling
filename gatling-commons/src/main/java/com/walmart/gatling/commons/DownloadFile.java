@@ -30,7 +30,7 @@ import net.lingala.zip4j.exception.ZipException;
 
 
 /**
- * Created by walmart on 3/28/16.
+ *  on 3/28/16.
  */
 public class DownloadFile {
     private static final int READ_TIMEOUT = 1000 * 60;
