@@ -10,7 +10,7 @@ client:
 client.accessKey: accessSecretKey
 client.partitionName: public
 client.className:
-client.parameter: -Dusers=10 -Dramps=1 -DsimulationClass=com.walmart.store.gatling.simulation.BasicSimulation
+client.parameter: -Dusers=10 -Dramps=1 -DsimulationClass=com.alh.store.gatling.simulation.BasicSimulation
 client.dataFeedPath: /Users/ahailem/workspace/distributed-gatling/distributed-gatling/gatling-uber-example/data/search.csv
 client.quiet: false
 client.parallelism: 1
@@ -27,5 +27,5 @@ akka:
 application.title: GATLING
 
 logging.level.root: ERROR
-logging.level.com.walmart.gatling: DEBUG
-logging.level.com.walmart.gatling.Client: ERROR
+logging.level.com.alh.gatling: DEBUG
+logging.level.com.alh.gatling.Client: ERROR

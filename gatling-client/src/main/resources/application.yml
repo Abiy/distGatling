@@ -12,7 +12,7 @@ gatling.password: gatling
 client.accessKey: optional #optional access key for the partition
 client.partitionName: public
 client.className: optional
-client.parameter: -Dusers=100 -Dramps=1 -DsimulationClass=com.walmart.store.gatling.simulation.BasicSimulation    #the simulation class is required
+client.parameter: -Dusers=100 -Dramps=1 -DsimulationClass=com.alh.store.gatling.simulation.BasicSimulation    #the simulation class is required
 client.resourcesFeedPath: /Users/ahailem/workspace/dist-gatling-2/distGatling/gatling-uber-example/toupload.zip # path to the data feed file
 client.quiet: false
 client.parallelism: 1
@@ -29,5 +29,5 @@ akka:
 application.title: distGatling
 
 logging.level.root: ERROR
-logging.level.com.walmart.gatling: DEBUG
-logging.level.com.walmart.gatling.Client: ERROR
+logging.level.com.alh.gatling: DEBUG
+logging.level.com.alh.gatling.Client: ERROR

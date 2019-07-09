@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~
-  ~   Copyright 2016 Walmart Technology
+  ~   Copyright 2016 alh Technology
   ~
   ~   Licensed under the Apache License, Version 2.0 (the "License");
   ~   you may not use this file except in compliance with the License.
@@ -20,12 +20,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-   <!-- <parent>
-        <artifactId>distributed-gatling</artifactId>
-        <groupId>com.walmart.store</groupId>
-        <version>${current.version}</version>
-    </parent>-->
-    <groupId>com.walmart.store</groupId>
+    <groupId>com.alh.store</groupId>
     <version>1.0.2-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
 
@@ -80,7 +75,7 @@
                 <configuration>
                     <configFolder>src/test/resources</configFolder>
                     <dataFolder>src/test/resources/data</dataFolder>
-                    <!--<simulationsFolder>src/main/scala/com/walmart/store/gatling/simulation</simulationsFolder>-->
+                    <!--<simulationsFolder>src/main/scala/com/alh/store/gatling/simulation</simulationsFolder>-->
                     <resultsFolder>results</resultsFolder>
                     <noReports>true</noReports>
                     <!--   <reportsOnly>directoryName</reportsOnly> -->
@@ -148,7 +143,7 @@
                                 <!-- add Main-Class to manifest file -->
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.walmart.store.gatling.Engine</mainClass>
+                                    <mainClass>com.alh.store.gatling.Engine</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

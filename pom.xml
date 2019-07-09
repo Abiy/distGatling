@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~
-  ~   Copyright 2016 Walmart Technology
+  ~   Copyright 2016 alh Technology
   ~
   ~   Licensed under the Apache License, Version 2.0 (the "License");
   ~   you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.walmart.store</groupId>
+    <groupId>com.alh.store</groupId>
     <artifactId>distributed-gatling</artifactId>
     <packaging>pom</packaging>
     <version>1.0.2-SNAPSHOT</version>
@@ -152,19 +152,6 @@
             <version>0.5.2</version>
         </dependency>
     </dependencies>
-    <!-- Your internal nexus repo for publishing artifacts-->
-    <!--<distributionManagement>-->
-    <!--<repository>-->
-    <!--<id>internal-repository</id>-->
-    <!--<name>devservices-nexus</name>-->
-    <!--<url>http://repo.wal-mart.com/content/repositories/walmart</url>-->
-    <!--</repository>-->
-    <!--<snapshotRepository>-->
-    <!--<id>internal-repository</id>-->
-    <!--<name>devservices-nexus</name>-->
-    <!--<url>http://repo.wal-mart.com/content/repositories/snapshots</url>-->
-    <!--</snapshotRepository>-->
-    <!--</distributionManagement>-->
     <build>
         <plugins>
             <plugin>
@@ -194,7 +181,7 @@
                         </goals>
                         <configuration>
                             <dependencySourceIncludes>
-                                <dependencySourceInclude>com.walmart.store:*
+                                <dependencySourceInclude>com.alh.store:*
                                 </dependencySourceInclude>
                             </dependencySourceIncludes>
                         </configuration>

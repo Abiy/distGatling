@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~
-  ~   Copyright 2016 Walmart Technology
+  ~   Copyright 2016 alh Technology
   ~
   ~   Licensed under the Apache License, Version 2.0 (the "License");
   ~   you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>distributed-gatling</artifactId>
-        <groupId>com.walmart.store</groupId>
+        <groupId>com.alh.store</groupId>
         <version>1.0.2-SNAPSHOT</version>
     </parent>
 
@@ -33,7 +33,7 @@
     <properties>
         <java.version>1.8</java.version>
         <current.version>1.0.2-SNAPSHOT</current.version>
-        <start-class>com.walmart.gatling.Application</start-class>
+        <start-class>com.alh.gatling.Application</start-class>
     </properties>
     <dependencies>
         <dependency>
@@ -83,7 +83,7 @@
             <version>2.6.3</version>
         </dependency>
         <dependency>
-            <groupId>com.walmart.store</groupId>
+            <groupId>com.alh.store</groupId>
             <artifactId>gatling-commons</artifactId>
             <version>${current.version}</version>
         </dependency>

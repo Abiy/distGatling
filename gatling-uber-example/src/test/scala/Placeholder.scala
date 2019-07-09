@@ -1,6 +1,6 @@
 /*
  *
- *   Copyright 2016 Walmart Technology
+ *   Copyright 2016 alh Technology
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  *
  */
 
-package com.walmart.cth.gatling
+package com.alh.cth.gatling
 
 /**
  * Needed because Gatling does a hardcoded check against the existence of _target/classes_ when run fom the IDE...

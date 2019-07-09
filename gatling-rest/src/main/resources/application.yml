@@ -42,10 +42,10 @@ graphite: #Graphite configuration for master api metrics
 
 jersey:
     controller:
-        packages: com.walmart # Base package for jersey controllers for auto registration
+        packages: com.alh # Base package for jersey controllers for auto registration
 
 logging.level.root: INFO
-logging.level.com.walmart.gatling: DEBUG
+logging.level.com.alh.gatling: DEBUG
 
 ---
 
@@ -57,12 +57,12 @@ spring:
 spring:
     profiles: integration
 
-logging.level.com.walmart.gatling: DEBUG
+logging.level.com.alh.gatling: DEBUG
     
 ---
 
 spring:
     profiles: production
 
-logging.level.com.walmart.gatling: DEBUG
+logging.level.com.alh.gatling: DEBUG
 

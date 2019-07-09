@@ -22,4 +22,4 @@ JAVA_OPTS="-server -XX:+UseThreadPriorities  -XX:ThreadPriorityPolicy=42 -Xms512
 
 GATLING_CLASSPATH="target/gatling-agent-1.0.2-SNAPSHOT.jar"
 # Run Gatling
-java $JAVA_OPTS -jar ${GATLING_CLASSPATH} com.walmart.gatling.Application
+java $JAVA_OPTS -jar ${GATLING_CLASSPATH} com.alh.gatling.Application

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2016 Walmart Technology
+# Copyright 2016 alh Technology
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,4 +22,4 @@ JAVA_OPTS="-server -XX:+UseThreadPriorities  -XX:ThreadPriorityPolicy=42 -Xms512
 
 GATLING_CLASSPATH="target/gatling-rest-1.0.2-SNAPSHOT.jar"
 # Run Gatling
-java $JAVA_OPTS -jar ${GATLING_CLASSPATH} com.walmart.gatling.Application
+java $JAVA_OPTS -jar ${GATLING_CLASSPATH} com.alh.gatling.Application

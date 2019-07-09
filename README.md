@@ -23,7 +23,7 @@ Gatling doesn’t have a cluster mode yet, hence the need for this project.
 
 ## Distributed Gatling (DistGatling)
 
-Distributed Gatling is a walmart Technology in house solution that was created to enable developers and QA engineers to run gatling simulation tests in a distributed/cluster environment.  
+Distributed Gatling is a solution that was created to enable developers and QA engineers to run gatling simulation tests in a distributed/cluster environment.  
 The solution is cloud native and has two components, Cluster Master and Cluster Worker.
 
      The overview section displays information about partition status across the cluster,worker task slots distribution by host and task slot distribution by partition

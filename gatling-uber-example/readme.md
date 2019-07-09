@@ -9,7 +9,7 @@ This will create an executable fat jar. Make sure that you have a the directory 
 Then simply execute the following command:
 
 
-    $mvn gatling:execute -DsimulationClass=com.walmart.store.gatling.simulation.BasicSimulation
+    $mvn gatling:execute -DsimulationClass=com.alh.store.gatling.simulation.BasicSimulation
 
 If there is only one simulations file then do:
 
@@ -17,7 +17,7 @@ If there is only one simulations file then do:
 
 If you have  parameters then run:
 
-mvn gatling:execute -DsimulationClass=com.walmart.store.gatling.simulation.BasicSimulation -Dusers=5 -Dramp=1
+mvn gatling:execute -DsimulationClass=com.alh.store.gatling.simulation.BasicSimulation -Dusers=5 -Dramp=1
 
 Note: Change then parameters accordingly
 The properties in the file resources/application.properties can be overridden by passing it as system properties. 
