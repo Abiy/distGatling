@@ -1,0 +1,31 @@
+FROM gatling:latest
+
+ARG AGENT_SERVER_PORT=8090
+ARG AKKA_PORT=8080
+ARG MASTER_SERVER=gatling-master.dist-gatling.svc.cluster.local
+
+ENV AGENT_SERVER_PORT=${AGENT_SERVER_PORT}
+ENV AKKA_PORT=${AKKA_PORT}
+ENV MASTER_SERVER=${MASTER_SERVER}
+ENV GATLING_BUNDLE_PATH="/opt/gatling-charts-highcharts-bundle"
+ENV DIST_GATLING_PATH="/usr/local/distGatling"
+
+#use your own values here
+ENV KUBERNETES_NAMESPACE="dist-gatling"
+ENV GRAPHITE_ENABLE=true
+ENV GRAPHITE_NAME="graphite-service"
+ENV LISTENING_AKKA_PORT=2551
+
+RUN mkdir -p ${DIST_GATLING_PATH}/logs ${DIST_GATLING_PATH}/uploads
+
+COPY gatling-*/*.sh ${DIST_GATLING_PATH}/
+RUN chmod +x ${DIST_GATLING_PATH}/*.sh
+COPY gatling-*/target/* ${DIST_GATLING_PATH}/target/
+
+EXPOSE ${AGENT_SERVER_PORT}
+EXPOSE ${AKKA_PORT}
+EXPOSE ${LISTENING_AKKA_PORT}
+
+WORKDIR ${DIST_GATLING_PATH}
+
+CMD ["/bin/bash", "-c", "cd ${DIST_GATLING_PATH} && ./agent.sh -Dakka.contact-points=${MASTER_SERVER}:${LISTENING_AKKA_PORT} -Dactor.port=0 -Dserver.port=${AGENT_SERVER_PORT}"] -Dactor.numberOfActors=1

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dist-gatling
+  name: gatling-worker
+  labels:
+    app: gatling
+    component: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gatling
+      component: worker
+  template:
+    metadata:
+      name: gatling-worker
+      labels:
+        app: gatling
+        component: worker
+    spec:
+      containers:
+      - name: worker
+        image: gatling-worker:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8090

@@ -61,6 +61,7 @@ export class SimulationModel{
                 public parameter: string,
                 public userName: string,
                 public accessKey: string,
-                public parallelism: number
+                public parallelism: number,
+                public kubernetesNamespace: string,
     ){}
 }

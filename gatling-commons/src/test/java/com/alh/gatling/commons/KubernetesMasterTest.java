@@ -1,21 +1,3 @@
-/*
- *
- *   Copyright 2016 alh Technology
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- *
- */
-
 package com.alh.gatling.commons;
 
 import akka.actor.ActorRef;
@@ -37,30 +19,32 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-/**
- *
- */
-public class MasterTest  {
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+
+public class KubernetesMasterTest  {
 
     protected static AgentConfig agentConfig;
     protected static ActorSystem system;
     protected static ActorRef master;
 
-    short parallelism = 1;
+    public short parallelism = 2;
     JobSummary.JobInfo jobinfo;
     TaskEvent taskEvent;
     @Before
     public void setUp(){
         jobinfo = JobSummary.JobInfo.newBuilder()
-                .withCount(parallelism)
-                .withJobName("gatling")
-                .withPartitionAccessKey("noAccessKey")
-                .withPartitionName("public")
-                .withUser("testUser")
-                .withTrackingId(UUID.randomUUID().toString())
-                .withParameterString("")
-                .withFileFullName("FileFullName")
-                .build();
+            .withCount(parallelism)
+            .withJobName("gatling")
+            .withPartitionAccessKey("noAccessKey")
+            .withPartitionName("public")
+            .withUser("testUser")
+            .withTrackingId(UUID.randomUUID().toString())
+            .withParameterString("")
+            .withFileFullName("FileFullName")
+            .build();
         taskEvent = new TaskEvent();
         {
             taskEvent.setJobName("gatling"); //the gatling.sh script is the gateway for simulation files
@@ -81,7 +65,10 @@ public class MasterTest  {
         log.setPort(8080);
         agentConfig.setLogServer(log);
         system = startMaster();
-        final Props props = GenericMaster.props(new FiniteDuration(20, TimeUnit.SECONDS), agentConfig);
+
+
+
+        final Props props = KubernetesMaster.props(new FiniteDuration(20, TimeUnit.SECONDS), agentConfig);
         master = system.actorOf(props, "master");
     }
 
@@ -95,10 +82,10 @@ public class MasterTest  {
         String ip = "127.0.0.1";
         String seed = String.format("akka.cluster.seed-nodes=[\"akka.tcp://%s@%s:%s\"]", Constants.PerformanceSystem, ip, 2551);
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[backend]").
-                withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=2551")).
-                withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + ip)).
-                withFallback(ConfigFactory.parseString(seed)).
-                withFallback(ConfigFactory.load("application"));
+            withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=2551")).
+            withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + ip)).
+            withFallback(ConfigFactory.parseString(seed)).
+            withFallback(ConfigFactory.load("application"));
 
         system = ActorSystem.create(Constants.PerformanceSystem, conf);
         system.actorOf(Props.create(SharedLeveldbStore.class), "store");
@@ -106,10 +93,12 @@ public class MasterTest  {
     }
 
 
-    protected Master.Job getJob() {
-        String id = UUID.randomUUID().toString();
+    protected Master.Job getJob(String trackingId) {
         taskEvent.setJobName("gatling");
-        Master.Job job = new Master.Job("projectName", taskEvent, id, "","simulationFilePath", "resourcesFilePath", false);
+
+        KubernetesService kubernetesService = mock(KubernetesService.class);
+        when(kubernetesService.createDeploy(anyString())).thenAnswer(invocation -> { return "gatling-worker." + invocation.getArgument(0); });
+        Master.Job job = new Master.Job("projectName", taskEvent, trackingId, "","simulationFilePath", "resourcesFilePath", false,parallelism);
         return job;
     }
 

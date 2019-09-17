@@ -6,12 +6,13 @@ actor:
   port: 2556 # Port number for the actor system that host the worker actors
   role: "public" # The name of the role each actor uses (role1,role2...role5 etc)
   executerType: "script"
+
 job:
-  path: "/Users/ahailem/workspace/gatling/gatling-charts-highcharts-bundle-3.0.2" # Path to the base directory where the gatling simulation, data, and conf are stored
-  logDirectory: "/Users/ahailem/workspace/gatling/gatling-charts-highcharts-bundle-3.0.2/" # Base directory for logfiles(log/error and log/std)
+  path: "${GATLING_BUNDLE_PATH:'/Users/ahailem/workspace/gatling/gatling-charts-highcharts-bundle-3.0.2'}" # Path to the base directory where the gatling simulation, data, and conf are stored
+  logDirectory: "${DIST_GATLING_PATH:'/Users/ahailem/workspace/gatling/gatling-charts-highcharts-bundle-3.0.2/'}/logs" # Base directory for logfiles(log/error and log/std)
   command: "/bin/bash" # Base command to run gatling.sh file
-  artifact: "/Users/ahailem/workspace/gatling/gatling-charts-highcharts-bundle-3.0.2/bin/{0}.sh" # Path for the location of gatling.sh
-  jobDirectory: /Users/ahailem/workspace/gspace/ # directory to store artifacts temporarily, only applicable for agents
+  artifact: "${GATLING_BUNDLE_PATH:'/Users/ahailem/workspace/gatling/gatling-charts-highcharts-bundle-3.0.2'}/bin/{0}.sh" # Path for the location of gatling.sh
+  jobDirectory: "${DIST_GATLING_PATH:'/Users/ahailem/workspace'}/gspace/" # directory to store artifacts temporarily, only applicable for agents
 
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on
@@ -19,10 +20,11 @@ akka:
   contact-points: "172.16.0.140:2551"
 
 graphite:
-    host: localhost
+    enable: "${GRAPHITE_ENABLE:false}"
+    host: "${GRAPHITE_NAME:graphite-service}.${KUBERNETES_NAMESPACE:dist-gatling}.svc.cluster.local"
     port: 2003
     prefix: gatling-worker
-    frequency-in-seconds: 10000
+    frequency-in-seconds: 10
 
 jersey:
     controller:

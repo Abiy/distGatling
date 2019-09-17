@@ -1,4 +1,4 @@
-package com.alh.gatling.service.exception;
+package com.alh.gatling.commons.exception;
 
 public class NotFoundException extends Exception {
 

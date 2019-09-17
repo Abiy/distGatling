@@ -1,0 +1,19 @@
+FROM openjdk:8u222-jdk
+
+LABEL \
+    name="gatling" \
+    version="${GATLING_VERSION}"
+
+ENV GATLING_VERSION ${GATLING_VERSION}
+
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+        openjfx \
+        unzip \
+    && rm -f /var/lib/apt/lists/*_dists_*
+
+COPY gatling-charts-highcharts-bundle.zip gatling.zip
+
+RUN \
+  unzip gatling.zip -d /opt \
+  && rm -f gatling.zip \

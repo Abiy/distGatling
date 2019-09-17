@@ -32,4 +32,5 @@ public class SubmitSimulationModel {
     private String userName;
     private String accessKey;
     private int parallelism;
+    private String kubernetesNamespace;
 }

@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gatling-role-binding
+  namespace: dist-gatling
+subjects:
+- kind: ServiceAccount
+  name: gatling-service-account
+  namespace: dist-gatling
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: gatling-role # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io

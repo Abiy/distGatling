@@ -42,7 +42,7 @@ public class CommandClientActor extends AbstractActor {
         public void apply(Object message) {
             log.info("{}", message);
             if (message instanceof MasterClientProtocol.CommandLineJobSubmitted) {
-                log.info("Job submitted. tracking info =>" + ((MasterClientProtocol.CommandLineJobSubmitted) message).getTrackingDetail());
+                log.info("Job submitted. tracking info => {}", ((MasterClientProtocol.CommandLineJobSubmitted) message).getTrackingDetail());
                 System.exit(0);
             } else {
                 unhandled(message);
