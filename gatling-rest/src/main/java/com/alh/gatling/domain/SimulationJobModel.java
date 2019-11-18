@@ -36,15 +36,8 @@ public class SimulationJobModel implements Serializable {
     private String resourcesFile;
     private String jobId;
     private String tag;
-    private String kubernetesToken;
-    private String kubernetesUrl;
-    private String namespace;
-    private int replicasCount;
-    private String kubernetesNamespace;
     private short count;
     private String fileFullName;
     private String parameterString;
-
-
 
 }

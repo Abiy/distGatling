@@ -1,7 +1,7 @@
 /*
  *
  *   Copyright 2016 alh Technology
- *
+ *  
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -18,12 +18,6 @@
 
 package com.alh.gatling.commons;
 
-import static akka.actor.SupervisorStrategy.escalate;
-import static akka.actor.SupervisorStrategy.restart;
-import static akka.actor.SupervisorStrategy.stop;
-
-import com.alh.gatling.commons.Master.Ack;
-import com.alh.gatling.commons.Master.Job;
 import akka.actor.AbstractActor;
 import akka.actor.ActorInitializationException;
 import akka.actor.ActorRef;
@@ -38,87 +32,64 @@ import akka.cluster.client.ClusterClient;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Procedure;
+import com.alh.gatling.commons.Master.Ack;
+import com.alh.gatling.commons.Master.Job;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.io.Serializable;
 import java.util.UUID;
 
+import static akka.actor.SupervisorStrategy.*;
+
 public class Worker extends AbstractActor {
 
-    public static final Object KeepAliveTick = new Object() {
-        @Override
-        public String toString() {
-            return "KeepAliveTick";
-        }
-    };
     private final ActorRef clusterClient;
     private final String host;
-    private final String workerId;
+    private String workerRole;
+    private final String workerId = UUID.randomUUID().toString();
     private final ActorRef workExecutor;
     private final Cancellable registerTask;
-    private final Cancellable keepAliveTask;
-    private String workerRole;
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private String currentJobId = null;
-    private final Procedure<Object> idle = new Procedure<Object>() {
-        public void apply(Object message) {
-            if (message == KeepAliveTick) {
-                sendToMaster(new MasterWorkerProtocol.WorkerRequestsFile(workerId, workerRole, host));
-            } else if (message instanceof MasterWorkerProtocol.WorkIsReady) {
-                sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
-            } else if (message instanceof Master.Job) {
-                Job job = (Job) message;
-                log.info("Got work: {}", job);
-                currentJobId = job.jobId;
-                workExecutor.tell(job, getSelf());
-                getContext().become(receiveBuilder()
-                                        .matchAny(p -> working.apply(p))
-                                        .build());
-            } else if (message instanceof Master.FileJob) {
-                Master.FileJob fileJob = (Master.FileJob) message;
-                log.info("Got file upload work: {}", fileJob.uploadFileRequest);
-                currentJobId = fileJob.jobId;
-                workExecutor.tell(fileJob, getSelf());
-                getContext().become(receiveBuilder()
-                                        .matchAny(p -> working.apply(p))
-                                        .build());
-            } else {
-                unhandled(message);
-            }
-        }
-    };
+    private final Cancellable keepAliveTask;
+
     private final Procedure<Object> working = new Procedure<Object>() {
         public void apply(Object message) {
+            //log.info("Work received. Result {}.", message);
             if (message instanceof WorkComplete) {
                 Object result = ((WorkComplete) message).result;
+                //log.info("Work is complete. Result {}.", result);
                 sendToMaster(new MasterWorkerProtocol.WorkIsDone(workerId, jobId(), result));
                 getContext().setReceiveTimeout(Duration.create(5, "seconds"));
                 Procedure<Object> waitForWorkIsDoneAck = waitForWorkIsDoneAck(result);
                 getContext().become(receiveBuilder()
-                                        .matchAny(p -> waitForWorkIsDoneAck.apply(p))
-                                        .build());
-            } else if (message instanceof Worker.FileUploadComplete) {
+                        .matchAny(p -> waitForWorkIsDoneAck.apply(p))
+                        .build());
+            }
+            else if (message instanceof  Worker.FileUploadComplete){
                 sendToMaster(message);
                 getContext().become(receiveBuilder()
-                                        .matchAny(p -> idle.apply(p))
-                                        .build());
-            } else if (message instanceof WorkFailed) {
+                        .matchAny(p->idle.apply(p))
+                        .build());
+            }
+            else if (message instanceof WorkFailed) {
                 Object result = ((WorkFailed) message).result;
-                log.warning("Work is failed. Result {}.", result);
-                sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(), result));
+                log.info("Work is failed. Result {}.", result);
+                sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),result));
                 getContext().become(receiveBuilder()
-                                        .matchAny(p -> idle.apply(p))
-                                        .build());
+                        .matchAny(p->idle.apply(p))
+                        .build());
                 //getContext().setReceiveTimeout(Duration.create(5, "seconds"));
                 ///Procedure<Object> waitForWorkIsDoneAck = waitForWorkIsDoneAck(result);
                 //getContext().become(waitForWorkIsDoneAck);
-            } else if (message == KeepAliveTick) {
-                log.info("Job is in progress for workId={}.", jobId());
-                if (currentJobId != null) {
+            }
+            else if(message==KeepAliveTick){
+                log.info("Job is in progress. {}.", jobId());
+                if (currentJobId!=null){
                     sendToMaster(new MasterWorkerProtocol.WorkInProgress(workerId, jobId()));
                 }
-            } else if (message instanceof Job) {
+            }else if (message instanceof Job) {
                 log.info("Yikes. Master told me to do work, while I'm working.");
             } else {
                 unhandled(message);
@@ -126,96 +97,110 @@ public class Worker extends AbstractActor {
         }
     };
 
-    {
-        getContext().become(receiveBuilder()
-                                .matchAny(p -> idle.apply(p))
-                                .build());
-    }
+    private final Procedure<Object> idle = new Procedure<Object>() {
+        public void apply(Object message) {
+            if(message==KeepAliveTick){
+                sendToMaster(new MasterWorkerProtocol.WorkerRequestsFile(workerId, workerRole, host));
+            }
+            else if (message instanceof MasterWorkerProtocol.WorkIsReady)
+                sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
+            else if (message instanceof Master.Job) {
+                Job job = (Job) message;
+                log.info("Got work: {}", job);
+                currentJobId = job.jobId;
+                workExecutor.tell(job, getSelf());
+                getContext().become(receiveBuilder()
+                        .matchAny(p->working.apply(p))
+                        .build());
+            }
+            else if (message instanceof Master.FileJob) {
+                Master.FileJob fileJob = (Master.FileJob) message;
+                log.info("Got file upload work: {}", fileJob.uploadFileRequest);
+                currentJobId = fileJob.jobId;
+                workExecutor.tell(fileJob, getSelf());
+                getContext().become(receiveBuilder()
+                        .matchAny(p->working.apply(p))
+                        .build());
+            }
+            else
+             unhandled(message);
+        }
+    };
+
+    public static final Object KeepAliveTick = new Object() {
+        @Override
+        public String toString() {
+            return "KeepAliveTick";
+        }
+    };
 
     public Worker(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval, String workerRole) {
         this.clusterClient = clusterClient;
         this.workerRole = workerRole;
-
-        // build the name of a worker after this format: gatling-worker.podName if running on Kubernetes
-        // or a random string otherwise
-        if (System.getenv("HOSTNAME") == null || !System.getenv("HOSTNAME").contains("-")) {
-            this.workerId = UUID.randomUUID().toString();
-        } else {
-            this.workerId = System.getenv("HOSTNAME").substring(0, System.getenv("HOSTNAME").lastIndexOf("-"));
-        }
         this.host = HostUtils.lookupIp();
         this.workExecutor = getContext().watch(getContext().actorOf(workExecutorProps, "exec"));
         this.registerTask = getContext().system().scheduler().schedule
-            (
-                Duration.Zero(),
-                registerInterval,
-                clusterClient,
-                new ClusterClient.SendToAll("/user/master/singleton",
-                                            new MasterWorkerProtocol.RegisterWorker(workerId)),
-                getContext().dispatcher(),
-                getSelf()
-            );
+                (
+                        Duration.Zero(),
+                        registerInterval,
+                        clusterClient,
+                        new ClusterClient.SendToAll("/user/master/singleton", new MasterWorkerProtocol.RegisterWorker(workerId)),
+                        getContext().dispatcher(),
+                        getSelf()
+                );
         FiniteDuration workTimeout = Duration.create(60, "seconds");
-        this.keepAliveTask = getContext().system().scheduler()
-            .schedule(workTimeout.div(2), workTimeout.div(2), getSelf(), KeepAliveTick, getContext().dispatcher(),
-                      getSelf());
+        this.keepAliveTask = getContext().system().scheduler().schedule(workTimeout.div(2), workTimeout.div(2), getSelf(), KeepAliveTick, getContext().dispatcher(), getSelf());
     }
 
-    public static Props props(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval,
-                              String workerRole) {
+    public static Props props(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval,String workerRole) {
         return Props.create(Worker.class, clusterClient, workExecutorProps, registerInterval, workerRole);
     }
 
-    public static Props props(ActorRef clusterClient, Props workExecutorProps, String workerRole) {
-        return props(clusterClient, workExecutorProps, Duration.create(10, "seconds"), workerRole);
+    public static Props props(ActorRef clusterClient, Props workExecutorProps,String workerRole) {
+        return props(clusterClient, workExecutorProps, Duration.create(10, "seconds"),workerRole);
     }
 
     private String jobId() {
-        if (currentJobId != null) {
+        if (currentJobId!=null)
             return currentJobId;
-        } else {
+        else
             throw new IllegalStateException("Not working");
-        }
     }
 
     @Override
     public SupervisorStrategy supervisorStrategy() {
         return new OneForOneStrategy(-1, Duration.Inf(),
-                 t -> {
-                     log.info("Throwable, Work is failed for1 {}",t);
-                     if (t instanceof ActorInitializationException) {
-                         return stop();
-                     } else if (t instanceof DeathPactException) {
-                         return stop();
-                     } else if (t instanceof RuntimeException) {
-                         if (currentJobId != null) {
-                             log.warning("RuntimeException, Work is failed for workId={}", currentJobId);
-                             sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),
-                                                                              new Result(-1, "", "",
-                                                                                         "",
-                                                                                         null)));
-                         }
-                         getContext().become(receiveBuilder()
-                                                 .matchAny(p -> idle.apply(p))
-                                                 .build());
-                         return restart();
-                     } else if (t instanceof Exception) {
-                         if (currentJobId != null) {
-                             log.warning("Exception, Work is failed for workId={}", currentJobId);
-                             sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),
-                                                                              new Result(-1, "", "",
-                                                                                         "",
-                                                                                         null)));
-                         }
-                         getContext().become(receiveBuilder()
-                                                 .matchAny(p -> idle.apply(p))
-                                                 .build());
-                         return restart();
-                     } else {
-                         log.warning("Throwable, Work is failed for {}", t);
-                         return escalate();
-                     }
-                 }
+                t -> {
+                    log.info("Throwable, Work is failed for1 "+ t);
+                    if (t instanceof ActorInitializationException)
+                        return stop();
+                    else if (t instanceof DeathPactException)
+                        return stop();
+                    else if (t instanceof RuntimeException) {
+                        if (currentJobId!=null) {
+                            log.info("RuntimeException, Work is failed for "+ currentJobId);
+                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Result(-1,"","","",null)));
+                        }
+                        getContext().become(receiveBuilder()
+                                .matchAny(p->idle.apply(p))
+                                .build());
+                        return restart();
+                    }
+                    else if (t instanceof Exception) {
+                        if (currentJobId!=null) {
+                            log.info("Exception, Work is failed for "+ currentJobId);
+                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Result(-1,"","","",null)));
+                        }
+                        getContext().become(receiveBuilder()
+                                .matchAny(p->idle.apply(p))
+                                .build());
+                        return restart();
+                    }
+                    else {
+                        log.info("Throwable, Work is failed for "+ t);
+                        return escalate();
+                    }
+                }
         );
     }
 
@@ -228,7 +213,7 @@ public class Worker extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-            .build();
+                .build();
     }
 
     public void onReceive(Object message) {
@@ -241,28 +226,29 @@ public class Worker extends AbstractActor {
                 sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
                 getContext().setReceiveTimeout(Duration.Undefined());
                 getContext().become(receiveBuilder()
-                                        .matchAny(p -> idle.apply(p))
-                                        .build());
-
+                        .matchAny(p->idle.apply(p))
+                        .build());
             } else if (message instanceof ReceiveTimeout) {
-                log.info("No ack from master, retrying workerId={} for workId={}", workerId ,jobId());
+                log.info("No ack from master, retrying (" + workerId + " -> " + jobId() + ")");
                 sendToMaster(new MasterWorkerProtocol.WorkIsDone(workerId, jobId(), result));
-            } else if (message instanceof KubernetesMaster.AckKubernetes && ((KubernetesMaster.AckKubernetes) message).workId
-                .equals(jobId())) {
-                // don't reconnect to master if work was done on Kubernetes
-                getContext().setReceiveTimeout(Duration.Undefined());
-                log.info("Worker received ack for work done in kubernetes");
             } else {
                 unhandled(message);
             }
         };
     }
 
+    {
+        getContext().become(receiveBuilder()
+                .matchAny(p->idle.apply(p))
+                .build());
+    }
+
     @Override
     public void unhandled(Object message) {
-        if (message == KeepAliveTick) {
+        if(message==KeepAliveTick){
             //do nothing
-        } else if (message instanceof Terminated && ((Terminated) message).getActor().equals(workExecutor)) {
+        }
+        else if (message instanceof Terminated && ((Terminated) message).getActor().equals(workExecutor)) {
             log.info("Received Terminated from exec.");
             getContext().stop(getSelf());
         } else if (message instanceof MasterWorkerProtocol.WorkIsReady) {
@@ -277,7 +263,6 @@ public class Worker extends AbstractActor {
     }
 
     public static final class WorkComplete implements Serializable {
-
         public final Object result;
 
         public WorkComplete(Object result) {
@@ -287,13 +272,12 @@ public class Worker extends AbstractActor {
         @Override
         public String toString() {
             return "WorkComplete{" +
-                   "result=" + result +
-                   '}';
+                    "result=" + result +
+                    '}';
         }
     }
 
     public static final class FileUploadComplete implements Serializable {
-
         public final Master.UploadFile result;
         public final String host;
 
@@ -305,14 +289,13 @@ public class Worker extends AbstractActor {
         @Override
         public String toString() {
             return "FileUploadComplete{" +
-                   "result=" + result +
-                   ", host='" + host + '\'' +
-                   '}';
+                    "result=" + result +
+                    ", host='" + host + '\'' +
+                    '}';
         }
     }
 
     public static final class WorkFailed implements Serializable {
-
         public final Object result;
 
         public WorkFailed(Object result) {
@@ -322,13 +305,12 @@ public class Worker extends AbstractActor {
         @Override
         public String toString() {
             return "WorkFailed{" +
-                   "result=" + result +
-                   '}';
+                    "result=" + result +
+                    '}';
         }
     }
 
     public static final class Result implements Serializable {
-
         public final int result;
         public final String errPath;
         public final String stdPath;
@@ -347,12 +329,12 @@ public class Worker extends AbstractActor {
         @Override
         public String toString() {
             return "Result{" +
-                   "result=" + result +
-                   ", errPath='" + errPath + '\'' +
-                   ", stdPath='" + stdPath + '\'' +
-                   ", metrics='" + metrics + '\'' +
-                   ", job=" + job +
-                   '}';
+                    "result=" + result +
+                    ", errPath='" + errPath + '\'' +
+                    ", stdPath='" + stdPath + '\'' +
+                    ", metrics='" + metrics + '\'' +
+                    ", job=" + job +
+                    '}';
         }
     }
 

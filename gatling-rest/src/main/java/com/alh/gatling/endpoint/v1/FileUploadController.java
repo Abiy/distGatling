@@ -39,7 +39,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
@@ -138,14 +137,6 @@ public class FileUploadController {
                 job.setResourcesFile(resourcesFilePath);
                 job.setFileFullName(packageName);
                 job.setParameterString(getValue(paramMap, "parameter"));
-
-                byte[] decoder = Base64.getDecoder().decode(getValue(paramMap, "kubernetesToken"));
-                String token = new String(decoder);
-                job.setKubernetesToken(token);
-
-                job.setKubernetesUrl(getValue(paramMap, "kubernetesUrl"));
-                job.setKubernetesNamespace(getValue(paramMap,"kubernetesNamespace"));
-
                 log.info("Submitting job: {}", job);
                 Optional<String> tId = serverRepository.submitSimulationJob(job);
                 trackingId = tId.get();

@@ -41,38 +41,30 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class MonitoringConfiguration {
 
-   @Bean
-    public Graphite graphite(@Value("${graphite.host}") String graphiteHost,
-                             @Value("${graphite.port}") int graphitePort,
-                             @Value("${graphite.enable}") String graphiteEnable) {
-       if (graphiteEnable.equalsIgnoreCase("true")) {
-           return new Graphite(
-               new InetSocketAddress(graphiteHost, graphitePort));
-       } else {
-           return null;
-       }
-
+    @Bean
+    public Graphite graphite(@Value("${graphite.host}")
+                             String graphiteHost,
+                             @Value("${graphite.port}")
+                             int graphitePort) {
+        return new Graphite(
+                new InetSocketAddress(graphiteHost, graphitePort));
     }
 
-    @Bean
+    //@Bean
     public GraphiteReporter graphiteReporter(Graphite graphite,
                                              MetricRegistry registry,
-                                             @Value("${graphite.prefix}") String prefix,
-                                             @Value("${graphite.frequency-in-seconds}") long frequencyInSeconds) {
-       if (graphite != null) {
-           GraphiteReporter reporter =
-               GraphiteReporter.forRegistry(registry)
-                   .prefixedWith(prefix + "." + HostUtils.lookupHost())
-                   .convertRatesTo(TimeUnit.SECONDS)
-                   .convertDurationsTo(TimeUnit.MILLISECONDS)
-                   .filter(MetricFilter.ALL)
-                   .build(graphite);
-           reporter.start(frequencyInSeconds, TimeUnit.SECONDS);
+                                             @Value("${graphite.prefix}")
+    										 String prefix,@Value("${graphite.frequency-in-seconds}") long frequencyInSeconds) {
+        GraphiteReporter reporter =
+                GraphiteReporter.forRegistry(registry)
+                        .prefixedWith(prefix + "." + HostUtils.lookupHost())
+                        .convertRatesTo(TimeUnit.SECONDS)
+                        .convertDurationsTo(TimeUnit.MILLISECONDS)
+                        .filter(MetricFilter.ALL)
+                        .build(graphite);
+        reporter.start(frequencyInSeconds, TimeUnit.SECONDS);
 
-           return reporter;
-       } else{
-           return null;
-       }
+        return reporter;
     }
 
     //@Bean
