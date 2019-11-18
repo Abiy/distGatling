@@ -1,7 +1,7 @@
 /*
  *
  *   Copyright 2016 alh Technology
- *
+ *  
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -81,7 +81,7 @@ public class MasterTest  {
         log.setPort(8080);
         agentConfig.setLogServer(log);
         system = startMaster();
-        final Props props = GenericMaster.props(new FiniteDuration(20, TimeUnit.SECONDS), agentConfig);
+        final Props props = Master.props(new FiniteDuration(20, TimeUnit.SECONDS), agentConfig);
         master = system.actorOf(props, "master");
     }
 

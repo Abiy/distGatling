@@ -1,7 +1,7 @@
 /*
  *
  *   Copyright 2016 alh Technology
- *
+ *  
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -26,7 +26,6 @@ import com.codahale.metrics.graphite.GraphiteReporter;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 import com.alh.gatling.commons.HostUtils;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,48 +40,35 @@ import java.util.concurrent.TimeUnit;
 public class MonitoringConfig {
 
     @Bean
-    public Graphite graphite(@Value("${graphite.host}") String graphiteHost,
-                             @Value("${graphite.enable}") String graphiteEnable,
-                             @Value("${graphite.port}") int graphitePort) {
-
-        //enable metrics based on configuration
-        if (graphiteEnable.equalsIgnoreCase("true")) {
-            return new Graphite(
+    public Graphite graphite(@Value("${graphite.host}")  String graphiteHost,
+                             @Value("${graphite.port}")  int graphitePort) {
+        return new Graphite(
                 new InetSocketAddress(graphiteHost, graphitePort));
-        }else {
-            return null;
-        }
-
-    }
-
-    @Bean
-    public GraphiteReporter graphiteReporter(Graphite graphite,
-                                             MetricRegistry registry,
-                                             @Value("${graphite.prefix}") String prefix,
-                                             @Value("${graphite.frequency-in-seconds}") long frequencyInSeconds) {
-        if (graphite != null){
-            GraphiteReporter reporter =
-                GraphiteReporter.forRegistry(registry)
-                    .prefixedWith(prefix + "." + HostUtils.lookupHost())
-                    .convertRatesTo(TimeUnit.SECONDS)
-                    .convertDurationsTo(TimeUnit.MILLISECONDS)
-                    .filter(MetricFilter.ALL)
-                    .build(graphite);
-            reporter.start(frequencyInSeconds, TimeUnit.SECONDS);
-
-            return reporter;
-        } else {
-            return null;
-        }
-
     }
 
     //@Bean
-    public ConsoleReporter consoleReporter(MetricRegistry registry) {
+    public GraphiteReporter graphiteReporter(Graphite graphite,
+                                             MetricRegistry registry,
+                                             @Value("${graphite.prefix}")
+    										 String prefix,@Value("${graphite.frequency-in-seconds}") long frequencyInSeconds) {
+        GraphiteReporter reporter =
+                GraphiteReporter.forRegistry(registry)
+                        .prefixedWith(prefix + "." + HostUtils.lookupHost())
+                        .convertRatesTo(TimeUnit.SECONDS)
+                        .convertDurationsTo(TimeUnit.MILLISECONDS)
+                        .filter(MetricFilter.ALL)
+                        .build(graphite);
+        reporter.start(frequencyInSeconds, TimeUnit.SECONDS);
+
+        return reporter;
+    }
+
+    //@Bean
+    public ConsoleReporter consoleReporter( MetricRegistry registry ) {
         ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
-            .convertRatesTo(TimeUnit.SECONDS)
-            .convertDurationsTo(TimeUnit.MILLISECONDS)
-            .build();
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .build();
         reporter.start(10, TimeUnit.SECONDS);
         return reporter;
     }
@@ -90,16 +76,15 @@ public class MonitoringConfig {
     @Bean
     public MemoryUsageGaugeSet memoryUsageGaugeSet(MetricRegistry registry) {
         MemoryUsageGaugeSet memoryUsageGaugeSet =
-            new MemoryUsageGaugeSet();
+                new MemoryUsageGaugeSet();
         registry.register("memory", memoryUsageGaugeSet);
         return memoryUsageGaugeSet;
     }
-
     @Bean
     public ThreadStatesGaugeSet
     threadStatesGaugeSet(MetricRegistry registry) {
         ThreadStatesGaugeSet threadStatesGaugeSet =
-            new ThreadStatesGaugeSet();
+                new ThreadStatesGaugeSet();
         registry.register("threads", threadStatesGaugeSet);
         return threadStatesGaugeSet;
     }

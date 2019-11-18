@@ -1,7 +1,7 @@
 /*
  *
  *   Copyright 2016 alh Technology
- *
+ *  
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -30,7 +30,7 @@ import com.alh.gatling.domain.WorkerModel;
 
 /**
  * Trivial integration test class that exercises the Junit spring runner and in container testing.
- *
+ * 
  * @author
  *
  */
@@ -39,7 +39,7 @@ public class RestControllerIntTest extends AbstractRestIntTest {
 
     @Value("${security.username}") private String USERNAME;
     @Value("${security.password}") private String PASSWORD;
-
+    
     @Before
     public void setup() {
         BasicAuthorizationInterceptor bai = new BasicAuthorizationInterceptor(USERNAME, PASSWORD);
@@ -51,5 +51,5 @@ public class RestControllerIntTest extends AbstractRestIntTest {
         WorkerModel[] info = template.getForObject(rootUrl+ "/server/info", WorkerModel[].class);
         log.debug(info.toString());
     }
-
+	
 }
