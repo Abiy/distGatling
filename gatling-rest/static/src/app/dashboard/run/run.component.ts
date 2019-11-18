@@ -52,7 +52,7 @@ export class RunComponent  implements OnDestroy, OnInit{
         
         this.uploader = new MultipartUploader({url: this.uploadUrl, authToken: localStorage.getItem('currentUser')});
         this.multipartItem =  new MultipartItem(this.uploader);
-        this.model = { parallelism:1, accessKey:"", packageName:"", partitionName:"", parameter:"", userName:""};
+        this.model = { parallelism:1, accessKey:"", packageName:"", partitionName:"", parameter:"", userName:"", kubernetesNamespace:"dist-gatling"};
         this.upload = () => {
             if (null == this.simulationFile || !this.isValid()){
                 console.error("run.component.ts & upload() form invalid.");
@@ -73,6 +73,7 @@ export class RunComponent  implements OnDestroy, OnInit{
             this.multipartItem.formData.append("accessKey",  this.model.accessKey);
             this.multipartItem.formData.append("resourcesFile",  this.resourcesFile);
             this.multipartItem.formData.append("parameter",  this.model.parameter);
+            this.multipartItem.formData.append("kubernetesNamespace", this.model.kubernetesNamespace);
 
             this.multipartItem.callback = this.uploadCallback;
             this.multipartItem.upload();

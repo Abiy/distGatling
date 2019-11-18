@@ -1,10 +1,10 @@
 <div class="main-content" >
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-9">
                 <div class="card" >
                     <div class="header">
-                        <h4 class="title">Please provide complete information for your performance test.</h4>
+                        <h4 class="title">Please provide complete information for your performance test</h4>
                     </div>
                     <div class="content">
                         <form #simulationForm="ngForm"  novalidate >
@@ -15,6 +15,7 @@
                                         <input #fileInput type="file" name="file" required class="form-control" (change)="selectFile($event)" placeholder="Simulation File" accept=".scala"/>
                                     </div>
                                 </div>
+
                             </div>
                             <div class="row">
                                 <div class="col-md-5">
@@ -71,6 +72,18 @@
                                                {{ partition }}
                                            </option>
                                         </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="'row">
+                                Complete next section just if running on Kubernetes
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Kubernetes Namespace</label>
+                                        <input type="text" name="kubernetesNamespace"  required class="form-control"  [(ngModel)]="model.kubernetesNamespace" placeholder="Kubernetes Namespace">
                                     </div>
                                 </div>
                             </div>

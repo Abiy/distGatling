@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dist-gatling
+  name: graphite-service
+  labels:
+    app: graphite
+    component: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: graphite
+      component: master
+  template:
+    metadata:
+      name: graphite-service
+      labels:
+        app: graphite
+        component: master
+    spec:
+      containers:
+      - name: graphite
+        image: graphite:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        - containerPort: 80
+        - containerPort: 2003
+        - containerPort: 2004
+        - containerPort: 2013
+        - containerPort: 2014
+        - containerPort: 2023
+        - containerPort: 2024
+        - containerPort: 8126
+        - containerPort: 8125

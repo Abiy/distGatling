@@ -57,7 +57,7 @@ After joining the cluster, CW workers are responsible for
 
 Download Gatling bundle as a .zip file [here](http://gatling.io/#/resources/download). Unzip the file in a directory of your choosing. Add a cancel.sh command in the bin directory, suitable for your system, that stops the gatling processes on the workers (example:  `ps ax | grep "uploads$1" | grep -v grep | awk '{print $1}' | xargs kill -9` )
                         
-After cloning or downloading the repository of distGatling ,follow the following steps to start the cluster
+After cloning or downloading the repository of distGatling ,use the following steps to start the cluster
     
     1. Update the application.yml file settings (gatling-rest and gatling-agent)
     
@@ -79,7 +79,7 @@ After cloning or downloading the repository of distGatling ,follow the following
     
     3. Locate the master shell script(under gatling-rest) and run master.sh to start the Cluster Master, take a note of the master ip and port
         
-        /bin/bash master.sh -Dmaster.port=<2551> -Dserver.port=<8080>
+        /bin/bash master.sh -Dmaster.port=<2551> -Dserver.port=<8080> -DCLUSTER_IP=`hostname -i`
         
 
 After starting the master using the above command, point your browser to GET http://localhost:8080/ to access the web page.
@@ -88,7 +88,7 @@ After starting the master using the above command, point your browser to GET htt
     4. Locate the agent shell script(under gatling-agent) and run agent.sh to start the Cluster worker on each node you intend to include in the cluster, each worker should be assigned the correct master contact point
         
         /bin/bash agent.sh -Dakka.contact-points=<MASTER_HOST>:<MASTER_PORT> -Dactor.port=<0> -Dserver.port=<8090>
-
+        
 
 ##  Goal
 
