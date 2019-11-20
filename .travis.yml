@@ -2,6 +2,7 @@ language: java
 dist: xenial
 jdk:
   - oraclejdk8
+  - openjdk8
 
 sudo: false
 script: mvn clean verify -DskipTests=true -Dmaven.javadoc.skip=true -B -V
